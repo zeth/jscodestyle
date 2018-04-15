@@ -28,7 +28,7 @@
  * @customtag This tag is passed as a flag in full_test.py
  * @requires anotherCustomTagPassedInFromFullTestThatShouldAllowASingleWordLongerThan80Lines
  * @requires firstWord, secondWordWhichShouldMakeThisLineTooLongSinceThereIsAFirstWord
- * @wizmodule
+ * @wizmodule // INVALID_JSDOC_TAG
  * @wizModule // INVALID_JSDOC_TAG
  */
 // -4: LINE_TOO_LONG
@@ -85,7 +85,7 @@ function goodTags() {
  *
  * @param {Object} object Good docs.
  * @ngInject
- * @wizaction
+ * @wizaction // INVALID_JSDOC_TAG
  */
 function good(object) {
 }
