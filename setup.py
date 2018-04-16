@@ -19,22 +19,23 @@ try:
 except ImportError:
     from distutils.core import setup
 
-setup(name='closure_linter',
+setup(name='jscodestyle',
       version='2.3.19',
-      description='Closure Linter',
+      description='JSCodeStyle',
       license='Apache',
-      author='The Closure Linter Authors',
-      author_email='opensource@google.com',
-      url='https://github.com/google/closure-linter',
+      author='The JSCodeStyle Authors',
+      author_email='theology@gmail.com',
+      url='https://github.com/zeth/jscodestyle',
       install_requires=['python-gflags'],
-      package_dir={'closure_linter': 'closure_linter'},
-      packages=['closure_linter', 'closure_linter.common'],
+      package_dir={'jscodestyle': 'jscodestyle'},
+      packages=['jscodestyle', 'jscodestyle.common'],
       test_suite="tests",
       entry_points = {
-        'console_scripts': [
-          'gjslint = closure_linter.gjslint:main',
-          'fixjsstyle = closure_linter.fixjsstyle:main'
-        ]
+          'console_scripts': [
+              'jscodestyle = jscodestyle.gjslint:main',
+              'gjslint = jscodestyle.gjslint:main',
+              'fixjsstyle = jscodestyle.fixjsstyle:main'
+          ]
       }
 )
 
