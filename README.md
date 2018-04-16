@@ -11,7 +11,7 @@ After installing, you get two helper applications installed into `/usr/local/bin
 
 ## History
 
-gjslint stands for Google Javascript Linter (I guess?). At some point
+gjslint stands for Google JavaScript Linter (I guess?). At some point
 it was then branded as "Closure Linter", though it was never specific
 to Closure code.
 
