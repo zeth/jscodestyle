@@ -28,7 +28,7 @@ it just reads the code like a human would.
 To take an analogy from the Python world, it is more like pycodestyle
 than pylint.
 
-It still based on ES5, it doesn't yet do anything special for ES6,
+It is still based on ES5, it doesn't yet do anything special for ES6,
 although I hope to change that.
 
 Hopefully, this tool will be useful to people checking their own code,
