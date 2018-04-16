@@ -20,8 +20,8 @@ __author__ = 'nnaze@google.com (Nathan Naze)'
 
 import gflags as flags
 
-from closure_linter import errors
-from closure_linter.common import erroroutput
+from jscodestyle import errors
+from jscodestyle.common import erroroutput
 
 FLAGS = flags.FLAGS
 

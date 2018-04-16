@@ -23,9 +23,9 @@ __author__ = ('nnaze@google.com (Nathan Naze)')
 
 import unittest as googletest
 
-from closure_linter import ecmametadatapass
-from closure_linter import scopeutil
-from closure_linter import testutil
+from jscodestyle import ecmametadatapass
+from jscodestyle import scopeutil
+from jscodestyle import testutil
 
 
 def _FindContexts(start_token):

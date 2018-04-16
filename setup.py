@@ -29,6 +29,7 @@ setup(name='closure_linter',
       install_requires=['python-gflags'],
       package_dir={'closure_linter': 'closure_linter'},
       packages=['closure_linter', 'closure_linter.common'],
+      test_suite="tests",
       entry_points = {
         'console_scripts': [
           'gjslint = closure_linter.gjslint:main',
@@ -36,3 +37,4 @@ setup(name='closure_linter',
         ]
       }
 )
+

@@ -25,11 +25,11 @@ import mox
 
 import unittest as googletest
 
-from closure_linter import errors
-from closure_linter import runner
-from closure_linter.common import error
-from closure_linter.common import errorhandler
-from closure_linter.common import tokens
+from jscodestyle import errors
+from jscodestyle import runner
+from jscodestyle.common import error
+from jscodestyle.common import errorhandler
+from jscodestyle.common import tokens
 
 
 class LimitedDocTest(googletest.TestCase):

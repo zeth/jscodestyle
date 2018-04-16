@@ -19,7 +19,7 @@
 __author__ = ('robbyw@google.com (Robert Walker)',
               'ajp@google.com (Andy Perelson)')
 
-from closure_linter.common import tokens
+from jscodestyle.common import tokens
 
 class JavaScriptTokenType(tokens.TokenType):
   """Enumeration of JavaScript token types, and useful sets of token types."""

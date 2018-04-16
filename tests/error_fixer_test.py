@@ -21,9 +21,9 @@
 
 
 import unittest as googletest
-from closure_linter import error_fixer
-from closure_linter import testutil
-from closure_linter import tokenutil
+from jscodestyle import error_fixer
+from jscodestyle import testutil
+from jscodestyle import tokenutil
 
 
 class ErrorFixerTest(googletest.TestCase):

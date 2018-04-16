@@ -19,7 +19,7 @@
 __author__ = 'robbyw@google.com (Robert Walker)'
 
 import gflags as flags
-from closure_linter import errors
+from jscodestyle import errors
 
 
 FLAGS = flags.FLAGS

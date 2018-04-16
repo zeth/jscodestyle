@@ -24,9 +24,9 @@ __author__ = ('nnaze@google.com (Nathan Naze)')
 
 import unittest as googletest
 
-from closure_linter import javascripttokens
-from closure_linter import statetracker
-from closure_linter import testutil
+from jscodestyle import javascripttokens
+from jscodestyle import statetracker
+from jscodestyle import testutil
 
 
 class _FakeDocFlag(object):

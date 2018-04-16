@@ -17,7 +17,7 @@
 __author__ = 'nnaze@google.com (Nathan Naze)'
 
 import unittest as googletest
-from closure_linter.common import tokens
+from jscodestyle.common import tokens
 
 
 def _CreateDummyToken():

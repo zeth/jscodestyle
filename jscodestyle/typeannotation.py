@@ -4,9 +4,9 @@
 
 
 
-from closure_linter import errors
-from closure_linter import javascripttokens
-from closure_linter.common import error
+from jscodestyle import errors
+from jscodestyle import javascripttokens
+from jscodestyle.common import error
 
 # Shorthand
 TYPE = javascripttokens.JavaScriptTokenType

@@ -21,11 +21,11 @@ import StringIO
 
 import gflags as flags
 import unittest as googletest
-from closure_linter import error_fixer
-from closure_linter import runner
+from jscodestyle import error_fixer
+from jscodestyle import runner
 
 
-_RESOURCE_PREFIX = 'closure_linter/testdata'
+_RESOURCE_PREFIX = 'tests/testdata'
 
 flags.FLAGS.strict = True
 flags.FLAGS.limited_doc_files = ('dummy.js', 'externs.js')

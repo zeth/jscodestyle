@@ -45,10 +45,10 @@ import time
 
 import gflags as flags
 
-from closure_linter import errorrecord
-from closure_linter import runner
-from closure_linter.common import erroraccumulator
-from closure_linter.common import simplefileflags as fileflags
+from jscodestyle import errorrecord
+from jscodestyle import runner
+from jscodestyle.common import erroraccumulator
+from jscodestyle.common import simplefileflags as fileflags
 
 # Attempt import of multiprocessing (should be available in Python 2.6 and up).
 try:

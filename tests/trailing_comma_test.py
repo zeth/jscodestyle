@@ -22,9 +22,9 @@ Tests for trailing commas (ES3) errors
 import gflags as flags
 import unittest as googletest
 
-from closure_linter import errors
-from closure_linter import runner
-from closure_linter.common import erroraccumulator
+from jscodestyle import errors
+from jscodestyle import runner
+from jscodestyle.common import erroraccumulator
 
 flags.FLAGS.check_trailing_comma = True
 class TrailingCommaTest(googletest.TestCase):

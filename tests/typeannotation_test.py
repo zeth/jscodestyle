@@ -6,8 +6,8 @@
 
 import unittest as googletest
 
-from closure_linter import testutil
-from closure_linter.common import erroraccumulator
+from jscodestyle import testutil
+from jscodestyle.common import erroraccumulator
 
 CRAZY_TYPE = ('Array.<!function(new:X,{a:null},...(c|d)):'
               'function(...(Object.<string>))>')

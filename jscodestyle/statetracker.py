@@ -21,10 +21,10 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 
 import re
 
-from closure_linter import javascripttokenizer
-from closure_linter import javascripttokens
-from closure_linter import tokenutil
-from closure_linter import typeannotation
+from jscodestyle import javascripttokenizer
+from jscodestyle import javascripttokens
+from jscodestyle import tokenutil
+from jscodestyle import typeannotation
 
 # Shorthand
 Type = javascripttokens.JavaScriptTokenType

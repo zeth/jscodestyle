@@ -25,18 +25,18 @@ import re
 
 import gflags as flags
 
-from closure_linter import checkerbase
-from closure_linter import ecmametadatapass
-from closure_linter import error_check
-from closure_linter import errorrules
-from closure_linter import errors
-from closure_linter import indentation
-from closure_linter import javascripttokenizer
-from closure_linter import javascripttokens
-from closure_linter import statetracker
-from closure_linter import tokenutil
-from closure_linter.common import error
-from closure_linter.common import position
+from jscodestyle import checkerbase
+from jscodestyle import ecmametadatapass
+from jscodestyle import error_check
+from jscodestyle import errorrules
+from jscodestyle import errors
+from jscodestyle import indentation
+from jscodestyle import javascripttokenizer
+from jscodestyle import javascripttokens
+from jscodestyle import statetracker
+from jscodestyle import tokenutil
+from jscodestyle.common import error
+from jscodestyle.common import position
 
 
 FLAGS = flags.FLAGS

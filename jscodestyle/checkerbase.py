@@ -23,8 +23,8 @@ __author__ = ('robbyw@google.com (Robert Walker)',
               'ajp@google.com (Andy Perelson)',
               'jacobr@google.com (Jacob Richman)')
 
-from closure_linter import errorrules
-from closure_linter.common import error
+from jscodestyle import errorrules
+from jscodestyle.common import error
 
 
 class LintRulesBase(object):

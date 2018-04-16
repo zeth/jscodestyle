@@ -24,12 +24,12 @@ __author__ = 'robbyw@google.com (Robert Walker)'
 import re
 
 import gflags as flags
-from closure_linter import errors
-from closure_linter import javascriptstatetracker
-from closure_linter import javascripttokens
-from closure_linter import requireprovidesorter
-from closure_linter import tokenutil
-from closure_linter.common import errorhandler
+from jscodestyle import errors
+from jscodestyle import javascriptstatetracker
+from jscodestyle import javascripttokens
+from jscodestyle import requireprovidesorter
+from jscodestyle import tokenutil
+from jscodestyle.common import errorhandler
 
 # Shorthand
 Token = javascripttokens.JavaScriptToken

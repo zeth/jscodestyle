@@ -19,13 +19,13 @@
 
 
 import unittest as googletest
-from closure_linter import aliaspass
-from closure_linter import closurizednamespacesinfo
-from closure_linter import ecmametadatapass
-from closure_linter import javascriptstatetracker
-from closure_linter import javascripttokens
-from closure_linter import testutil
-from closure_linter import tokenutil
+from jscodestyle import aliaspass
+from jscodestyle import closurizednamespacesinfo
+from jscodestyle import ecmametadatapass
+from jscodestyle import javascriptstatetracker
+from jscodestyle import javascripttokens
+from jscodestyle import testutil
+from jscodestyle import tokenutil
 
 # pylint: disable=g-bad-name
 TokenType = javascripttokens.JavaScriptTokenType

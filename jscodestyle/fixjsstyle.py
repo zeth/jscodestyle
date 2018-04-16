@@ -23,9 +23,9 @@ import sys
 
 import gflags as flags
 
-from closure_linter import error_fixer
-from closure_linter import runner
-from closure_linter.common import simplefileflags as fileflags
+from jscodestyle import error_fixer
+from jscodestyle import runner
+from jscodestyle.common import simplefileflags as fileflags
 
 FLAGS = flags.FLAGS
 flags.DEFINE_list('additional_extensions', None, 'List of additional file '

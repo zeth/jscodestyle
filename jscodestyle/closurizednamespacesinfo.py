@@ -26,8 +26,8 @@ processed to determine if they constitute the creation or usage of a dependency.
 
 import re
 
-from closure_linter import javascripttokens
-from closure_linter import tokenutil
+from jscodestyle import javascripttokens
+from jscodestyle import tokenutil
 
 # pylint: disable=g-bad-name
 TokenType = javascripttokens.JavaScriptTokenType

@@ -23,9 +23,9 @@ __author__ = ('nnaze@google.com (Nathan Naze)')
 
 import unittest as googletest
 
-from closure_linter import javascripttokens
-from closure_linter import testutil
-from closure_linter import tokenutil
+from jscodestyle import javascripttokens
+from jscodestyle import testutil
+from jscodestyle import tokenutil
 
 
 _FUNCTION_SCRIPT = """\

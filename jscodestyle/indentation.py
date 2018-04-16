@@ -19,12 +19,12 @@ __author__ = ('robbyw@google.com (Robert Walker)')
 
 import gflags as flags
 
-from closure_linter import ecmametadatapass
-from closure_linter import errors
-from closure_linter import javascripttokens
-from closure_linter import tokenutil
-from closure_linter.common import error
-from closure_linter.common import position
+from jscodestyle import ecmametadatapass
+from jscodestyle import errors
+from jscodestyle import javascripttokens
+from jscodestyle import tokenutil
+from jscodestyle.common import error
+from jscodestyle.common import position
 
 
 flags.DEFINE_boolean('debug_indentation', False,

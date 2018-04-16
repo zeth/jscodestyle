@@ -27,7 +27,7 @@ import re
 
 import gflags as flags
 import unittest as googletest
-from closure_linter.common import erroraccumulator
+from jscodestyle.common import erroraccumulator
 
 
 class AnnotatedFileTestCase(googletest.TestCase):

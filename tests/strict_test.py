@@ -25,9 +25,9 @@ import unittest
 import gflags as flags
 import unittest as googletest
 
-from closure_linter import errors
-from closure_linter import runner
-from closure_linter.common import erroraccumulator
+from jscodestyle import errors
+from jscodestyle import runner
+from jscodestyle.common import erroraccumulator
 
 flags.FLAGS.strict = True
 
