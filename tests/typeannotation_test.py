@@ -4,7 +4,7 @@
 
 
 
-import unittest as googletest
+import unittest
 
 from jscodestyle import testutil
 from jscodestyle.common import erroraccumulator
@@ -21,7 +21,7 @@ class TypeErrorException(Exception):
     self.errors = errors
 
 
-class TypeParserTest(googletest.TestCase):
+class TypeParserTest(unittest.TestCase):
   """Tests for typeannotation parsing."""
 
   def _ParseComment(self, script):
@@ -229,5 +229,5 @@ class TypeParserTest(googletest.TestCase):
     self.assertProperReconstruction(newlines, no_spaces)
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()
 

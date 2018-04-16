@@ -22,7 +22,7 @@ __author__ = ('nnaze@google.com (Nathan Naze)')
 
 
 
-import unittest as googletest
+import unittest
 
 from jscodestyle import javascripttokens
 from jscodestyle import statetracker
@@ -35,7 +35,7 @@ class _FakeDocFlag(object):
     return '@%s %s' % (self.flag_type, self.name)
 
 
-class IdentifierTest(googletest.TestCase):
+class IdentifierTest(unittest.TestCase):
 
   def testJustIdentifier(self):
     a = javascripttokens.JavaScriptToken(
@@ -45,7 +45,7 @@ class IdentifierTest(googletest.TestCase):
     st.HandleToken(a, None)
 
 
-class DocCommentTest(googletest.TestCase):
+class DocCommentTest(unittest.TestCase):
 
   @staticmethod
   def _MakeDocFlagFake(flag_type, name=None):
@@ -120,4 +120,4 @@ class DocCommentTest(googletest.TestCase):
     return comments[0]
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

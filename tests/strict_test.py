@@ -23,7 +23,7 @@ Tests errors that can be thrown by gjslint when in strict mode.
 import unittest
 
 import gflags as flags
-import unittest as googletest
+import unittest
 
 from jscodestyle import errors
 from jscodestyle import runner
@@ -64,5 +64,5 @@ class StrictTest(unittest.TestCase):
     self.assertListEqual(error_nums, expected_errors)
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()
 

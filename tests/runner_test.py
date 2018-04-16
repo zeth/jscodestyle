@@ -23,7 +23,7 @@ import StringIO
 import mox
 
 
-import unittest as googletest
+import unittest
 
 from jscodestyle import errors
 from jscodestyle import runner
@@ -32,7 +32,7 @@ from jscodestyle.common import errorhandler
 from jscodestyle.common import tokens
 
 
-class LimitedDocTest(googletest.TestCase):
+class LimitedDocTest(unittest.TestCase):
 
   def testIsLimitedDocCheck(self):
     self.assertTrue(runner._IsLimitedDocCheck('foo_test.js', ['_test.js']))
@@ -44,7 +44,7 @@ class LimitedDocTest(googletest.TestCase):
         'foo_moo.js', ['woof.js', 'quack.js']))
 
 
-class RunnerTest(googletest.TestCase):
+class RunnerTest(unittest.TestCase):
 
   def setUp(self):
     self.mox = mox.Mox()
@@ -98,4 +98,4 @@ function foo () {
 
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

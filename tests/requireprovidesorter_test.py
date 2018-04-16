@@ -18,7 +18,7 @@
 
 
 
-import unittest as googletest
+import unittest
 from jscodestyle import javascripttokens
 from jscodestyle import requireprovidesorter
 from jscodestyle import testutil
@@ -27,7 +27,7 @@ from jscodestyle import testutil
 TokenType = javascripttokens.JavaScriptTokenType
 
 
-class RequireProvideSorterTest(googletest.TestCase):
+class RequireProvideSorterTest(unittest.TestCase):
   """Tests for RequireProvideSorter."""
 
   def testGetFixedProvideString(self):
@@ -152,4 +152,4 @@ class RequireProvideSorterTest(googletest.TestCase):
     return lines
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

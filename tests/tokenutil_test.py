@@ -20,7 +20,7 @@
 
 __author__ = ('nnaze@google.com (Nathan Naze)')
 
-import unittest as googletest
+import unittest
 
 from jscodestyle import ecmametadatapass
 from jscodestyle import javascripttokens
@@ -32,7 +32,7 @@ class FakeToken(object):
   pass
 
 
-class TokenUtilTest(googletest.TestCase):
+class TokenUtilTest(unittest.TestCase):
 
   def testGetTokenRange(self):
 
@@ -294,4 +294,4 @@ start11.abc. middle1.shouldNotBeIdentifier
 
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

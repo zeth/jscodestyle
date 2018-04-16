@@ -18,7 +18,7 @@
 
 
 
-import unittest as googletest
+import unittest
 from jscodestyle import aliaspass
 from jscodestyle import closurizednamespacesinfo
 from jscodestyle import ecmametadatapass
@@ -36,7 +36,7 @@ def _ToLineDict(illegal_alias_stmts):
   return {k: v.line_number for k, v in illegal_alias_stmts.iteritems()}
 
 
-class ClosurizedNamespacesInfoTest(googletest.TestCase):
+class ClosurizedNamespacesInfoTest(unittest.TestCase):
   """Tests for ClosurizedNamespacesInfo."""
 
   _test_cases = {
@@ -870,4 +870,4 @@ class ClosurizedNamespacesInfoTest(googletest.TestCase):
     return testutil.TokenizeSource([line_text])
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

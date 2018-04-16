@@ -21,7 +21,7 @@
 __author__ = ('nnaze@google.com (Nathan Naze)')
 
 
-import unittest as googletest
+import unittest
 
 from jscodestyle import ecmametadatapass
 from jscodestyle import scopeutil
@@ -77,7 +77,7 @@ def _ParseAssignment(script):
   return statement
 
 
-class StatementTest(googletest.TestCase):
+class StatementTest(unittest.TestCase):
 
   def assertAlias(self, expected_match, script):
     statement = _ParseAssignment(script)
@@ -122,7 +122,7 @@ class StatementTest(googletest.TestCase):
         'var foo = goog.require(notastring);')
 
 
-class ScopeBlockTest(googletest.TestCase):
+class ScopeBlockTest(unittest.TestCase):
 
   @staticmethod
   def _GetBlocks(source):
@@ -165,7 +165,7 @@ class ScopeBlockTest(googletest.TestCase):
     self.assertFalse(scopeutil.IsGoogScopeBlock(blocks.pop()))
 
 
-class AliasTest(googletest.TestCase):
+class AliasTest(unittest.TestCase):
 
   def setUp(self):
     self.start_token = testutil.TokenizeSourceAndRunEcmaPass(_TEST_SCRIPT)
@@ -219,4 +219,4 @@ goog.scope(function() {
 """
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

@@ -28,7 +28,7 @@ import sys
 import unittest
 
 import gflags as flags
-import unittest as googletest
+import unittest
 
 from jscodestyle import error_check
 from jscodestyle import errors
@@ -119,4 +119,4 @@ class GJsLintTestSuite(unittest.TestSuite):
 
 if __name__ == '__main__':
   # Don't let main parse args; it happens in the TestSuite.
-  googletest.main(argv=sys.argv[0:1], defaultTest='GJsLintTestSuite')
+  unittest.main(argv=sys.argv[0:1], defaultTest='GJsLintTestSuite')

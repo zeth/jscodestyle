@@ -26,11 +26,11 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 import re
 
 import gflags as flags
-import unittest as googletest
+import unittest
 from jscodestyle.common import erroraccumulator
 
 
-class AnnotatedFileTestCase(googletest.TestCase):
+class AnnotatedFileTestCase(unittest.TestCase):
   """Test case to run a linter against a single file."""
 
   # Matches an all caps letters + underscores error identifer
@@ -50,7 +50,7 @@ class AnnotatedFileTestCase(googletest.TestCase):
       converter: Function taking an error string and returning an error code.
     """
 
-    googletest.TestCase.__init__(self, 'runTest')
+    unittest.TestCase.__init__(self, 'runTest')
     self._filename = filename
     self._messages = []
     self._lint_callable = lint_callable

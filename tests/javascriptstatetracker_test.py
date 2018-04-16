@@ -21,7 +21,7 @@
 __author__ = ('nnaze@google.com (Nathan Naze)')
 
 
-import unittest as googletest
+import unittest
 
 from jscodestyle import javascripttokens
 from jscodestyle import testutil
@@ -57,7 +57,7 @@ var baz = function(ggg, hhh, iii) {
 """
 
 
-class FunctionTest(googletest.TestCase):
+class FunctionTest(unittest.TestCase):
 
   def testFunctionParse(self):
     functions, _ = testutil.ParseFunctionsAndComments(_FUNCTION_SCRIPT)
@@ -165,7 +165,7 @@ class FunctionTest(googletest.TestCase):
 
 
 
-class CommentTest(googletest.TestCase):
+class CommentTest(unittest.TestCase):
 
   def testGetDescription(self):
     comment = self._ParseComment("""
@@ -275,4 +275,4 @@ class CommentTest(googletest.TestCase):
 
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

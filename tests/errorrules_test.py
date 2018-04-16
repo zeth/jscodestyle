@@ -21,7 +21,7 @@ Currently its just verifying that warnings can't be disabled.
 
 
 import gflags as flags
-import unittest as googletest
+import unittest
 
 from jscodestyle import errors
 from jscodestyle import runner
@@ -32,7 +32,7 @@ flags.FLAGS.limited_doc_files = ('dummy.js', 'externs.js')
 flags.FLAGS.closurized_namespaces = ('goog', 'dummy')
 
 
-class ErrorRulesTest(googletest.TestCase):
+class ErrorRulesTest(unittest.TestCase):
   """Test case to for gjslint errorrules."""
 
   def testNoMaxLineLengthFlagExists(self):
@@ -114,4 +114,4 @@ class ErrorRulesTest(googletest.TestCase):
 
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

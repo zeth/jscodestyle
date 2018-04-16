@@ -20,13 +20,13 @@
 
 
 
-import unittest as googletest
+import unittest
 from jscodestyle import error_fixer
 from jscodestyle import testutil
 from jscodestyle import tokenutil
 
 
-class ErrorFixerTest(googletest.TestCase):
+class ErrorFixerTest(unittest.TestCase):
   """Unit tests for error_fixer."""
 
   def setUp(self):
@@ -74,4 +74,4 @@ var x = 3;
 """
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

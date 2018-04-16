@@ -20,7 +20,7 @@
 
 __author__ = ('nnaze@google.com (Nathan Naze)')
 
-import unittest as googletest
+import unittest
 
 from jscodestyle import aliaspass
 from jscodestyle import errors
@@ -35,7 +35,7 @@ def _GetTokenByLineAndString(start_token, string, line_number):
       return token
 
 
-class AliasPassTest(googletest.TestCase):
+class AliasPassTest(unittest.TestCase):
 
   def testInvalidGoogScopeCall(self):
     start_token = testutil.TokenizeSourceAndRunEcmaPass(_TEST_SCOPE_SCRIPT)
@@ -188,4 +188,4 @@ goog.scope(function() {
 
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

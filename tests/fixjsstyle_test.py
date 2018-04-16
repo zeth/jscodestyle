@@ -20,7 +20,7 @@ __author__ = 'robbyw@google.com (Robby Walker)'
 import StringIO
 
 import gflags as flags
-import unittest as googletest
+import unittest
 from jscodestyle import error_fixer
 from jscodestyle import runner
 
@@ -32,7 +32,7 @@ flags.FLAGS.limited_doc_files = ('dummy.js', 'externs.js')
 flags.FLAGS.closurized_namespaces = ('goog', 'dummy')
 
 
-class FixJsStyleTest(googletest.TestCase):
+class FixJsStyleTest(unittest.TestCase):
   """Test case to for gjslint auto-fixing."""
 
   def setUp(self):
@@ -612,4 +612,4 @@ class FixJsStyleTest(googletest.TestCase):
 
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()

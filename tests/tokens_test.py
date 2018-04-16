@@ -16,7 +16,7 @@
 
 __author__ = 'nnaze@google.com (Nathan Naze)'
 
-import unittest as googletest
+import unittest
 from jscodestyle.common import tokens
 
 
@@ -43,7 +43,7 @@ def _SetTokensAsNeighbors(neighbor_tokens):
       neighbor_tokens[i].next = neighbor_tokens[next_index]
 
 
-class TokensTest(googletest.TestCase):
+class TokensTest(unittest.TestCase):
 
   def testIsFirstInLine(self):
 
@@ -110,4 +110,4 @@ class TokensTest(googletest.TestCase):
 
 
 if __name__ == '__main__':
-  googletest.main()
+  unittest.main()
