@@ -32,4 +32,5 @@ It is still based on ES5, it doesn't yet do anything special for ES6,
 although I hope to change that.
 
 Hopefully, this tool will be useful to people checking their own code,
-as well as a sanity check for code review/continuous tools.
+as well as a sanity check for code review and/or continuous
+integration tools.
