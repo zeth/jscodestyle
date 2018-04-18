@@ -37,7 +37,8 @@ class ErrorRulesTest(unittest.TestCase):
 
   def testNoMaxLineLengthFlagExists(self):
     """Tests that --max_line_length flag does not exists."""
-    self.assertTrue('max_line_length' not in flags.FLAGS.FlagDict())
+    flag = flags.FLAGS.FlagDict()['max_line_length'].value
+    self.assertEqual(flag, 80)
 
   def testGetMaxLineLength(self):
     """Tests warning are reported for line greater than 80.
@@ -64,7 +65,8 @@ class ErrorRulesTest(unittest.TestCase):
 
   def testNoDisableFlagExists(self):
     """Tests that --disable flag does not exists."""
-    self.assertTrue('disable' not in flags.FLAGS.FlagDict())
+    flag = flags.FLAGS.FlagDict()['disable'].value
+    self.assertIsNone(flag)
 
   def testWarningsNotDisabled(self):
     """Tests warnings are reported when nothing is disabled.
