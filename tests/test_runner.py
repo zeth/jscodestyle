@@ -15,26 +15,23 @@
 
 """Unit tests for the runner module."""
 
-__author__ = ('nnaze@google.com (Nathan Naze)')
 
 import StringIO
-
-
-import mox
-
-
 import unittest
 
-from jscodestyle import errors
+try:
+    from unittest.mock import MagicMock
+except ImportError:
+    from mock import MagicMock
+
 from jscodestyle import runner
 from jscodestyle.common import error
-from jscodestyle.common import errorhandler
 from jscodestyle.common import tokens
 
 
 class LimitedDocTest(unittest.TestCase):
 
-    def testIsLimitedDocCheck(self):
+    def test_is_limited_doc_check(self):
         self.assertTrue(runner._IsLimitedDocCheck('foo_test.js', ['_test.js']))
         self.assertFalse(runner._IsLimitedDocCheck('foo_bar.js', ['_test.js']))
 
@@ -47,45 +44,34 @@ class LimitedDocTest(unittest.TestCase):
 class RunnerTest(unittest.TestCase):
 
     def setUp(self):
-        self.mox = mox.Mox()
+        self.mock_error_handler = MagicMock()
 
-    def testRunOnMissingFile(self):
-        mock_error_handler = self.mox.CreateMock(errorhandler.ErrorHandler)
+    def test_run_on_missing_file(self):
+        runner.Run('does_not_exist.js', self.mock_error_handler)
 
-        def ValidateError(err):
-            return (isinstance(err, error.Error) and
-                    err.code is errors.FILE_NOT_FOUND and
-                    err.token is None)
+        self.mock_error_handler.HandleFile.assert_called_once_with(
+            'does_not_exist.js', None)
+        self.assertIsInstance(
+            self.mock_error_handler.HandleError.call_args[0][0],
+            error.Error)
+        self.mock_error_handler.FinishFile.assert_called_once()
 
-        mock_error_handler.HandleFile('does_not_exist.js', None)
-        mock_error_handler.HandleError(mox.Func(ValidateError))
-        mock_error_handler.FinishFile()
-
-        self.mox.ReplayAll()
-
-        runner.Run('does_not_exist.js', mock_error_handler)
-
-        self.mox.VerifyAll()
-
-    def testBadTokenization(self):
-        mock_error_handler = self.mox.CreateMock(errorhandler.ErrorHandler)
-
-        def ValidateError(err):
-            return (isinstance(err, error.Error) and
-                    err.code is errors.FILE_IN_BLOCK and
-                    err.token.string == '}')
-
-        mock_error_handler.HandleFile('foo.js', mox.IsA(tokens.Token))
-        mock_error_handler.HandleError(mox.Func(ValidateError))
-        mock_error_handler.HandleError(mox.IsA(error.Error))
-        mock_error_handler.FinishFile()
-
-        self.mox.ReplayAll()
-
+    def test_bad_tokenization(self):
         source = StringIO.StringIO(_BAD_TOKENIZATION_SCRIPT)
-        runner.Run('foo.js', mock_error_handler, source)
+        runner.Run('foo.js', self.mock_error_handler, source)
 
-        self.mox.VerifyAll()
+        #  self.mock_error_handler.HandleFile.assert_called_once_with(
+        #    'foo.js', tokens.Token)
+        self.assertEquals(
+            self.mock_error_handler.HandleFile.call_args[0][0],
+            'foo.js')
+        self.assertIsInstance(
+            self.mock_error_handler.HandleFile.call_args[0][1],
+            tokens.Token)
+        self.assertIsInstance(
+            self.mock_error_handler.HandleError.call_args[0][0],
+            error.Error)
+        self.mock_error_handler.FinishFile.assert_called_once()
 
 
 _BAD_TOKENIZATION_SCRIPT = """
