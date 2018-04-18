@@ -21,19 +21,19 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 
 
 class LintRunner(object):
-  """Interface for a lint running wrapper."""
+    """Interface for a lint running wrapper."""
 
-  def __init__(self):
-    if self.__class__ == LintRunner:
-      raise NotImplementedError('class LintRunner is abstract')
+    def __init__(self):
+        if self.__class__ == LintRunner:
+            raise NotImplementedError('class LintRunner is abstract')
 
-  def Run(self, filenames, error_handler):
-    """Run a linter on the given filenames.
+    def Run(self, filenames, error_handler):
+        """Run a linter on the given filenames.
 
-    Args:
-      filenames: The filenames to check
-      error_handler: An ErrorHandler object
+        Args:
+          filenames: The filenames to check
+          error_handler: An ErrorHandler object
 
-    Returns:
-      The error handler, which may have been used to collect error info.
-    """
+        Returns:
+          The error handler, which may have been used to collect error info.
+        """

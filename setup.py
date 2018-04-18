@@ -38,4 +38,3 @@ setup(name='jscodestyle',
           ]
       }
 )
-

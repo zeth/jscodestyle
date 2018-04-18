@@ -23,30 +23,30 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 
 
 def GetUnixErrorOutput(filename, error, new_error=False):
-  """Get a output line for an error in UNIX format."""
+    """Get a output line for an error in UNIX format."""
 
-  line = ''
+    line = ''
 
-  if error.token:
-    line = '%d' % error.token.line_number
+    if error.token:
+        line = '%d' % error.token.line_number
 
-  error_code = '%04d' % error.code
-  if new_error:
-    error_code = 'New Error ' + error_code
-  return '%s:%s:(%s) %s' % (filename, line, error_code, error.message)
+    error_code = '%04d' % error.code
+    if new_error:
+        error_code = 'New Error ' + error_code
+    return '%s:%s:(%s) %s' % (filename, line, error_code, error.message)
 
 
 def GetErrorOutput(error, new_error=False):
-  """Get a output line for an error in regular format."""
+    """Get a output line for an error in regular format."""
 
-  line = ''
-  if error.token:
-    line = 'Line %d, ' % error.token.line_number
+    line = ''
+    if error.token:
+        line = 'Line %d, ' % error.token.line_number
 
-  code = 'E:%04d' % error.code
+    code = 'E:%04d' % error.code
 
-  error_message = error.message
-  if new_error:
-    error_message = 'New Error ' + error_message
+    error_message = error.message
+    if new_error:
+        error_message = 'New Error ' + error_message
 
-  return '%s%s: %s' % (line, code, error.message)
+    return '%s%s: %s' % (line, code, error.message)

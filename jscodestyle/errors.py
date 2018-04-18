@@ -20,15 +20,15 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 
 
 def ByName(name):
-  """Get the error code for the given error name.
+    """Get the error code for the given error name.
 
-  Args:
-    name: The name of the error
+    Args:
+      name: The name of the error
 
-  Returns:
-    The error code
-  """
-  return globals()[name]
+    Returns:
+      The error code
+    """
+    return globals()[name]
 
 
 # "File-fatal" errors - these errors stop further parsing of a single file

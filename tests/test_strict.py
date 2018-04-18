@@ -33,36 +33,35 @@ flags.FLAGS.strict = True
 
 
 class StrictTest(unittest.TestCase):
-  """Tests scenarios where strict generates warnings."""
+    """Tests scenarios where strict generates warnings."""
 
-  def testUnclosedString(self):
-    """Tests warnings are reported when nothing is disabled.
+    def testUnclosedString(self):
+        """Tests warnings are reported when nothing is disabled.
 
-       b/11450054.
-    """
-    original = [
-        'bug = function() {',
-        '  (\'foo\'\');',
-        '};',
-        '',
-        ]
+           b/11450054.
+        """
+        original = [
+            'bug = function() {',
+            '  (\'foo\'\');',
+            '};',
+            '',
+            ]
 
-    expected = [errors.FILE_DOES_NOT_PARSE, errors.MULTI_LINE_STRING,
-                errors.FILE_IN_BLOCK]
-    self._AssertErrors(original, expected)
+        expected = [errors.FILE_DOES_NOT_PARSE, errors.MULTI_LINE_STRING,
+                    errors.FILE_IN_BLOCK]
+        self._AssertErrors(original, expected)
 
-  def _AssertErrors(self, original, expected_errors):
-    """Asserts that the error fixer corrects original to expected."""
+    def _AssertErrors(self, original, expected_errors):
+        """Asserts that the error fixer corrects original to expected."""
 
-    # Trap gjslint's output parse it to get messages added.
-    error_accumulator = erroraccumulator.ErrorAccumulator()
-    runner.Run('testing.js', error_accumulator, source=original)
-    error_nums = [e.code for e in error_accumulator.GetErrors()]
+        # Trap gjslint's output parse it to get messages added.
+        error_accumulator = erroraccumulator.ErrorAccumulator()
+        runner.Run('testing.js', error_accumulator, source=original)
+        error_nums = [e.code for e in error_accumulator.GetErrors()]
 
-    error_nums.sort()
-    expected_errors.sort()
-    self.assertListEqual(error_nums, expected_errors)
+        error_nums.sort()
+        expected_errors.sort()
+        self.assertListEqual(error_nums, expected_errors)
 
 if __name__ == '__main__':
-  unittest.main()
-
+    unittest.main()

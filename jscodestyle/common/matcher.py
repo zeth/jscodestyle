@@ -28,33 +28,33 @@ Position = position.Position
 
 
 class Matcher(object):
-  """A token matcher.
+    """A token matcher.
 
-  Specifies a pattern to match, the type of token it represents, what mode the
-  token changes to, and what mode the token applies to.
+    Specifies a pattern to match, the type of token it represents, what mode the
+    token changes to, and what mode the token applies to.
 
-  Modes allow more advanced grammars to be incorporated, and are also necessary
-  to tokenize line by line.  We can have different patterns apply to different
-  modes - i.e. looking for documentation while in comment mode.
+    Modes allow more advanced grammars to be incorporated, and are also necessary
+    to tokenize line by line.  We can have different patterns apply to different
+    modes - i.e. looking for documentation while in comment mode.
 
-  Attributes:
-    regex: The regular expression representing this matcher.
-    type: The type of token indicated by a successful match.
-    result_mode: The mode to move to after a successful match.
-  """
-
-  def __init__(self, regex, token_type, result_mode=None, line_start=False):
-    """Create a new matcher template.
-
-    Args:
-      regex: The regular expression to match.
-      token_type: The type of token a successful match indicates.
-      result_mode: What mode to change to after a successful match.  Defaults to
-        None, which means to not change the current mode.
-      line_start: Whether this matcher should only match string at the start
-        of a line.
+    Attributes:
+      regex: The regular expression representing this matcher.
+      type: The type of token indicated by a successful match.
+      result_mode: The mode to move to after a successful match.
     """
-    self.regex = regex
-    self.type = token_type
-    self.result_mode = result_mode
-    self.line_start = line_start
+
+    def __init__(self, regex, token_type, result_mode=None, line_start=False):
+        """Create a new matcher template.
+
+        Args:
+          regex: The regular expression to match.
+          token_type: The type of token a successful match indicates.
+          result_mode: What mode to change to after a successful match.  Defaults to
+            None, which means to not change the current mode.
+          line_start: Whether this matcher should only match string at the start
+            of a line.
+        """
+        self.regex = regex
+        self.type = token_type
+        self.result_mode = result_mode
+        self.line_start = line_start

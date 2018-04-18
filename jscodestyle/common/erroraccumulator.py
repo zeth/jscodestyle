@@ -24,23 +24,23 @@ from jscodestyle.common import errorhandler
 
 
 class ErrorAccumulator(errorhandler.ErrorHandler):
-  """Error handler object that accumulates errors in a list."""
+    """Error handler object that accumulates errors in a list."""
 
-  def __init__(self):
-    self._errors = []
+    def __init__(self):
+        self._errors = []
 
-  def HandleError(self, error):
-    """Append the error to the list.
+    def HandleError(self, error):
+        """Append the error to the list.
 
-    Args:
-      error: The error object
-    """
-    self._errors.append(error)
+        Args:
+          error: The error object
+        """
+        self._errors.append(error)
 
-  def GetErrors(self):
-    """Returns the accumulated errors.
+    def GetErrors(self):
+        """Returns the accumulated errors.
 
-    Returns:
-      A sequence of errors.
-    """
-    return self._errors
+        Returns:
+          A sequence of errors.
+        """
+        return self._errors

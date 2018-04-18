@@ -21,45 +21,45 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 
 
 class Error(object):
-  """Object representing a style error."""
+    """Object representing a style error."""
 
-  def __init__(self, code, message, token=None, position=None, fix_data=None):
-    """Initialize the error object.
+    def __init__(self, code, message, token=None, position=None, fix_data=None):
+        """Initialize the error object.
 
-    Args:
-      code: The numeric error code.
-      message: The error message string.
-      token: The tokens.Token where the error occurred.
-      position: The position of the error within the token.
-      fix_data: Data to be used in autofixing.  Codes with fix_data are:
-          GOOG_REQUIRES_NOT_ALPHABETIZED - List of string value tokens that are
-          class names in goog.requires calls.
-    """
-    self.code = code
-    self.message = message
-    self.token = token
-    self.position = position
-    if token:
-      self.start_index = token.start_index
-    else:
-      self.start_index = 0
-    self.fix_data = fix_data
-    if self.position:
-      self.start_index += self.position.start
+        Args:
+          code: The numeric error code.
+          message: The error message string.
+          token: The tokens.Token where the error occurred.
+          position: The position of the error within the token.
+          fix_data: Data to be used in autofixing.  Codes with fix_data are:
+              GOOG_REQUIRES_NOT_ALPHABETIZED - List of string value tokens that are
+              class names in goog.requires calls.
+        """
+        self.code = code
+        self.message = message
+        self.token = token
+        self.position = position
+        if token:
+            self.start_index = token.start_index
+        else:
+            self.start_index = 0
+        self.fix_data = fix_data
+        if self.position:
+            self.start_index += self.position.start
 
-  def Compare(a, b):
-    """Compare two error objects, by source code order.
+    def Compare(a, b):
+        """Compare two error objects, by source code order.
 
-    Args:
-      a: First error object.
-      b: Second error object.
+        Args:
+          a: First error object.
+          b: Second error object.
 
-    Returns:
-      A Negative/0/Positive number when a is before/the same as/after b.
-    """
-    line_diff = a.token.line_number - b.token.line_number
-    if line_diff:
-      return line_diff
+        Returns:
+          A Negative/0/Positive number when a is before/the same as/after b.
+        """
+        line_diff = a.token.line_number - b.token.line_number
+        if line_diff:
+            return line_diff
 
-    return a.start_index - b.start_index
-  Compare = staticmethod(Compare)
+        return a.start_index - b.start_index
+    Compare = staticmethod(Compare)

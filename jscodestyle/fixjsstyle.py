@@ -35,32 +35,32 @@ flags.DEFINE_boolean('dry_run', False, 'Do not modify the file, only print it.')
 
 
 def main(argv=None):
-  """Main function.
+    """Main function.
 
-  Args:
-    argv: Sequence of command line arguments.
-  """
-  if argv is None:
-    argv = flags.FLAGS(sys.argv)
+    Args:
+      argv: Sequence of command line arguments.
+    """
+    if argv is None:
+        argv = flags.FLAGS(sys.argv)
 
-  suffixes = ['.js']
-  if FLAGS.additional_extensions:
-    suffixes += ['.%s' % ext for ext in FLAGS.additional_extensions]
+    suffixes = ['.js']
+    if FLAGS.additional_extensions:
+        suffixes += ['.%s' % ext for ext in FLAGS.additional_extensions]
 
-  files = fileflags.GetFileList(argv, 'JavaScript', suffixes)
+    files = fileflags.GetFileList(argv, 'JavaScript', suffixes)
 
-  output_buffer = None
-  if FLAGS.dry_run:
-    output_buffer = StringIO.StringIO()
-
-  fixer = error_fixer.ErrorFixer(output_buffer)
-
-  # Check the list of files.
-  for filename in files:
-    runner.Run(filename, fixer)
+    output_buffer = None
     if FLAGS.dry_run:
-      print output_buffer.getvalue()
+        output_buffer = StringIO.StringIO()
+
+    fixer = error_fixer.ErrorFixer(output_buffer)
+
+    # Check the list of files.
+    for filename in files:
+        runner.Run(filename, fixer)
+        if FLAGS.dry_run:
+            print output_buffer.getvalue()
 
 
 if __name__ == '__main__':
-  main()
+    main()

@@ -27,40 +27,40 @@ FLAGS = flags.FLAGS
 
 
 class ErrorRecord(object):
-  """Record-keeping struct that can be serialized back from a process.
+    """Record-keeping struct that can be serialized back from a process.
 
-  Attributes:
-    path: Path to the file.
-    error_string: Error string for the user.
-    new_error: Whether this is a "new error" (see errors.NEW_ERRORS).
-  """
+    Attributes:
+      path: Path to the file.
+      error_string: Error string for the user.
+      new_error: Whether this is a "new error" (see errors.NEW_ERRORS).
+    """
 
-  def __init__(self, path, error_string, new_error):
-    self.path = path
-    self.error_string = error_string
-    self.new_error = new_error
+    def __init__(self, path, error_string, new_error):
+        self.path = path
+        self.error_string = error_string
+        self.new_error = new_error
 
 
 def MakeErrorRecord(path, error):
-  """Make an error record with correctly formatted error string.
+    """Make an error record with correctly formatted error string.
 
-  Errors are not able to be serialized (pickled) over processes because of
-  their pointers to the complex token/context graph.  We use an intermediary
-  serializable class to pass back just the relevant information.
+    Errors are not able to be serialized (pickled) over processes because of
+    their pointers to the complex token/context graph.  We use an intermediary
+    serializable class to pass back just the relevant information.
 
-  Args:
-    path: Path of file the error was found in.
-    error: An error.Error instance.
+    Args:
+      path: Path of file the error was found in.
+      error: An error.Error instance.
 
-  Returns:
-    _ErrorRecord instance.
-  """
-  new_error = error.code in errors.NEW_ERRORS
+    Returns:
+      _ErrorRecord instance.
+    """
+    new_error = error.code in errors.NEW_ERRORS
 
-  if FLAGS.unix_mode:
-    error_string = erroroutput.GetUnixErrorOutput(
-        path, error, new_error=new_error)
-  else:
-    error_string = erroroutput.GetErrorOutput(error, new_error=new_error)
+    if FLAGS.unix_mode:
+        error_string = erroroutput.GetUnixErrorOutput(
+            path, error, new_error=new_error)
+    else:
+        error_string = erroroutput.GetErrorOutput(error, new_error=new_error)
 
-  return ErrorRecord(path, error_string, new_error)
+    return ErrorRecord(path, error_string, new_error)

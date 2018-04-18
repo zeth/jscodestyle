@@ -31,93 +31,93 @@ from jscodestyle import testutil
 
 class _FakeDocFlag(object):
 
-  def __repr__(self):
-    return '@%s %s' % (self.flag_type, self.name)
+    def __repr__(self):
+        return '@%s %s' % (self.flag_type, self.name)
 
 
 class IdentifierTest(unittest.TestCase):
 
-  def testJustIdentifier(self):
-    a = javascripttokens.JavaScriptToken(
-        'abc', javascripttokens.JavaScriptTokenType.IDENTIFIER, 'abc', 1)
+    def testJustIdentifier(self):
+        a = javascripttokens.JavaScriptToken(
+            'abc', javascripttokens.JavaScriptTokenType.IDENTIFIER, 'abc', 1)
 
-    st = statetracker.StateTracker()
-    st.HandleToken(a, None)
+        st = statetracker.StateTracker()
+        st.HandleToken(a, None)
 
 
 class DocCommentTest(unittest.TestCase):
 
-  @staticmethod
-  def _MakeDocFlagFake(flag_type, name=None):
-    flag = _FakeDocFlag()
-    flag.flag_type = flag_type
-    flag.name = name
-    return flag
+    @staticmethod
+    def _MakeDocFlagFake(flag_type, name=None):
+        flag = _FakeDocFlag()
+        flag.flag_type = flag_type
+        flag.name = name
+        return flag
 
-  def testDocFlags(self):
-    comment = statetracker.DocComment(None)
+    def testDocFlags(self):
+        comment = statetracker.DocComment(None)
 
-    a = self._MakeDocFlagFake('param', 'foo')
-    comment.AddFlag(a)
+        a = self._MakeDocFlagFake('param', 'foo')
+        comment.AddFlag(a)
 
-    b = self._MakeDocFlagFake('param', '')
-    comment.AddFlag(b)
+        b = self._MakeDocFlagFake('param', '')
+        comment.AddFlag(b)
 
-    c = self._MakeDocFlagFake('param', 'bar')
-    comment.AddFlag(c)
+        c = self._MakeDocFlagFake('param', 'bar')
+        comment.AddFlag(c)
 
-    self.assertEquals(
-        ['foo', 'bar'],
-        comment.ordered_params)
+        self.assertEquals(
+            ['foo', 'bar'],
+            comment.ordered_params)
 
-    self.assertEquals(
-        [a, b, c],
-        comment.GetDocFlags())
+        self.assertEquals(
+            [a, b, c],
+            comment.GetDocFlags())
 
-  def testInvalidate(self):
-    comment = statetracker.DocComment(None)
+    def testInvalidate(self):
+        comment = statetracker.DocComment(None)
 
-    self.assertFalse(comment.invalidated)
-    self.assertFalse(comment.IsInvalidated())
+        self.assertFalse(comment.invalidated)
+        self.assertFalse(comment.IsInvalidated())
 
-    comment.Invalidate()
+        comment.Invalidate()
 
-    self.assertTrue(comment.invalidated)
-    self.assertTrue(comment.IsInvalidated())
+        self.assertTrue(comment.invalidated)
+        self.assertTrue(comment.IsInvalidated())
 
-  def testSuppressionOnly(self):
-    comment = statetracker.DocComment(None)
+    def testSuppressionOnly(self):
+        comment = statetracker.DocComment(None)
 
-    self.assertFalse(comment.SuppressionOnly())
-    comment.AddFlag(self._MakeDocFlagFake('suppress'))
-    self.assertTrue(comment.SuppressionOnly())
-    comment.AddFlag(self._MakeDocFlagFake('foo'))
-    self.assertFalse(comment.SuppressionOnly())
+        self.assertFalse(comment.SuppressionOnly())
+        comment.AddFlag(self._MakeDocFlagFake('suppress'))
+        self.assertTrue(comment.SuppressionOnly())
+        comment.AddFlag(self._MakeDocFlagFake('foo'))
+        self.assertFalse(comment.SuppressionOnly())
 
-  def testRepr(self):
-    comment = statetracker.DocComment(None)
-    comment.AddFlag(self._MakeDocFlagFake('param', 'foo'))
-    comment.AddFlag(self._MakeDocFlagFake('param', 'bar'))
+    def testRepr(self):
+        comment = statetracker.DocComment(None)
+        comment.AddFlag(self._MakeDocFlagFake('param', 'foo'))
+        comment.AddFlag(self._MakeDocFlagFake('param', 'bar'))
 
-    self.assertEquals(
-        '<DocComment: [\'foo\', \'bar\'], [@param foo, @param bar]>',
-        repr(comment))
+        self.assertEquals(
+            '<DocComment: [\'foo\', \'bar\'], [@param foo, @param bar]>',
+            repr(comment))
 
-  def testDocFlagParam(self):
-    comment = self._ParseComment("""
-    /**
-     * @param {string} [name] Name of customer.
-     */""")
-    flag = comment.GetFlag('param')
-    self.assertEquals('string', flag.type)
-    self.assertEquals('string', flag.jstype.ToString())
-    self.assertEquals('[name]', flag.name)
+    def testDocFlagParam(self):
+        comment = self._ParseComment("""
+        /**
+         * @param {string} [name] Name of customer.
+         */""")
+        flag = comment.GetFlag('param')
+        self.assertEquals('string', flag.type)
+        self.assertEquals('string', flag.jstype.ToString())
+        self.assertEquals('[name]', flag.name)
 
-  def _ParseComment(self, script):
-    """Parse a script that contains one comment and return it."""
-    _, comments = testutil.ParseFunctionsAndComments(script)
-    self.assertEquals(1, len(comments))
-    return comments[0]
+    def _ParseComment(self, script):
+        """Parse a script that contains one comment and return it."""
+        _, comments = testutil.ParseFunctionsAndComments(script)
+        self.assertEquals(1, len(comments))
+        return comments[0]
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

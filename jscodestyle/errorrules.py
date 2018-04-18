@@ -35,38 +35,38 @@ disabled_error_nums = None
 
 
 def GetMaxLineLength():
-  """Returns allowed maximum length of line.
+    """Returns allowed maximum length of line.
 
-  Returns:
-    Length of line allowed without any warning.
-  """
-  return FLAGS.max_line_length
+    Returns:
+      Length of line allowed without any warning.
+    """
+    return FLAGS.max_line_length
 
 
 def ShouldReportError(error):
-  """Whether the given error should be reported.
+    """Whether the given error should be reported.
 
-  Returns:
-    True for all errors except missing documentation errors and disabled
-    errors.  For missing documentation, it returns the value of the
-    jsdoc flag.
-  """
-  global disabled_error_nums
-  if disabled_error_nums is None:
-    disabled_error_nums = []
-    if FLAGS.disable:
-      for error_str in FLAGS.disable:
-        error_num = 0
-        try:
-          error_num = int(error_str)
-        except ValueError:
-          pass
-        disabled_error_nums.append(error_num)
+    Returns:
+      True for all errors except missing documentation errors and disabled
+      errors.  For missing documentation, it returns the value of the
+      jsdoc flag.
+    """
+    global disabled_error_nums
+    if disabled_error_nums is None:
+        disabled_error_nums = []
+        if FLAGS.disable:
+            for error_str in FLAGS.disable:
+                error_num = 0
+                try:
+                    error_num = int(error_str)
+                except ValueError:
+                    pass
+                disabled_error_nums.append(error_num)
 
-  return ((FLAGS.jsdoc or error not in (
-      errors.MISSING_PARAMETER_DOCUMENTATION,
-      errors.MISSING_RETURN_DOCUMENTATION,
-      errors.MISSING_MEMBER_DOCUMENTATION,
-      errors.MISSING_PRIVATE,
-      errors.MISSING_JSDOC_TAG_THIS)) and
-          (not FLAGS.disable or error not in disabled_error_nums))
+    return ((FLAGS.jsdoc or error not in (
+        errors.MISSING_PARAMETER_DOCUMENTATION,
+        errors.MISSING_RETURN_DOCUMENTATION,
+        errors.MISSING_MEMBER_DOCUMENTATION,
+        errors.MISSING_PRIVATE,
+        errors.MISSING_JSDOC_TAG_THIS)) and
+            (not FLAGS.disable or error not in disabled_error_nums))

@@ -26,36 +26,36 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 
 
 class ErrorHandler(object):
-  """Error handler interface."""
+    """Error handler interface."""
 
-  def __init__(self):
-    if self.__class__ == ErrorHandler:
-      raise NotImplementedError('class ErrorHandler is abstract')
+    def __init__(self):
+        if self.__class__ == ErrorHandler:
+            raise NotImplementedError('class ErrorHandler is abstract')
 
-  def HandleFile(self, filename, first_token):
-    """Notifies this ErrorHandler that subsequent errors are in filename.
+    def HandleFile(self, filename, first_token):
+        """Notifies this ErrorHandler that subsequent errors are in filename.
 
-    Args:
-      filename: The file being linted.
-      first_token: The first token of the file.
-    """
+        Args:
+          filename: The file being linted.
+          first_token: The first token of the file.
+        """
 
-  def HandleError(self, error):
-    """Append the error to the list.
+    def HandleError(self, error):
+        """Append the error to the list.
 
-    Args:
-      error: The error object
-    """
+        Args:
+          error: The error object
+        """
 
-  def FinishFile(self):
-    """Finishes handling the current file.
+    def FinishFile(self):
+        """Finishes handling the current file.
 
-    Should be called after all errors in a file have been handled.
-    """
+        Should be called after all errors in a file have been handled.
+        """
 
-  def GetErrors(self):
-    """Returns the accumulated errors.
+    def GetErrors(self):
+        """Returns the accumulated errors.
 
-    Returns:
-      A sequence of errors.
-    """
+        Returns:
+          A sequence of errors.
+        """

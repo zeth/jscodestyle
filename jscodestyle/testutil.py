@@ -29,66 +29,66 @@ from jscodestyle import javascripttokenizer
 
 
 def TokenizeSource(source):
-  """Convert a source into a string of tokens.
+    """Convert a source into a string of tokens.
 
-  Args:
-    source: A source file as a string or file-like object (iterates lines).
+    Args:
+      source: A source file as a string or file-like object (iterates lines).
 
-  Returns:
-    The first token of the resulting token stream.
-  """
+    Returns:
+      The first token of the resulting token stream.
+    """
 
-  if isinstance(source, basestring):
-    source = StringIO.StringIO(source)
+    if isinstance(source, basestring):
+        source = StringIO.StringIO(source)
 
-  tokenizer = javascripttokenizer.JavaScriptTokenizer()
-  return tokenizer.TokenizeFile(source)
+    tokenizer = javascripttokenizer.JavaScriptTokenizer()
+    return tokenizer.TokenizeFile(source)
 
 
 def TokenizeSourceAndRunEcmaPass(source):
-  """Tokenize a source and run the EcmaMetaDataPass on it.
+    """Tokenize a source and run the EcmaMetaDataPass on it.
 
-  Args:
-    source: A source file as a string or file-like object (iterates lines).
+    Args:
+      source: A source file as a string or file-like object (iterates lines).
 
-  Returns:
-    The first token of the resulting token stream.
-  """
-  start_token = TokenizeSource(source)
-  ecma_pass = ecmametadatapass.EcmaMetaDataPass()
-  ecma_pass.Process(start_token)
-  return start_token
+    Returns:
+      The first token of the resulting token stream.
+    """
+    start_token = TokenizeSource(source)
+    ecma_pass = ecmametadatapass.EcmaMetaDataPass()
+    ecma_pass.Process(start_token)
+    return start_token
 
 
 def ParseFunctionsAndComments(source, error_handler=None):
-  """Run the tokenizer and tracker and return comments and functions found.
+    """Run the tokenizer and tracker and return comments and functions found.
 
-  Args:
-    source: A source file as a string or file-like object (iterates lines).
-    error_handler: An error handler.
+    Args:
+      source: A source file as a string or file-like object (iterates lines).
+      error_handler: An error handler.
 
-  Returns:
-    The functions and comments as a tuple.
-  """
-  start_token = TokenizeSourceAndRunEcmaPass(source)
+    Returns:
+      The functions and comments as a tuple.
+    """
+    start_token = TokenizeSourceAndRunEcmaPass(source)
 
-  tracker = javascriptstatetracker.JavaScriptStateTracker()
-  if error_handler is not None:
-    tracker.DocFlagPass(start_token, error_handler)
+    tracker = javascriptstatetracker.JavaScriptStateTracker()
+    if error_handler is not None:
+        tracker.DocFlagPass(start_token, error_handler)
 
-  functions = []
-  comments = []
-  for token in start_token:
-    tracker.HandleToken(token, tracker.GetLastNonSpaceToken())
+    functions = []
+    comments = []
+    for token in start_token:
+        tracker.HandleToken(token, tracker.GetLastNonSpaceToken())
 
-    function = tracker.GetFunction()
-    if function and function not in functions:
-      functions.append(function)
+        function = tracker.GetFunction()
+        if function and function not in functions:
+            functions.append(function)
 
-    comment = tracker.GetDocComment()
-    if comment and comment not in comments:
-      comments.append(comment)
+        comment = tracker.GetDocComment()
+        if comment and comment not in comments:
+            comments.append(comment)
 
-    tracker.HandleAfterToken(token)
+        tracker.HandleAfterToken(token)
 
-  return functions, comments
+    return functions, comments

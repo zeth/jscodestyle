@@ -31,85 +31,85 @@ from jscodestyle.common import erroraccumulator
 
 
 class AnnotatedFileTestCase(unittest.TestCase):
-  """Test case to run a linter against a single file."""
+    """Test case to run a linter against a single file."""
 
-  # Matches an all caps letters + underscores error identifer
-  _MESSAGE = {'msg': '[A-Z][A-Z_]+'}
-  # Matches a //, followed by an optional line number with a +/-, followed by a
-  # list of message IDs. Used to extract expected messages from testdata files.
-  # TODO(robbyw): Generalize to use different commenting patterns.
-  _EXPECTED_RE = re.compile(r'\s*//\s*(?:(?P<line>[+-]?[0-9]+):)?'
-                            r'\s*(?P<msgs>%(msg)s(?:,\s*%(msg)s)*)' % _MESSAGE)
+    # Matches an all caps letters + underscores error identifer
+    _MESSAGE = {'msg': '[A-Z][A-Z_]+'}
+    # Matches a //, followed by an optional line number with a +/-, followed by a
+    # list of message IDs. Used to extract expected messages from testdata files.
+    # TODO(robbyw): Generalize to use different commenting patterns.
+    _EXPECTED_RE = re.compile(r'\s*//\s*(?:(?P<line>[+-]?[0-9]+):)?'
+                              r'\s*(?P<msgs>%(msg)s(?:,\s*%(msg)s)*)' % _MESSAGE)
 
-  def __init__(self, filename, lint_callable, converter):
-    """Create a single file lint test case.
+    def __init__(self, filename, lint_callable, converter):
+        """Create a single file lint test case.
 
-    Args:
-      filename: Filename to test.
-      lint_callable: Callable that lints a file.  This is usually runner.Run().
-      converter: Function taking an error string and returning an error code.
-    """
+        Args:
+          filename: Filename to test.
+          lint_callable: Callable that lints a file.  This is usually runner.Run().
+          converter: Function taking an error string and returning an error code.
+        """
 
-    unittest.TestCase.__init__(self, 'runTest')
-    self._filename = filename
-    self._messages = []
-    self._lint_callable = lint_callable
-    self._converter = converter
+        unittest.TestCase.__init__(self, 'runTest')
+        self._filename = filename
+        self._messages = []
+        self._lint_callable = lint_callable
+        self._converter = converter
 
-  def setUp(self):
-    flags.FLAGS.dot_on_next_line = True
+    def setUp(self):
+        flags.FLAGS.dot_on_next_line = True
 
-  def tearDown(self):
-    flags.FLAGS.dot_on_next_line = False
+    def tearDown(self):
+        flags.FLAGS.dot_on_next_line = False
 
-  def shortDescription(self):
-    """Provides a description for the test."""
-    return 'Run linter on %s' % self._filename
+    def shortDescription(self):
+        """Provides a description for the test."""
+        return 'Run linter on %s' % self._filename
 
-  def runTest(self):
-    """Runs the test."""
-    try:
-      filename = self._filename
-      stream = open(filename)
-    except IOError as ex:
-      raise IOError('Could not find testdata resource for %s: %s' %
-                    (self._filename, ex))
+    def runTest(self):
+        """Runs the test."""
+        try:
+            filename = self._filename
+            stream = open(filename)
+        except IOError as ex:
+            raise IOError('Could not find testdata resource for %s: %s' %
+                          (self._filename, ex))
 
-    expected = self._GetExpectedMessages(stream)
-    got = self._ProcessFileAndGetMessages(filename)
-    self.assertEqual(expected, got)
+        expected = self._GetExpectedMessages(stream)
+        got = self._ProcessFileAndGetMessages(filename)
+        self.assertEqual(expected, got)
 
-  def _GetExpectedMessages(self, stream):
-    """Parse a file and get a sorted list of expected messages."""
-    messages = []
-    for i, line in enumerate(stream):
-      match = self._EXPECTED_RE.search(line)
-      if match:
-        line = match.group('line')
-        msg_ids = match.group('msgs')
-        if line is None:
-          line = i + 1
-        elif line.startswith('+') or line.startswith('-'):
-          line = i + 1 + int(line)
-        else:
-          line = int(line)
-        for msg_id in msg_ids.split(','):
-          # Ignore a spurious message from the license preamble.
-          if msg_id != 'WITHOUT':
-            messages.append((line, self._converter(msg_id.strip())))
-    stream.seek(0)
-    messages.sort()
-    return messages
+    def _GetExpectedMessages(self, stream):
+        """Parse a file and get a sorted list of expected messages."""
+        messages = []
+        for i, line in enumerate(stream):
+            match = self._EXPECTED_RE.search(line)
+            if match:
+                line = match.group('line')
+                msg_ids = match.group('msgs')
+                if line is None:
+                    line = i + 1
+                elif line.startswith('+') or line.startswith('-'):
+                    line = i + 1 + int(line)
+                else:
+                    line = int(line)
+                for msg_id in msg_ids.split(','):
+                    # Ignore a spurious message from the license preamble.
+                    if msg_id != 'WITHOUT':
+                        messages.append((line, self._converter(msg_id.strip())))
+        stream.seek(0)
+        messages.sort()
+        return messages
 
-  def _ProcessFileAndGetMessages(self, filename):
-    """Trap gjslint's output parse it to get messages added."""
-    error_accumulator = erroraccumulator.ErrorAccumulator()
-    self._lint_callable(filename, error_accumulator)
+    def _ProcessFileAndGetMessages(self, filename):
+        """Trap gjslint's output parse it to get messages added."""
+        error_accumulator = erroraccumulator.ErrorAccumulator()
+        self._lint_callable(filename, error_accumulator)
 
-    errors = error_accumulator.GetErrors()
+        errors = error_accumulator.GetErrors()
 
-    # Convert to expected tuple format.
+        # Convert to expected tuple format.
 
-    error_msgs = [(error.token.line_number, error.code) for error in errors]
-    error_msgs.sort()
-    return error_msgs
+        error_msgs = [(error.token.line_number, error.code) for error in errors]
+        error_msgs.sort()
+        return error_msgs

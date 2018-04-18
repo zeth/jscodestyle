@@ -25,31 +25,31 @@ FLAGS = flags.FLAGS
 
 
 class Rule(object):
-  """Different rules to check."""
+    """Different rules to check."""
 
-  # Documentations for specific rules goes in flag definition.
-  BLANK_LINES_AT_TOP_LEVEL = 'blank_lines_at_top_level'
-  INDENTATION = 'indentation'
-  WELL_FORMED_AUTHOR = 'well_formed_author'
-  NO_BRACES_AROUND_INHERIT_DOC = 'no_braces_around_inherit_doc'
-  BRACES_AROUND_TYPE = 'braces_around_type'
-  OPTIONAL_TYPE_MARKER = 'optional_type_marker'
-  VARIABLE_ARG_MARKER = 'variable_arg_marker'
-  UNUSED_PRIVATE_MEMBERS = 'unused_private_members'
-  UNUSED_LOCAL_VARIABLES = 'unused_local_variables'
+    # Documentations for specific rules goes in flag definition.
+    BLANK_LINES_AT_TOP_LEVEL = 'blank_lines_at_top_level'
+    INDENTATION = 'indentation'
+    WELL_FORMED_AUTHOR = 'well_formed_author'
+    NO_BRACES_AROUND_INHERIT_DOC = 'no_braces_around_inherit_doc'
+    BRACES_AROUND_TYPE = 'braces_around_type'
+    OPTIONAL_TYPE_MARKER = 'optional_type_marker'
+    VARIABLE_ARG_MARKER = 'variable_arg_marker'
+    UNUSED_PRIVATE_MEMBERS = 'unused_private_members'
+    UNUSED_LOCAL_VARIABLES = 'unused_local_variables'
 
-  # Rule to raise all known errors.
-  ALL = 'all'
+    # Rule to raise all known errors.
+    ALL = 'all'
 
-  # All rules that are to be checked when using the strict flag. E.g. the rules
-  # that are specific to the stricter Closure style.
-  CLOSURE_RULES = frozenset([BLANK_LINES_AT_TOP_LEVEL,
-                             INDENTATION,
-                             WELL_FORMED_AUTHOR,
-                             NO_BRACES_AROUND_INHERIT_DOC,
-                             BRACES_AROUND_TYPE,
-                             OPTIONAL_TYPE_MARKER,
-                             VARIABLE_ARG_MARKER])
+    # All rules that are to be checked when using the strict flag. E.g. the rules
+    # that are specific to the stricter Closure style.
+    CLOSURE_RULES = frozenset([BLANK_LINES_AT_TOP_LEVEL,
+                               INDENTATION,
+                               WELL_FORMED_AUTHOR,
+                               NO_BRACES_AROUND_INHERIT_DOC,
+                               BRACES_AROUND_TYPE,
+                               OPTIONAL_TYPE_MARKER,
+                               VARIABLE_ARG_MARKER])
 
 
 flags.DEFINE_boolean('strict', False,
@@ -78,20 +78,20 @@ flags.DEFINE_multistring('jslint_error', [],
 
 
 def ShouldCheck(rule):
-  """Returns whether the optional rule should be checked.
+    """Returns whether the optional rule should be checked.
 
-  Computes different flags (strict, jslint_error, jslint_noerror) to find out if
-  this specific rule should be checked.
+    Computes different flags (strict, jslint_error, jslint_noerror) to find out if
+    this specific rule should be checked.
 
-  Args:
-    rule: Name of the rule (see Rule).
+    Args:
+      rule: Name of the rule (see Rule).
 
-  Returns:
-    True if the rule should be checked according to the flags, otherwise False.
-  """
-  if 'no_' + rule in FLAGS.jslint_error:
-    return False
-  if rule in FLAGS.jslint_error or Rule.ALL in FLAGS.jslint_error:
-    return True
-  # Checks strict rules.
-  return FLAGS.strict and rule in Rule.CLOSURE_RULES
+    Returns:
+      True if the rule should be checked according to the flags, otherwise False.
+    """
+    if 'no_' + rule in FLAGS.jslint_error:
+        return False
+    if rule in FLAGS.jslint_error or Rule.ALL in FLAGS.jslint_error:
+        return True
+    # Checks strict rules.
+    return FLAGS.strict and rule in Rule.CLOSURE_RULES

@@ -28,128 +28,128 @@ TokenType = javascripttokens.JavaScriptTokenType
 
 
 class RequireProvideSorterTest(unittest.TestCase):
-  """Tests for RequireProvideSorter."""
+    """Tests for RequireProvideSorter."""
 
-  def testGetFixedProvideString(self):
-    """Tests that fixed string constains proper comments also."""
-    input_lines = [
-        'goog.provide(\'package.xyz\');',
-        '/** @suppress {extraprovide} **/',
-        'goog.provide(\'package.abcd\');'
-    ]
+    def testGetFixedProvideString(self):
+        """Tests that fixed string constains proper comments also."""
+        input_lines = [
+            'goog.provide(\'package.xyz\');',
+            '/** @suppress {extraprovide} **/',
+            'goog.provide(\'package.abcd\');'
+        ]
 
-    expected_lines = [
-        '/** @suppress {extraprovide} **/',
-        'goog.provide(\'package.abcd\');',
-        'goog.provide(\'package.xyz\');'
-    ]
+        expected_lines = [
+            '/** @suppress {extraprovide} **/',
+            'goog.provide(\'package.abcd\');',
+            'goog.provide(\'package.xyz\');'
+        ]
 
-    token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
+        token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
 
-    sorter = requireprovidesorter.RequireProvideSorter()
-    fixed_provide_string = sorter.GetFixedProvideString(token)
+        sorter = requireprovidesorter.RequireProvideSorter()
+        fixed_provide_string = sorter.GetFixedProvideString(token)
 
-    self.assertEquals(expected_lines, fixed_provide_string.splitlines())
+        self.assertEquals(expected_lines, fixed_provide_string.splitlines())
 
-  def testGetFixedRequireString(self):
-    """Tests that fixed string constains proper comments also."""
-    input_lines = [
-        'goog.require(\'package.xyz\');',
-        '/** This is needed for scope. **/',
-        'goog.require(\'package.abcd\');'
-    ]
+    def testGetFixedRequireString(self):
+        """Tests that fixed string constains proper comments also."""
+        input_lines = [
+            'goog.require(\'package.xyz\');',
+            '/** This is needed for scope. **/',
+            'goog.require(\'package.abcd\');'
+        ]
 
-    expected_lines = [
-        '/** This is needed for scope. **/',
-        'goog.require(\'package.abcd\');',
-        'goog.require(\'package.xyz\');'
-    ]
+        expected_lines = [
+            '/** This is needed for scope. **/',
+            'goog.require(\'package.abcd\');',
+            'goog.require(\'package.xyz\');'
+        ]
 
-    token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
+        token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
 
-    sorter = requireprovidesorter.RequireProvideSorter()
-    fixed_require_string = sorter.GetFixedRequireString(token)
+        sorter = requireprovidesorter.RequireProvideSorter()
+        fixed_require_string = sorter.GetFixedRequireString(token)
 
-    self.assertEquals(expected_lines, fixed_require_string.splitlines())
+        self.assertEquals(expected_lines, fixed_require_string.splitlines())
 
-  def testFixRequires_removeBlankLines(self):
-    """Tests that blank lines are omitted in sorted goog.require statements."""
-    input_lines = [
-        'goog.provide(\'package.subpackage.Whatever\');',
-        '',
-        'goog.require(\'package.subpackage.ClassB\');',
-        '',
-        'goog.require(\'package.subpackage.ClassA\');'
-    ]
-    expected_lines = [
-        'goog.provide(\'package.subpackage.Whatever\');',
-        '',
-        'goog.require(\'package.subpackage.ClassA\');',
-        'goog.require(\'package.subpackage.ClassB\');'
-    ]
-    token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
+    def testFixRequires_removeBlankLines(self):
+        """Tests that blank lines are omitted in sorted goog.require statements."""
+        input_lines = [
+            'goog.provide(\'package.subpackage.Whatever\');',
+            '',
+            'goog.require(\'package.subpackage.ClassB\');',
+            '',
+            'goog.require(\'package.subpackage.ClassA\');'
+        ]
+        expected_lines = [
+            'goog.provide(\'package.subpackage.Whatever\');',
+            '',
+            'goog.require(\'package.subpackage.ClassA\');',
+            'goog.require(\'package.subpackage.ClassB\');'
+        ]
+        token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
 
-    sorter = requireprovidesorter.RequireProvideSorter()
-    sorter.FixRequires(token)
+        sorter = requireprovidesorter.RequireProvideSorter()
+        sorter.FixRequires(token)
 
-    self.assertEquals(expected_lines, self._GetLines(token))
+        self.assertEquals(expected_lines, self._GetLines(token))
 
-  def fixRequiresTest_withTestOnly(self, position):
-    """Regression-tests sorting even with a goog.setTestOnly statement.
+    def fixRequiresTest_withTestOnly(self, position):
+        """Regression-tests sorting even with a goog.setTestOnly statement.
 
-    Args:
-      position: The position in the list where to insert the goog.setTestOnly
-                statement. Will be used to test all possible combinations for
-                this test.
-    """
-    input_lines = [
-        'goog.provide(\'package.subpackage.Whatever\');',
-        '',
-        'goog.require(\'package.subpackage.ClassB\');',
-        'goog.require(\'package.subpackage.ClassA\');'
-    ]
-    expected_lines = [
-        'goog.provide(\'package.subpackage.Whatever\');',
-        '',
-        'goog.require(\'package.subpackage.ClassA\');',
-        'goog.require(\'package.subpackage.ClassB\');'
-    ]
-    input_lines.insert(position, 'goog.setTestOnly();')
-    expected_lines.insert(position, 'goog.setTestOnly();')
+        Args:
+          position: The position in the list where to insert the goog.setTestOnly
+                    statement. Will be used to test all possible combinations for
+                    this test.
+        """
+        input_lines = [
+            'goog.provide(\'package.subpackage.Whatever\');',
+            '',
+            'goog.require(\'package.subpackage.ClassB\');',
+            'goog.require(\'package.subpackage.ClassA\');'
+        ]
+        expected_lines = [
+            'goog.provide(\'package.subpackage.Whatever\');',
+            '',
+            'goog.require(\'package.subpackage.ClassA\');',
+            'goog.require(\'package.subpackage.ClassB\');'
+        ]
+        input_lines.insert(position, 'goog.setTestOnly();')
+        expected_lines.insert(position, 'goog.setTestOnly();')
 
-    token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
+        token = testutil.TokenizeSourceAndRunEcmaPass(input_lines)
 
-    sorter = requireprovidesorter.RequireProvideSorter()
-    sorter.FixRequires(token)
+        sorter = requireprovidesorter.RequireProvideSorter()
+        sorter.FixRequires(token)
 
-    self.assertEquals(expected_lines, self._GetLines(token))
+        self.assertEquals(expected_lines, self._GetLines(token))
 
-  def testFixRequires_withTestOnly(self):
-    """Regression-tests sorting even after a goog.setTestOnly statement."""
+    def testFixRequires_withTestOnly(self):
+        """Regression-tests sorting even after a goog.setTestOnly statement."""
 
-    # goog.setTestOnly at first line.
-    self.fixRequiresTest_withTestOnly(position=0)
+        # goog.setTestOnly at first line.
+        self.fixRequiresTest_withTestOnly(position=0)
 
-    # goog.setTestOnly after goog.provide.
-    self.fixRequiresTest_withTestOnly(position=1)
+        # goog.setTestOnly after goog.provide.
+        self.fixRequiresTest_withTestOnly(position=1)
 
-    # goog.setTestOnly before goog.require.
-    self.fixRequiresTest_withTestOnly(position=2)
+        # goog.setTestOnly before goog.require.
+        self.fixRequiresTest_withTestOnly(position=2)
 
-    # goog.setTestOnly after goog.require.
-    self.fixRequiresTest_withTestOnly(position=4)
+        # goog.setTestOnly after goog.require.
+        self.fixRequiresTest_withTestOnly(position=4)
 
-  def _GetLines(self, token):
-    """Returns an array of lines based on the specified token stream."""
-    lines = []
-    line = ''
-    while token:
-      line += token.string
-      if token.IsLastInLine():
-        lines.append(line)
+    def _GetLines(self, token):
+        """Returns an array of lines based on the specified token stream."""
+        lines = []
         line = ''
-      token = token.next
-    return lines
+        while token:
+            line += token.string
+            if token.IsLastInLine():
+                lines.append(line)
+                line = ''
+            token = token.next
+        return lines
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

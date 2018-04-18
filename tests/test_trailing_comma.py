@@ -28,37 +28,37 @@ from jscodestyle.common import erroraccumulator
 
 flags.FLAGS.check_trailing_comma = True
 class TrailingCommaTest(unittest.TestCase):
-  """Test case to for gjslint errorrules."""
+    """Test case to for gjslint errorrules."""
 
-  def testGetTrailingCommaArray(self):
-    """ warning for trailing commas before closing array
-    """
-    original = ['q = [1,]', ]
+    def testGetTrailingCommaArray(self):
+        """ warning for trailing commas before closing array
+        """
+        original = ['q = [1,]', ]
 
-    # Expect line too long.
-    expected = errors.COMMA_AT_END_OF_LITERAL
+        # Expect line too long.
+        expected = errors.COMMA_AT_END_OF_LITERAL
 
-    self._AssertInError(original, expected)
+        self._AssertInError(original, expected)
 
-  def testGetTrailingCommaDict(self):
-    """ warning for trailing commas before closing array
-    """
-    original = ['q = {1:1,}', ]
+    def testGetTrailingCommaDict(self):
+        """ warning for trailing commas before closing array
+        """
+        original = ['q = {1:1,}', ]
 
-    # Expect line too long.
-    expected = errors.COMMA_AT_END_OF_LITERAL
+        # Expect line too long.
+        expected = errors.COMMA_AT_END_OF_LITERAL
 
-    self._AssertInError(original, expected)
+        self._AssertInError(original, expected)
 
-  def _AssertInError(self, original, expected):
-    """Asserts that the error fixer corrects original to expected."""
+    def _AssertInError(self, original, expected):
+        """Asserts that the error fixer corrects original to expected."""
 
-    # Trap gjslint's output parse it to get messages added.
-    error_accumulator = erroraccumulator.ErrorAccumulator()
-    runner.Run('testing.js', error_accumulator, source=original)
-    error_nums = [e.code for e in error_accumulator.GetErrors()]
+        # Trap gjslint's output parse it to get messages added.
+        error_accumulator = erroraccumulator.ErrorAccumulator()
+        runner.Run('testing.js', error_accumulator, source=original)
+        error_nums = [e.code for e in error_accumulator.GetErrors()]
 
-    self.assertIn(expected, error_nums)
+        self.assertIn(expected, error_nums)
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

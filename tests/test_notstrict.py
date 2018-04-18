@@ -49,26 +49,26 @@ _TEST_FILES = [
 
 
 class GJsLintTestSuite(unittest.TestSuite):
-  """Test suite to run a GJsLintTest for each of several files.
+    """Test suite to run a GJsLintTest for each of several files.
 
-  If sys.argv[1:] is non-empty, it is interpreted as a list of filenames in
-  testdata to test. Otherwise, _TEST_FILES is used.
-  """
+    If sys.argv[1:] is non-empty, it is interpreted as a list of filenames in
+    testdata to test. Otherwise, _TEST_FILES is used.
+    """
 
-  def __init__(self, tests=()):
-    unittest.TestSuite.__init__(self, tests)
+    def __init__(self, tests=()):
+        unittest.TestSuite.__init__(self, tests)
 
-    argv = sys.argv and sys.argv[1:] or []
-    if argv:
-      test_files = argv
-    else:
-      test_files = _TEST_FILES
-    for test_file in test_files:
-      resource_path = os.path.join(_RESOURCE_PREFIX, test_file)
-      self.addTest(filetestcase.AnnotatedFileTestCase(resource_path,
-                                                      runner.Run,
-                                                      errors.ByName))
+        argv = sys.argv and sys.argv[1:] or []
+        if argv:
+            test_files = argv
+        else:
+            test_files = _TEST_FILES
+        for test_file in test_files:
+            resource_path = os.path.join(_RESOURCE_PREFIX, test_file)
+            self.addTest(filetestcase.AnnotatedFileTestCase(resource_path,
+                                                            runner.Run,
+                                                            errors.ByName))
 
 if __name__ == '__main__':
-  # Don't let main parse args; it happens in the TestSuite.
-  unittest.main(argv=sys.argv[0:1], defaultTest='GJsLintTestSuite')
+    # Don't let main parse args; it happens in the TestSuite.
+    unittest.main(argv=sys.argv[0:1], defaultTest='GJsLintTestSuite')

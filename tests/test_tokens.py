@@ -21,93 +21,93 @@ from jscodestyle.common import tokens
 
 
 def _CreateDummyToken():
-  return tokens.Token('foo', None, 1, 1)
+    return tokens.Token('foo', None, 1, 1)
 
 
 def _CreateDummyTokens(count):
-  dummy_tokens = []
-  for _ in xrange(count):
-    dummy_tokens.append(_CreateDummyToken())
-  return dummy_tokens
+    dummy_tokens = []
+    for _ in xrange(count):
+        dummy_tokens.append(_CreateDummyToken())
+    return dummy_tokens
 
 
 def _SetTokensAsNeighbors(neighbor_tokens):
-  for i in xrange(len(neighbor_tokens)):
-    prev_index = i - 1
-    next_index = i + 1
+    for i in xrange(len(neighbor_tokens)):
+        prev_index = i - 1
+        next_index = i + 1
 
-    if prev_index >= 0:
-      neighbor_tokens[i].previous = neighbor_tokens[prev_index]
+        if prev_index >= 0:
+            neighbor_tokens[i].previous = neighbor_tokens[prev_index]
 
-    if next_index < len(neighbor_tokens):
-      neighbor_tokens[i].next = neighbor_tokens[next_index]
+        if next_index < len(neighbor_tokens):
+            neighbor_tokens[i].next = neighbor_tokens[next_index]
 
 
 class TokensTest(unittest.TestCase):
 
-  def testIsFirstInLine(self):
+    def testIsFirstInLine(self):
 
-    # First token in file (has no previous).
-    self.assertTrue(_CreateDummyToken().IsFirstInLine())
+        # First token in file (has no previous).
+        self.assertTrue(_CreateDummyToken().IsFirstInLine())
 
-    a, b = _CreateDummyTokens(2)
-    _SetTokensAsNeighbors([a, b])
+        a, b = _CreateDummyTokens(2)
+        _SetTokensAsNeighbors([a, b])
 
-    # Tokens on same line
-    a.line_number = 30
-    b.line_number = 30
+        # Tokens on same line
+        a.line_number = 30
+        b.line_number = 30
 
-    self.assertFalse(b.IsFirstInLine())
+        self.assertFalse(b.IsFirstInLine())
 
-    # Tokens on different lines
-    b.line_number = 31
-    self.assertTrue(b.IsFirstInLine())
+        # Tokens on different lines
+        b.line_number = 31
+        self.assertTrue(b.IsFirstInLine())
 
-  def testIsLastInLine(self):
-    # Last token in file (has no next).
-    self.assertTrue(_CreateDummyToken().IsLastInLine())
+    def testIsLastInLine(self):
+        # Last token in file (has no next).
+        self.assertTrue(_CreateDummyToken().IsLastInLine())
 
-    a, b = _CreateDummyTokens(2)
-    _SetTokensAsNeighbors([a, b])
+        a, b = _CreateDummyTokens(2)
+        _SetTokensAsNeighbors([a, b])
 
-    # Tokens on same line
-    a.line_number = 30
-    b.line_number = 30
-    self.assertFalse(a.IsLastInLine())
+        # Tokens on same line
+        a.line_number = 30
+        b.line_number = 30
+        self.assertFalse(a.IsLastInLine())
 
-    b.line_number = 31
-    self.assertTrue(a.IsLastInLine())
+        b.line_number = 31
+        self.assertTrue(a.IsLastInLine())
 
-  def testIsType(self):
-    a = tokens.Token('foo', 'fakeType1', 1, 1)
-    self.assertTrue(a.IsType('fakeType1'))
-    self.assertFalse(a.IsType('fakeType2'))
+    def testIsType(self):
+        a = tokens.Token('foo', 'fakeType1', 1, 1)
+        self.assertTrue(a.IsType('fakeType1'))
+        self.assertFalse(a.IsType('fakeType2'))
 
-  def testIsAnyType(self):
-    a = tokens.Token('foo', 'fakeType1', 1, 1)
-    self.assertTrue(a.IsAnyType(['fakeType1', 'fakeType2']))
-    self.assertFalse(a.IsAnyType(['fakeType3', 'fakeType4']))
+    def testIsAnyType(self):
+        a = tokens.Token('foo', 'fakeType1', 1, 1)
+        self.assertTrue(a.IsAnyType(['fakeType1', 'fakeType2']))
+        self.assertFalse(a.IsAnyType(['fakeType3', 'fakeType4']))
 
-  def testRepr(self):
-    a = tokens.Token('foo', 'fakeType1', 1, 1)
-    self.assertEquals('<Token: fakeType1, "foo", None, 1, None>', str(a))
+    def testRepr(self):
+        a = tokens.Token('foo', 'fakeType1', 1, 1)
+        self.assertEquals('<Token: fakeType1, "foo", None, 1, None>', str(a))
 
-  def testIter(self):
-    dummy_tokens = _CreateDummyTokens(5)
-    _SetTokensAsNeighbors(dummy_tokens)
-    a, b, c, d, e = dummy_tokens
+    def testIter(self):
+        dummy_tokens = _CreateDummyTokens(5)
+        _SetTokensAsNeighbors(dummy_tokens)
+        a, b, c, d, e = dummy_tokens
 
-    i = iter(a)
-    self.assertListEqual([a, b, c, d, e], list(i))
+        i = iter(a)
+        self.assertListEqual([a, b, c, d, e], list(i))
 
-  def testReverseIter(self):
-    dummy_tokens = _CreateDummyTokens(5)
-    _SetTokensAsNeighbors(dummy_tokens)
-    a, b, c, d, e = dummy_tokens
+    def testReverseIter(self):
+        dummy_tokens = _CreateDummyTokens(5)
+        _SetTokensAsNeighbors(dummy_tokens)
+        a, b, c, d, e = dummy_tokens
 
-    ri = reversed(e)
-    self.assertListEqual([e, d, c, b, a], list(ri))
+        ri = reversed(e)
+        self.assertListEqual([e, d, c, b, a], list(ri))
 
 
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

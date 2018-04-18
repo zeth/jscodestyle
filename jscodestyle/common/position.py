@@ -21,106 +21,106 @@ __author__ = ('robbyw@google.com (Robert Walker)',
 
 
 class Position(object):
-  """Object representing a segment of a string.
+    """Object representing a segment of a string.
 
-  Attributes:
-    start: The index in to the string where the segment starts.
-    length: The length of the string segment.
-  """
-
-  def __init__(self, start, length):
-    """Initialize the position object.
-
-    Args:
-      start: The start index.
-      length: The number of characters to include.
+    Attributes:
+      start: The index in to the string where the segment starts.
+      length: The length of the string segment.
     """
-    self.start = start
-    self.length = length
 
-  def Get(self, string):
-    """Returns this range of the given string.
+    def __init__(self, start, length):
+        """Initialize the position object.
 
-    Args:
-      string: The string to slice.
+        Args:
+          start: The start index.
+          length: The number of characters to include.
+        """
+        self.start = start
+        self.length = length
 
-    Returns:
-      The string within the range specified by this object.
-    """
-    return string[self.start:self.start + self.length]
+    def Get(self, string):
+        """Returns this range of the given string.
 
-  def Set(self, target, source):
-    """Sets this range within the target string to the source string.
+        Args:
+          string: The string to slice.
 
-    Args:
-      target: The target string.
-      source: The source string.
+        Returns:
+          The string within the range specified by this object.
+        """
+        return string[self.start:self.start + self.length]
 
-    Returns:
-      The resulting string
-    """
-    return target[:self.start] + source + target[self.start + self.length:]
+    def Set(self, target, source):
+        """Sets this range within the target string to the source string.
 
-  def AtEnd(string):
-    """Create a Position representing the end of the given string.
+        Args:
+          target: The target string.
+          source: The source string.
 
-    Args:
-      string: The string to represent the end of.
+        Returns:
+          The resulting string
+        """
+        return target[:self.start] + source + target[self.start + self.length:]
 
-    Returns:
-      The created Position object.
-    """
-    return Position(len(string), 0)
-  AtEnd = staticmethod(AtEnd)
+    def AtEnd(string):
+        """Create a Position representing the end of the given string.
 
-  def IsAtEnd(self, string):
-    """Returns whether this position is at the end of the given string.
+        Args:
+          string: The string to represent the end of.
 
-    Args:
-      string: The string to test for the end of.
+        Returns:
+          The created Position object.
+        """
+        return Position(len(string), 0)
+    AtEnd = staticmethod(AtEnd)
 
-    Returns:
-      Whether this position is at the end of the given string.
-    """
-    return self.start == len(string) and self.length == 0
+    def IsAtEnd(self, string):
+        """Returns whether this position is at the end of the given string.
 
-  def AtBeginning():
-    """Create a Position representing the beginning of any string.
+        Args:
+          string: The string to test for the end of.
 
-    Returns:
-      The created Position object.
-    """
-    return Position(0, 0)
-  AtBeginning = staticmethod(AtBeginning)
+        Returns:
+          Whether this position is at the end of the given string.
+        """
+        return self.start == len(string) and self.length == 0
 
-  def IsAtBeginning(self):
-    """Returns whether this position is at the beginning of any string.
+    def AtBeginning():
+        """Create a Position representing the beginning of any string.
 
-    Returns:
-      Whether this position is at the beginning of any string.
-    """
-    return self.start == 0 and self.length == 0
+        Returns:
+          The created Position object.
+        """
+        return Position(0, 0)
+    AtBeginning = staticmethod(AtBeginning)
 
-  def All(string):
-    """Create a Position representing the entire string.
+    def IsAtBeginning(self):
+        """Returns whether this position is at the beginning of any string.
 
-    Args:
-      string: The string to represent the entirety of.
+        Returns:
+          Whether this position is at the beginning of any string.
+        """
+        return self.start == 0 and self.length == 0
 
-    Returns:
-      The created Position object.
-    """
-    return Position(0, len(string))
-  All = staticmethod(All)
+    def All(string):
+        """Create a Position representing the entire string.
 
-  def Index(index):
-    """Returns a Position object for the specified index.
+        Args:
+          string: The string to represent the entirety of.
 
-    Args:
-      index: The index to select, inclusively.
+        Returns:
+          The created Position object.
+        """
+        return Position(0, len(string))
+    All = staticmethod(All)
 
-    Returns:
-      The created Position object.
-    """
-    return Position(index, 1)
-  Index = staticmethod(Index)
+    def Index(index):
+        """Returns a Position object for the specified index.
+
+        Args:
+          index: The index to select, inclusively.
+
+        Returns:
+          The created Position object.
+        """
+        return Position(index, 1)
+    Index = staticmethod(Index)
