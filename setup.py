@@ -14,27 +14,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Setup.py file for jscodestyle."""
+
+
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-setup(name='jscodestyle',
-      version='2.3.19',
-      description='JSCodeStyle',
-      license='Apache',
-      author='The JSCodeStyle Authors',
-      author_email='theology@gmail.com',
-      url='https://github.com/zeth/jscodestyle',
-      install_requires=['python-gflags'],
-      package_dir={'jscodestyle': 'jscodestyle'},
-      packages=['jscodestyle', 'jscodestyle.common'],
-      test_suite="tests",
-      entry_points = {
-          'console_scripts': [
-              'jscodestyle = jscodestyle.gjslint:main',
-              'gjslint = jscodestyle.gjslint:main',
-              'fixjsstyle = jscodestyle.fixjsstyle:main'
-          ]
-      }
+# Unit Tests require mock on Python 2
+TESTS_REQUIRE = []
+try:
+    # pylint: disable=unused-import
+    import unittest.mock
+except ImportError:
+    TESTS_REQUIRE.append('mock')
+
+
+setup(
+    name='jscodestyle',
+    version='2.3.19',
+    description='JSCodeStyle',
+    license='Apache',
+    author='The JSCodeStyle Authors',
+    author_email='theology@gmail.com',
+    url='https://github.com/zeth/jscodestyle',
+    install_requires=['python-gflags'],
+    tests_require=TESTS_REQUIRE,
+    package_dir={'jscodestyle': 'jscodestyle'},
+    packages=['jscodestyle', 'jscodestyle.common'],
+    test_suite="tests",
+    entry_points={
+        'console_scripts': [
+            'jscodestyle = jscodestyle.gjslint:main',
+            'gjslint = jscodestyle.gjslint:main',
+            'fixjsstyle = jscodestyle.fixjsstyle:main'
+        ]
+    }
 )
