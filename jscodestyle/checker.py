@@ -16,9 +16,6 @@
 
 """Core methods for checking JS files for common style guide violations."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 import gflags as flags
 
 from jscodestyle import aliaspass

@@ -15,8 +15,6 @@
 
 """Medium tests for the gpylint auto-fixer."""
 
-__author__ = 'robbyw@google.com (Robby Walker)'
-
 import StringIO
 
 import gflags as flags

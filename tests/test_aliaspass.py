@@ -15,11 +15,6 @@
 
 """Unit tests for the aliaspass module."""
 
-# Allow non-Google copyright
-# pylint: disable=g-bad-file-header
-
-__author__ = ('nnaze@google.com (Nathan Naze)')
-
 import unittest
 
 from jscodestyle import aliaspass

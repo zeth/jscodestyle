@@ -15,11 +15,6 @@
 
 """Unit tests for the error_fixer module."""
 
-# Allow non-Google copyright
-# pylint: disable=g-bad-file-header
-
-
-
 import unittest
 from jscodestyle import error_fixer
 from jscodestyle import testutil

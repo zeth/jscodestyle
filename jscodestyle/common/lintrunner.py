@@ -16,9 +16,6 @@
 
 """Interface for a lint running wrapper."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 
 class LintRunner(object):
     """Interface for a lint running wrapper."""

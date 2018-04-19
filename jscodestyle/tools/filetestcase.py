@@ -20,9 +20,6 @@ of errors is then matched against those annotated in the file.  Based heavily
 on devtools/javascript/gpylint/full_test.py.
 """
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 import re
 
 import gflags as flags

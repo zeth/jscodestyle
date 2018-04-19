@@ -16,9 +16,6 @@
 
 """Regular expression based lexer."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 from jscodestyle.common import tokens
 
 # Shorthand

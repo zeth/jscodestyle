@@ -16,8 +16,6 @@
 
 """Light weight EcmaScript state tracker that reads tokens and tracks state."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
 
 import re
 

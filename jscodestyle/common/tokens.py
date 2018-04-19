@@ -16,9 +16,6 @@
 
 """Classes to represent tokens and positions within them."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 
 class TokenType(object):
     """Token types common to all languages."""

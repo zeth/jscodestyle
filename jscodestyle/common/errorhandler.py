@@ -21,9 +21,6 @@ perform some action based on the reported errors, for example, logging the error
 or automatically fixing it.
 """
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 
 class ErrorHandler(object):
     """Error handler interface."""

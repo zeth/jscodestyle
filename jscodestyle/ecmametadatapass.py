@@ -16,8 +16,6 @@
 
 """Metadata pass for annotating tokens in EcmaScript files."""
 
-__author__ = ('robbyw@google.com (Robert Walker)')
-
 from jscodestyle import javascripttokens
 from jscodestyle import tokenutil
 

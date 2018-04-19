@@ -16,8 +16,6 @@
 
 """Automatically fix simple style guide violations."""
 
-__author__ = 'robbyw@google.com (Robert Walker)'
-
 import StringIO
 import sys
 

@@ -16,9 +16,6 @@
 
 """Regular expression based JavaScript parsing classes."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 import copy
 import re
 

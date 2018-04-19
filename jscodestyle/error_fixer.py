@@ -16,11 +16,6 @@
 
 """Main class responsible for automatically fixing simple style violations."""
 
-# Allow non-Google copyright
-# pylint: disable=g-bad-file-header
-
-__author__ = 'robbyw@google.com (Robert Walker)'
-
 import re
 
 import gflags as flags

@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-__author__ = 'nnaze@google.com (Nathan Naze)'
-
 import unittest
 from jscodestyle.common import tokens
 

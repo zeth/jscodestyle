@@ -16,9 +16,6 @@
 
 """Error object commonly used in linters."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 
 class Error(object):
     """Object representing a style error."""

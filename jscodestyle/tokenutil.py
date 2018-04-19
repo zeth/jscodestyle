@@ -16,9 +16,6 @@
 
 """Token utility functions."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 import copy
 import StringIO
 

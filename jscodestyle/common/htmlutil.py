@@ -16,8 +16,6 @@
 
 """Utilities for dealing with HTML."""
 
-__author__ = ('robbyw@google.com (Robert Walker)')
-
 import cStringIO
 import formatter
 import htmllib

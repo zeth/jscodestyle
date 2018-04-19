@@ -15,10 +15,6 @@
 
 """Error codes for JavaScript style checker."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
-
 def ByName(name):
     """Get the error code for the given error name.
 

@@ -20,9 +20,6 @@ Tests every error that can be thrown by gjslint.  Based heavily on
 devtools/javascript/gpylint/full_test.py
 """
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 import os
 import sys
 import unittest

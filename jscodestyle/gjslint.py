@@ -31,10 +31,6 @@ This file is a front end that parses arguments and flags.  The core of the code
 is in tokenizer.py and checker.py.
 """
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)',
-              'nnaze@google.com (Nathan Naze)',)
-
 import errno
 import itertools
 import os

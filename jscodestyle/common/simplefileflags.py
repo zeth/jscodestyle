@@ -16,9 +16,6 @@
 
 """Determines the list of files to be checked from command line arguments."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 import glob
 import os
 import re

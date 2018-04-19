@@ -16,9 +16,6 @@
 
 """Classes to represent JavaScript tokens."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 from jscodestyle.common import tokens
 
 class JavaScriptTokenType(tokens.TokenType):

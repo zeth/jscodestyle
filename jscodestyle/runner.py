@@ -15,11 +15,6 @@
 
 """Main lint function. Tokenizes file, runs passes, and feeds to checker."""
 
-# Allow non-Google copyright
-# pylint: disable=g-bad-file-header
-
-__author__ = 'nnaze@google.com (Nathan Naze)'
-
 import traceback
 
 import gflags as flags

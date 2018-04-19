@@ -15,11 +15,6 @@
 
 """Tools to match goog.scope alias statements."""
 
-# Allow non-Google copyright
-# pylint: disable=g-bad-file-header
-
-__author__ = ('nnaze@google.com (Nathan Naze)')
-
 import itertools
 
 from jscodestyle import ecmametadatapass

@@ -17,10 +17,6 @@
 """Core methods for checking EcmaScript files for common style guide violations.
 """
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)',
-              'jacobr@google.com (Jacob Richman)')
-
 import re
 
 import gflags as flags

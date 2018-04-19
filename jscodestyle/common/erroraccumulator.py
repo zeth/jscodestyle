@@ -16,10 +16,6 @@
 
 """Linter error handler class that accumulates an array of errors."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
-
 from jscodestyle.common import errorhandler
 
 

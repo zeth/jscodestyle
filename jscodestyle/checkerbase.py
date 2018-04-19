@@ -16,13 +16,6 @@
 
 """Base classes for writing checkers that operate on tokens."""
 
-# Allow non-Google copyright
-# pylint: disable=g-bad-file-header
-
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)',
-              'jacobr@google.com (Jacob Richman)')
-
 from jscodestyle import errorrules
 from jscodestyle.common import error
 

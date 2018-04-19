@@ -16,12 +16,6 @@
 
 """Utility functions to format errors."""
 
-
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)',
-              'nnaze@google.com (Nathan Naze)')
-
-
 def GetUnixErrorOutput(filename, error, new_error=False):
     """Get a output line for an error in UNIX format."""
 

@@ -19,10 +19,6 @@ These style guide violations should only apply to JavaScript and not an Ecma
 scripting languages.
 """
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)',
-              'jacobr@google.com (Jacob Richman)')
-
 import re
 
 from jscodestyle import ecmalintrules

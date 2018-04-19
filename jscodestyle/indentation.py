@@ -15,8 +15,6 @@
 
 """Methods for checking EcmaScript files for indentation issues."""
 
-__author__ = ('robbyw@google.com (Robert Walker)')
-
 import gflags as flags
 
 from jscodestyle import ecmametadatapass

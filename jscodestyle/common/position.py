@@ -16,9 +16,6 @@
 
 """Classes to represent positions within strings."""
 
-__author__ = ('robbyw@google.com (Robert Walker)',
-              'ajp@google.com (Andy Perelson)')
-
 
 class Position(object):
     """Object representing a segment of a string.

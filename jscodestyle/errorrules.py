@@ -16,8 +16,6 @@
 
 """Linter error rules class for Closure Linter."""
 
-__author__ = 'robbyw@google.com (Robert Walker)'
-
 import gflags as flags
 from jscodestyle import errors
 
