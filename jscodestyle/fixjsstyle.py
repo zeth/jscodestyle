@@ -31,7 +31,9 @@ FLAGS = flags.FLAGS
 flags.DEFINE_list('additional_extensions', None, 'List of additional file '
                   'extensions (not js) that should be treated as '
                   'JavaScript files.')
-flags.DEFINE_boolean('dry_run', False, 'Do not modify the file, only print it.')
+flags.DEFINE_boolean('dry_run',
+                     False,
+                     'Do not modify the file, only print it.')
 
 
 def main(argv=None):

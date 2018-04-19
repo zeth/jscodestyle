@@ -18,7 +18,6 @@
 """Specific JSLint errors checker."""
 
 
-
 import gflags as flags
 
 FLAGS = flags.FLAGS
@@ -41,8 +40,8 @@ class Rule(object):
     # Rule to raise all known errors.
     ALL = 'all'
 
-    # All rules that are to be checked when using the strict flag. E.g. the rules
-    # that are specific to the stricter Closure style.
+    # All rules that are to be checked when using the strict flag
+    # E.g. the rules that are specific to the stricter Closure style.
     CLOSURE_RULES = frozenset([BLANK_LINES_AT_TOP_LEVEL,
                                INDENTATION,
                                WELL_FORMED_AUTHOR,
@@ -56,8 +55,8 @@ flags.DEFINE_boolean('strict', False,
                      'Whether to validate against the stricter Closure style. '
                      'This includes ' + (', '.join(Rule.CLOSURE_RULES)) + '.')
 flags.DEFINE_multistring('jslint_error', [],
-                         'List of specific lint errors to check. Here is a list'
-                         ' of accepted values:\n'
+                         'List of specific lint errors to check. '
+                         'Here is a list of accepted values:\n'
                          ' - ' + Rule.ALL + ': enables all following errors.\n'
                          ' - ' + Rule.BLANK_LINES_AT_TOP_LEVEL + ': validates'
                          'number of blank lines between blocks at top level.\n'
@@ -69,25 +68,27 @@ flags.DEFINE_multistring('jslint_error', [],
                          'forbids braces around @inheritdoc JsDoc tags.\n'
                          ' - ' + Rule.BRACES_AROUND_TYPE + ': enforces braces '
                          'around types in JsDoc tags.\n'
-                         ' - ' + Rule.OPTIONAL_TYPE_MARKER + ': checks correct '
-                         'use of optional marker = in param types.\n'
+                         ' - ' + Rule.OPTIONAL_TYPE_MARKER + ': checks '
+                         'correct use of optional marker = in param types.\n'
                          ' - ' + Rule.UNUSED_PRIVATE_MEMBERS + ': checks for '
                          'unused private variables.\n'
                          ' - ' + Rule.UNUSED_LOCAL_VARIABLES + ': checks for '
                          'unused local variables.\n')
 
 
-def ShouldCheck(rule):
+def should_check(rule):
     """Returns whether the optional rule should be checked.
 
-    Computes different flags (strict, jslint_error, jslint_noerror) to find out if
-    this specific rule should be checked.
+    Computes different flags (strict, jslint_error, jslint_noerror) to
+    find out if this specific rule should be checked.
 
     Args:
       rule: Name of the rule (see Rule).
 
     Returns:
-      True if the rule should be checked according to the flags, otherwise False.
+      True if the rule should be checked according to the flags,
+      otherwise False.
+
     """
     if 'no_' + rule in FLAGS.jslint_error:
         return False

@@ -317,7 +317,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         token_type = token.type
 
         # Process the line change.
-        if not self._is_html and error_check.ShouldCheck(Rule.INDENTATION):
+        if not self._is_html and error_check.should_check(Rule.INDENTATION):
             # TODO(robbyw): Support checking indentation in HTML files.
             indentation_errors = self._indentation.CheckToken(token, state)
             for indentation_error in indentation_errors:
@@ -540,7 +540,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                                 errors.INVALID_SUPPRESS_TYPE,
                                 'Invalid suppression type: %s' % suppress_type, token)
 
-            elif (error_check.ShouldCheck(Rule.WELL_FORMED_AUTHOR) and
+            elif (error_check.should_check(Rule.WELL_FORMED_AUTHOR) and
                   flag.flag_type == 'author'):
                 # TODO(user): In non strict mode check the author tag for as much as
                 # it exists, though the full form checked below isn't required.
@@ -601,7 +601,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 if flag.jstype and not flag.jstype.IsEmpty():
                     self._CheckJsDocType(token, flag.jstype)
 
-                    if error_check.ShouldCheck(Rule.BRACES_AROUND_TYPE) and (
+                    if error_check.should_check(Rule.BRACES_AROUND_TYPE) and (
                         flag.type_start_token.type != Type.DOC_START_BRACE or
                         flag.type_end_token.type != Type.DOC_END_BRACE):
                         self._HandleError(
@@ -615,7 +615,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                     errors.INVALID_JSDOC_TAG,
                     'Invalid JsDoc tag: %s' % token.values['name'], token)
 
-            if (error_check.ShouldCheck(Rule.NO_BRACES_AROUND_INHERIT_DOC) and
+            if (error_check.should_check(Rule.NO_BRACES_AROUND_INHERIT_DOC) and
                 token.values['name'] == 'inheritDoc' and
                 token_type == Type.DOC_INLINE_FLAG):
                 self._HandleError(errors.UNNECESSARY_BRACES_AROUND_INHERIT_DOC,

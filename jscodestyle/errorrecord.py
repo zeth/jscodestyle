@@ -41,7 +41,7 @@ class ErrorRecord(object):
         self.new_error = new_error
 
 
-def MakeErrorRecord(path, error):
+def make_error_record(path, error):
     """Make an error record with correctly formatted error string.
 
     Errors are not able to be serialized (pickled) over processes because of

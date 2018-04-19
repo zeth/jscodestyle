@@ -146,7 +146,7 @@ def _check_path(path):
     error_handler = erroraccumulator.ErrorAccumulator()
     runner.Run(path, error_handler)
 
-    make_error_record = lambda err: errorrecord.MakeErrorRecord(path, err)
+    make_error_record = lambda err: errorrecord.make_error_record(path, err)
     return map(make_error_record, error_handler.GetErrors())
 
 

@@ -77,10 +77,10 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         # Store some convenience variables
         namespaces_info = self._namespaces_info
 
-        if error_check.ShouldCheck(Rule.UNUSED_LOCAL_VARIABLES):
+        if error_check.should_check(Rule.UNUSED_LOCAL_VARIABLES):
             self._CheckUnusedLocalVariables(token, state)
 
-        if error_check.ShouldCheck(Rule.UNUSED_PRIVATE_MEMBERS):
+        if error_check.should_check(Rule.UNUSED_PRIVATE_MEMBERS):
             # Find all assignments to private members.
             if token.type == Type.SIMPLE_LVALUE:
                 identifier = token.string
@@ -124,7 +124,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     token.attached_object.name_token)
 
                 if flag.type is not None and flag.name is not None:
-                    if error_check.ShouldCheck(Rule.VARIABLE_ARG_MARKER):
+                    if error_check.should_check(Rule.VARIABLE_ARG_MARKER):
                         # Check for variable arguments marker in type.
                         if flag.jstype.IsVarArgsType() and flag.name != 'var_args':
                             self._HandleError(errors.JSDOC_MISSING_VAR_ARGS_NAME,
@@ -137,7 +137,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                                               'with \'...\'.' % flag.name,
                                               token)
 
-                    if error_check.ShouldCheck(Rule.OPTIONAL_TYPE_MARKER):
+                    if error_check.should_check(Rule.OPTIONAL_TYPE_MARKER):
                         # Check for optional marker in type.
                         if (flag.jstype.opt_arg and
                             not flag.name.startswith('opt_')):
@@ -190,7 +190,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             if doc_comment.HasFlag('fileoverview') and doc_comment.HasFlag('externs'):
                 self._SetLimitedDocChecks(True)
 
-            if (error_check.ShouldCheck(Rule.BLANK_LINES_AT_TOP_LEVEL) and
+            if (error_check.should_check(Rule.BLANK_LINES_AT_TOP_LEVEL) and
                 not self._is_html and
                 state.InTopLevel() and
                 not state.InNonScopeBlock()):
@@ -673,7 +673,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         # Call the base class's Finalize function.
         super(JavaScriptLintRules, self).Finalize(state)
 
-        if error_check.ShouldCheck(Rule.UNUSED_PRIVATE_MEMBERS):
+        if error_check.should_check(Rule.UNUSED_PRIVATE_MEMBERS):
             # Report an error for any declared private member that was never used.
             unused_private_members = (self._declared_private_members -
                                       self._used_private_members)
