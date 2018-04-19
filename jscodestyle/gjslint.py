@@ -39,7 +39,6 @@ import errno
 import itertools
 import os
 import platform
-import re
 import sys
 import time
 
@@ -52,7 +51,6 @@ from jscodestyle.common import simplefileflags as fileflags
 
 # Attempt import of multiprocessing (should be available in Python 2.6 and up).
 try:
-    # pylint: disable=g-import-not-at-top
     import multiprocessing
 except ImportError:
     multiprocessing = None
@@ -63,8 +61,8 @@ flags.DEFINE_boolean('unix_mode', False,
 flags.DEFINE_boolean('beep', True, 'Whether to beep when errors are found.')
 flags.DEFINE_boolean('time', False, 'Whether to emit timing statistics.')
 flags.DEFINE_boolean('quiet', False, 'Whether to minimize logged messages. '
-                     'Most useful for per-file linting, such as that performed '
-                     'by the presubmit linter service.')
+                     'Most useful for per-file linting, such as that '
+                     'performed by the presubmit linter service.')
 flags.DEFINE_boolean('check_html', False,
                      'Whether to check javascript in html files.')
 flags.DEFINE_boolean('summary', False,
@@ -73,7 +71,7 @@ flags.DEFINE_list('additional_extensions', None, 'List of additional file '
                   'extensions (not js) that should be treated as '
                   'JavaScript files.')
 flags.DEFINE_boolean('multiprocess',
-                     platform.system() is 'Linux' and bool(multiprocessing),
+                     platform.system() == 'Linux' and bool(multiprocessing),
                      'Whether to attempt parallelized linting using the '
                      'multiprocessing module.  Enabled by default on Linux '
                      'if the multiprocessing module is present (Python 2.6+). '
@@ -87,9 +85,8 @@ GJSLINT_ONLY_FLAGS = ['--unix_mode', '--beep', '--nobeep', '--time',
                       '--check_html', '--summary', '--quiet']
 
 
-
-def _MultiprocessCheckPaths(paths):
-    """Run _CheckPath over mutltiple processes.
+def _multiprocess_check_paths(paths):
+    """Run _check_path over mutltiple processes.
 
     Tokenization, passes, and checks are expensive operations.  Running in a
     single process, they can only run on one CPU/core.  Instead,
@@ -104,7 +101,7 @@ def _MultiprocessCheckPaths(paths):
 
     pool = multiprocessing.Pool()
 
-    path_results = pool.imap(_CheckPath, paths)
+    path_results = pool.imap(_check_path, paths)
     for results in path_results:
         for result in results:
             yield result
@@ -120,8 +117,8 @@ def _MultiprocessCheckPaths(paths):
             raise err
 
 
-def _CheckPaths(paths):
-    """Run _CheckPath on all paths in one thread.
+def _check_paths(paths):
+    """Run _check_path on all paths in one thread.
 
     Args:
       paths: paths to check.
@@ -131,12 +128,12 @@ def _CheckPaths(paths):
     """
 
     for path in paths:
-        results = _CheckPath(path)
+        results = _check_path(path)
         for record in results:
             yield record
 
 
-def _CheckPath(path):
+def _check_path(path):
     """Check a path and return any errors.
 
     Args:
@@ -153,7 +150,8 @@ def _CheckPath(path):
     return map(make_error_record, error_handler.GetErrors())
 
 
-def _GetFilePaths(argv):
+def _get_file_paths(argv):
+    """NOTE: This doesn't seem to be used anywhere?"""
     suffixes = ['.js']
     if FLAGS.additional_extensions:
         suffixes += ['.%s' % ext for ext in FLAGS.additional_extensions]
@@ -165,7 +163,7 @@ def _GetFilePaths(argv):
 # Error printing functions
 
 
-def _PrintFileSummary(paths, records):
+def _print_file_summary(paths, records):
     """Print a detailed summary of the number of errors in each file."""
 
     paths = list(paths)
@@ -176,11 +174,11 @@ def _PrintFileSummary(paths, records):
         print '%s: %d' % (path, len(path_errors))
 
 
-def _PrintFileSeparator(path):
+def _print_file_separator(path):
     print '----- FILE  :  %s -----' % path
 
 
-def _PrintSummary(paths, error_records):
+def _print_summary(paths, error_records):
     """Print a summary of the number of errors and files."""
 
     error_count = len(error_records)
@@ -201,18 +199,18 @@ def _PrintSummary(paths, error_records):
         new_error_noun = 'error' if new_error_count == 1 else 'errors'
         error_file_noun = 'file' if error_paths_count == 1 else 'files'
         ok_file_noun = 'file' if no_error_paths_count == 1 else 'files'
-        print ('Found %d %s, including %d new %s, in %d %s (%d %s OK).' %
-               (error_count,
-                error_noun,
-                new_error_count,
-                new_error_noun,
-                error_paths_count,
-                error_file_noun,
-                no_error_paths_count,
-                ok_file_noun))
+        print('Found %d %s, including %d new %s, in %d %s (%d %s OK).' %
+              (error_count,
+               error_noun,
+               new_error_count,
+               new_error_noun,
+               error_paths_count,
+               error_file_noun,
+               no_error_paths_count,
+               ok_file_noun))
 
 
-def _PrintErrorRecords(error_records):
+def _print_error_records(error_records):
     """Print error records strings in the expected format."""
 
     current_path = None
@@ -221,26 +219,23 @@ def _PrintErrorRecords(error_records):
         if current_path != record.path:
             current_path = record.path
             if not FLAGS.unix_mode:
-                _PrintFileSeparator(current_path)
+                _print_file_separator(current_path)
 
         print record.error_string
 
 
-def _FormatTime(t):
+def _format_time(duration):
     """Formats a duration as a human-readable string.
 
     Args:
-      t: A duration in seconds.
+      duration: A duration in seconds.
 
     Returns:
       A formatted duration string.
     """
-    if t < 1:
-        return '%dms' % round(t * 1000)
-    else:
-        return '%.2fs' % t
-
-
+    if duration < 1:
+        return '%dms' % round(duration * 1000)
+    return '%.2fs' % duration
 
 
 def main(argv=None):
@@ -271,15 +266,15 @@ def main(argv=None):
     paths = fileflags.GetFileList(argv, 'JavaScript', suffixes)
 
     if FLAGS.multiprocess:
-        records_iter = _MultiprocessCheckPaths(paths)
+        records_iter = _multiprocess_check_paths(paths)
     else:
-        records_iter = _CheckPaths(paths)
+        records_iter = _check_paths(paths)
 
     records_iter, records_iter_copy = itertools.tee(records_iter, 2)
-    _PrintErrorRecords(records_iter_copy)
+    _print_error_records(records_iter_copy)
 
     error_records = list(records_iter)
-    _PrintSummary(paths, error_records)
+    _print_summary(paths, error_records)
 
     exit_code = 0
 
@@ -293,7 +288,7 @@ def main(argv=None):
 
     if exit_code:
         if FLAGS.summary:
-            _PrintFileSummary(paths, error_records)
+            _print_file_summary(paths, error_records)
 
         if FLAGS.beep:
             # Make a beep noise.
@@ -303,22 +298,22 @@ def main(argv=None):
         # reported errors.
         fix_args = []
         for flag in sys.argv[1:]:
-            for f in GJSLINT_ONLY_FLAGS:
-                if flag.startswith(f):
+            for go_flag in GJSLINT_ONLY_FLAGS:
+                if flag.startswith(go_flag):
                     break
             else:
                 fix_args.append(flag)
 
         if not FLAGS.quiet:
             print """
-      Some of the errors reported by GJsLint may be auto-fixable using the script
-      fixjsstyle. Please double check any changes it makes and report any bugs. The
-      script can be run by executing:
+      Some of the errors reported by GJsLint may be auto-fixable using the
+      command fixjsstyle. Please double check any changes it makes and report
+      any bugs. The command can be run by executing:
 
       fixjsstyle %s """ % ' '.join(fix_args)
 
     if FLAGS.time:
-        print 'Done in %s.' % _FormatTime(time.time() - start_time)
+        print 'Done in %s.' % _format_time(time.time() - start_time)
 
     sys.exit(exit_code)
 
