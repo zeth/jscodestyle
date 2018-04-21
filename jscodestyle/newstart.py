@@ -33,50 +33,163 @@ is in tokenizer.py and checker.py.
 """
 
 import argparse
+import sys
 
 
 class JsCodeStyle(object):
     """This class is a front end that parses arguments and flags."""
     def __init__(self):
         parser = argparse.ArgumentParser()
+
+        parser.add_argument(
+            'files', metavar='N', type=str, nargs='*',
+            help='the files to check',
+            default=sys.stdin)
+
         parser.add_argument(
             '-u', '--unix_mode',
             help='emit warnings in standard unix format',
             action='store_true')
+
         parser.add_argument(
             '-b', '--beep',
             help='do not beep when errors are found',
             action='store_false')
+
         parser.add_argument(
             '-t', '--time',
             help='emit timing statistics',
             action='store_true')
+
         parser.add_argument(
             '-c', '--check_html',
             help='check javascript in html files',
             action='store_true')
+
         parser.add_argument(
             '-s', '--summary',
             help='show an error count summary',
             action='store_true')
+
         parser.add_argument(
             '-q', '--quiet',
             help=('minimize logged messages. '
                   'Most useful for per-file linting, such as that '
                   'performed by the presubmit linter service.'),
             action='store_true')
+
         parser.add_argument(
             '-a', '--additional_extensions',
             help=('comma separated list of additional file '
                   'extensions (not js) that should be treated as '
                   'JavaScript files.'))
+
         parser.add_argument(
             '-m', '--multiprocess',
             help=('disable parallelised linting using the '
                   'multiprocessing module; this may make debugging easier.'),
             action='store_true')
 
-        parser.parse_args()
+        parser.add_argument(
+            '-r', '--recurse',
+            help=('recurse in to the subdirectories of the given path'),
+            action='append',
+            nargs='*')
+
+        parser.add_argument(
+            '-e', '--exclude_directories',
+            type=str,
+            nargs='*',
+            help=('exclude the specified directories '
+                  '(only applicable along with -r'),
+            default='_demos',
+            action='append')
+
+        parser.add_argument(
+            '-x', '--exclude_files', type=str, nargs='*',
+            help='exclude the specified files',
+            action='append')
+
+        parser.add_argument(
+            '--limited_doc_files',
+            help=('List of files with relaxed documentation checks. Will not '
+                  'report errors for missing documentation, some missing '
+                  'descriptions, or methods whose @return tags don\'t have a '
+                  'matching return statement.'),
+            action='append',
+            nargs='*')
+
+        parser.add_argument(
+            '--error_trace',
+            help='show error exceptions.',
+            action='store_true')
+
+        parser.add_argument(
+            '--closurized_namespaces',
+            help=('namespace prefixes, used for testing of'
+                  'goog.provide/require'),
+            action='append',
+            nargs='*')
+
+        parser.add_argument(
+            '--ignored_extra_namespaces',
+            help=('Fully qualified namespaces that should be not be reported '
+                  'as extra by the linter.'),
+            action='append',
+            nargs='*')
+
+        parser.add_argument(
+            '--custom_jsdoc_tags',
+            help=('extra jsdoc tags to allow'),
+            action='append',
+            nargs='*')
+
+        parser.add_argument(
+            '--dot_on_next_line',
+            help=('Require dots to be'
+                  'placed on the next line for wrapped expressions'),
+            action='store_true')
+
+        parser.add_argument(
+            '--check_trailing_comma',
+            help=('check trailing commas'
+                  ' (ES3, not needed from ES5 onwards)'),
+            action='store_true')
+
+        parser.add_argument(
+            '--debug_indentation',
+            help='print debugging information for indentation',
+            action='store_true')
+
+        # Comment - watch this one, backwards internally than before
+        parser.add_argument(
+            '--jsdoc',
+            help='disable reporting errors for missing JsDoc.',
+            action='store_true')
+
+        parser.add_argument(
+            '--disable',
+            help=('Disable specific error. Usage Ex.: gjslint --disable 1,'
+                  '0011 foo.js.'),
+            action='append',
+            nargs='*')
+
+        # Comment - old version checked for minimum of 1,
+        # so maybe check for negative later
+        parser.add_argument(
+            '-m', '--max_line_length',
+            type=int,
+            help=('Maximum line length allowed '
+                  'without warning.'),
+            default=80)
+
+        parser.add_argument(
+            '--dry_run',
+            help='(fixjscodestyle) do not modify the file, only print it.',
+            action='store_true')
+
+        args = parser.parse_args()
+        print args
 
     def check(self):
         """Check the JavaScript files for style."""
