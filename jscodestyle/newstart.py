@@ -42,8 +42,10 @@ class JsCodeStyle(object):
         parser = argparse.ArgumentParser()
 
         parser.add_argument(
-            'files', metavar='N', type=str, nargs='*',
+            'files',
             help='the files to check',
+            type=str,
+            nargs='*',
             default=sys.stdin)
 
         parser.add_argument(
@@ -79,16 +81,17 @@ class JsCodeStyle(object):
             action='store_true')
 
         parser.add_argument(
-            '-a', '--additional_extensions',
-            help=('comma separated list of additional file '
-                  'extensions (not js) that should be treated as '
-                  'JavaScript files.'))
-
-        parser.add_argument(
             '-m', '--multiprocess',
             help=('disable parallelised linting using the '
                   'multiprocessing module; this may make debugging easier.'),
             action='store_true')
+
+        parser.add_argument(
+            '-a', '--additional_extensions',
+            help=('comma separated list of additional file '
+                  'extensions (not js) that should be treated as '
+                  'JavaScript files.'),
+            metavar="es,es6,ts")
 
         parser.add_argument(
             '-r', '--recurse',
@@ -98,12 +101,12 @@ class JsCodeStyle(object):
 
         parser.add_argument(
             '-e', '--exclude_directories',
-            type=str,
-            nargs='*',
             help=('exclude the specified directories '
                   '(only applicable along with -r'),
-            default='_demos',
-            action='append')
+            type=str,
+            action='append',
+            nargs='*',
+            default='_demos')
 
         parser.add_argument(
             '-x', '--exclude_files', type=str, nargs='*',
@@ -152,8 +155,8 @@ class JsCodeStyle(object):
 
         parser.add_argument(
             '--check_trailing_comma',
-            help=('check trailing commas'
-                  ' (ES3, not needed from ES5 onwards)'),
+            help=('check trailing commas '
+                  '(ES3, not needed from ES5 onwards)'),
             action='store_true')
 
         parser.add_argument(
@@ -177,10 +180,11 @@ class JsCodeStyle(object):
         # Comment - old version checked for minimum of 1,
         # so maybe check for negative later
         parser.add_argument(
-            '-m', '--max_line_length',
+            '--max_line_length',
             type=int,
             help=('Maximum line length allowed '
-                  'without warning.'),
+                  'without warning (default 80).'),
+            metavar="N",
             default=80)
 
         parser.add_argument(
@@ -190,6 +194,8 @@ class JsCodeStyle(object):
 
         args = parser.parse_args()
         print args
+
+        # Everything in error_check.py
 
     def check(self):
         """Check the JavaScript files for style."""
