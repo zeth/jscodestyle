@@ -34,10 +34,12 @@ is in tokenizer.py and checker.py.
 
 import argparse
 import sys
-
+import time
+import os
 
 # Comment - These are all the tags from gjslint There are way too
 # many, we should think what is really useful and cull some.
+# Perhaps we should rely more on a config file for advance setups
 
 class JsCodeStyle(object):
     """This class is a front end that parses arguments and flags."""
@@ -45,7 +47,7 @@ class JsCodeStyle(object):
         parser = argparse.ArgumentParser()
 
         parser.add_argument(
-            'files',
+            'paths',
             help='the files to check',
             type=str,
             nargs='*',
@@ -91,10 +93,11 @@ class JsCodeStyle(object):
 
         parser.add_argument(
             '-a', '--additional_extensions',
-            help=('comma separated list of additional file '
-                  'extensions (not js) that should be treated as '
-                  'JavaScript files.'),
-            metavar='es,es6,ts')
+            help=('Additional file extensions (not js) that should '
+                  'be treated as JavaScript files e.g. es, es6 or ts.'),
+            metavar='ext',
+            nargs='+'
+        )
 
         parser.add_argument(
             '-r', '--recurse',
@@ -205,14 +208,27 @@ class JsCodeStyle(object):
             help='(fixjscodestyle) do not modify the file, only print it.',
             action='store_true')
 
-        args = parser.parse_args()
-        print args
+        # Don't forget everything in error_check.py
+        self.args = parser.parse_args()
 
-        # Everything in error_check.py
+        # Emacs sets the environment variable INSIDE_EMACS in the subshell.
+        # Request Unix mode as emacs will expect output to be in Unix format
+        # for integration.
+        # See https://www.gnu.org/software/emacs/manual/html_node/emacs/
+        # Interactive-Shell.html
+
+        if 'INSIDE_EMACS' in os.environ:
+            self.args.unix_mode = True
 
     def check(self):
         """Check the JavaScript files for style."""
-        pass
+        if self.args.time:
+            start_time = time.time()
+        suffixes = ['.js']
+        if self.args.additional_extensions:
+            suffixes += ['.%s' % ext for ext in self.args.additional_extensions]
+        if self.args.check_html:
+            suffixes += ['.html', '.htm']
 
 
 def main():
