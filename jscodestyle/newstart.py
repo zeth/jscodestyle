@@ -36,6 +36,9 @@ import argparse
 import sys
 
 
+# Comment - These are all the tags from gjslint There are way too
+# many, we should think what is really useful and cull some.
+
 class JsCodeStyle(object):
     """This class is a front end that parses arguments and flags."""
     def __init__(self):
@@ -50,7 +53,7 @@ class JsCodeStyle(object):
 
         parser.add_argument(
             '-u', '--unix_mode',
-            help='emit warnings in standard unix format',
+            help='emit warnings in standard unix format e.g. for Emacs',
             action='store_true')
 
         parser.add_argument(
@@ -91,13 +94,14 @@ class JsCodeStyle(object):
             help=('comma separated list of additional file '
                   'extensions (not js) that should be treated as '
                   'JavaScript files.'),
-            metavar="es,es6,ts")
+            metavar='es,es6,ts')
 
         parser.add_argument(
             '-r', '--recurse',
             help=('recurse in to the subdirectories of the given path'),
             action='append',
-            nargs='*')
+            nargs='+',
+            metavar='dir')
 
         parser.add_argument(
             '-e', '--exclude_directories',
@@ -105,13 +109,16 @@ class JsCodeStyle(object):
                   '(only applicable along with -r'),
             type=str,
             action='append',
-            nargs='*',
-            default='_demos')
+            nargs='+',
+            metavar='dir')
 
         parser.add_argument(
-            '-x', '--exclude_files', type=str, nargs='*',
+            '-x', '--exclude_files',
+            type=str,
+            nargs='*',
             help='exclude the specified files',
-            action='append')
+            action='append',
+            metavar='file')
 
         parser.add_argument(
             '--limited_doc_files',
@@ -120,7 +127,8 @@ class JsCodeStyle(object):
                   'descriptions, or methods whose @return tags don\'t have a '
                   'matching return statement.'),
             action='append',
-            nargs='*')
+            nargs='*',
+            metavar="filename")
 
         parser.add_argument(
             '--error_trace',
@@ -132,20 +140,23 @@ class JsCodeStyle(object):
             help=('namespace prefixes, used for testing of'
                   'goog.provide/require'),
             action='append',
-            nargs='*')
+            nargs='*',
+            metavar="prefix")
 
         parser.add_argument(
             '--ignored_extra_namespaces',
             help=('Fully qualified namespaces that should be not be reported '
                   'as extra by the linter.'),
             action='append',
-            nargs='*')
+            nargs='*',
+            metavar="namespace")
 
         parser.add_argument(
             '--custom_jsdoc_tags',
             help=('extra jsdoc tags to allow'),
             action='append',
-            nargs='*')
+            nargs='*',
+            metavar="tagname")
 
         parser.add_argument(
             '--dot_on_next_line',
@@ -170,21 +181,23 @@ class JsCodeStyle(object):
             help='disable reporting errors for missing JsDoc.',
             action='store_true')
 
+        # Comment - this should change to named errors
         parser.add_argument(
             '--disable',
-            help=('Disable specific error. Usage Ex.: gjslint --disable 1,'
+            help=('Disable specific error. Usage Ex.: gjslint --disable 1 '
                   '0011 foo.js.'),
             action='append',
-            nargs='*')
+            nargs='*',
+            metavar='error_num')
 
-        # Comment - old version checked for minimum of 1,
+        # Comment - old version checked for minimum of N=1,
         # so maybe check for negative later
         parser.add_argument(
             '--max_line_length',
             type=int,
             help=('Maximum line length allowed '
                   'without warning (default 80).'),
-            metavar="N",
+            metavar='N',
             default=80)
 
         parser.add_argument(
