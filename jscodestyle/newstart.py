@@ -36,6 +36,8 @@ import argparse
 import sys
 import time
 import os
+import glob
+import re
 
 # Comment - These are all the tags from gjslint There are way too
 # many, we should think what is really useful and cull some.
@@ -220,16 +222,134 @@ class JsCodeStyle(object):
         if 'INSIDE_EMACS' in os.environ:
             self.args.unix_mode = True
 
+        self.suffixes = ['.js']
+        if self.args.additional_extensions:
+            self.suffixes += ['.%s' % ext for ext in self.args.additional_extensions]
+        if self.args.check_html:
+            self.suffixes += ['.html', '.htm']
+        self.paths = None
+        self._get_paths()
+        self.start_time = time.time()
+
+    def matches_suffixes(self, filename):
+        """Returns whether the given filename matches one of the given suffixes.
+
+        Args:
+          filename: Filename to check.
+
+        Returns:
+          Whether the given filename matches one of the given suffixes.
+        """
+        suffix = filename[filename.rfind('.'):]
+        return suffix in self.suffixes
+
+    def get_user_specified_files(self):
+        """Returns files to be linted, specified directly on the command line.
+
+        Can handle the '*' wildcard in filenames, but no other wildcards.
+
+        Args:
+          argv: Sequence of command line arguments. The second and following arguments
+            are assumed to be files that should be linted.
+          suffixes: Expected suffixes for the file type being checked.
+
+        Returns:
+          A sequence of files to be linted.
+        """
+        all_files = []
+        lint_files = []
+
+         # Perform any necessary globs.
+        for f in self.args.paths:
+            if f.find('*') != -1:
+                for result in glob.glob(f):
+                    all_files.append(result)
+            else:
+                all_files.append(f)
+
+        for f in all_files:
+            if self.matches_suffixes(f):
+                lint_files.append(f)
+        return lint_files
+
+    def get_recursive_files(self):
+        """Returns files to be checked specified by the --recurse flag.
+
+        Returns:
+          A list of files to be checked.
+        """
+        lint_files = []
+        # Perform any request recursion
+        if self.args.recurse:
+            for start in self.args.recurse:
+                for root, _, files in os.walk(start):
+                    for f in files:
+                        if self.matches_suffixes(f):
+                            lint_files.append(os.path.join(root, f))
+        return lint_files
+
+    def filter_files(self, files):
+        """Filters the list of files to be linted be removing any excluded files.
+
+        Filters out files excluded using --exclude_files and  --exclude_directories.
+
+        Args:
+          files: Sequence of files that needs filtering.
+
+        Returns:
+          Filtered list of files to be linted.
+        """
+        num_files = len(files)
+
+        ignore_dirs_regexs = []
+
+        excluded_dirs = (self.args.exclude_directories if
+                         self.args.exclude_directories else [])
+
+        excluded_files = (self.args.exclude_files if
+                          self.args.exclude_files else [])
+
+        for ignore in excluded_dirs:
+            ignore_dirs_regexs.append(re.compile(r'(^|[\\/])%s[\\/]' % ignore))
+
+        result_files = []
+        for f in files:
+            add_file = True
+            for exclude in excluded_files:
+                if f.endswith('/' + exclude) or f == exclude:
+                    add_file = False
+                    break
+            for ignore in ignore_dirs_regexs:
+                if ignore.search(f):
+                    # Break out of ignore loop so we don't add to
+                    # filtered files.
+                    add_file = False
+                    break
+            if add_file:
+                # Convert everything to absolute paths so we can easily remove duplicates
+                # using a set.
+                result_files.append(os.path.abspath(f))
+
+        skipped = num_files - len(result_files)
+        if skipped:
+            print 'Skipping %d file(s).' % skipped
+
+        self.paths = set(result_files)
+
+
+    def _get_paths(self):
+        """Finds all files specified by the user on the commandline."""
+        files = self.get_user_specified_files()
+
+        if self.args.recurse:
+            files += self.get_recursive_files()
+
+        self.filter_files(files)
+
     def check(self):
         """Check the JavaScript files for style."""
-        if self.args.time:
-            start_time = time.time()
-        suffixes = ['.js']
-        if self.args.additional_extensions:
-            suffixes += ['.%s' % ext for ext in self.args.additional_extensions]
-        if self.args.check_html:
-            suffixes += ['.html', '.htm']
-
+        print(self.start_time)
+        print(self.paths)
 
 def main():
     """Used when called as a command line script."""
