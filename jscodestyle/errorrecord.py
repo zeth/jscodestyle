@@ -17,12 +17,9 @@
 
 """A simple, pickle-serializable class to represent a lint error."""
 
-import gflags as flags
 
 from jscodestyle import errors
 from jscodestyle.common import erroroutput
-
-FLAGS = flags.FLAGS
 
 
 class ErrorRecord(object):
@@ -40,7 +37,7 @@ class ErrorRecord(object):
         self.new_error = new_error
 
 
-def make_error_record(path, error):
+def make_error_record(path, error, unix_mode=False):
     """Make an error record with correctly formatted error string.
 
     Errors are not able to be serialized (pickled) over processes because of
@@ -56,7 +53,7 @@ def make_error_record(path, error):
     """
     new_error = error.code in errors.NEW_ERRORS
 
-    if FLAGS.unix_mode:
+    if unix_mode:
         error_string = erroroutput.GetUnixErrorOutput(
             path, error, new_error=new_error)
     else:

@@ -30,7 +30,10 @@ JavaScript style guide.
 
 This file is a front end that parses arguments and flags.  The core of the code
 is in tokenizer.py and checker.py.
+
 """
+
+from __future__ import print_function
 
 import argparse
 import sys
@@ -38,9 +41,39 @@ import time
 import os
 import glob
 import re
+import multiprocessing
+import errno
+import itertools
 
-# Comment - These are all the tags from gjslint There are way too
-# many, we should think what is really useful and cull some.
+from jscodestyle import errorrecord
+from jscodestyle import runner
+from jscodestyle.common import erroraccumulator
+
+GJSLINT_ONLY_FLAGS = ['--unix_mode', '--beep', '--nobeep', '--time',
+                      '--check_html', '--summary', '--quiet']
+
+# Comment - Below are all the arguments from gjslint. There are way
+# too many, we should think what is really useful and cull some.
+
+
+def _check_path(path):
+    """Check a path and return any errors.
+
+    Args:
+      path: paths to check.
+
+    Returns:
+      A list of errorrecord.ErrorRecords for any found errors.
+    """
+
+    error_handler = erroraccumulator.ErrorAccumulator()
+    runner.Run(path, error_handler)
+
+    make_error_record = lambda err: errorrecord.make_error_record(path, err)
+    return map(make_error_record, error_handler.GetErrors())
+
+
+
 # Perhaps we should rely more on a config file for advance setups
 
 class JsCodeStyle(object):
@@ -88,7 +121,7 @@ class JsCodeStyle(object):
             action='store_true')
 
         parser.add_argument(
-            '-m', '--multiprocess',
+            '-p', '--singleprocess',
             help=('disable parallelised linting using the '
                   'multiprocessing module; this may make debugging easier.'),
             action='store_true')
@@ -260,16 +293,16 @@ class JsCodeStyle(object):
         lint_files = []
 
          # Perform any necessary globs.
-        for f in self.args.paths:
-            if f.find('*') != -1:
-                for result in glob.glob(f):
+        for filename in self.args.paths:
+            if filename.find('*') != -1:
+                for result in glob.glob(filename):
                     all_files.append(result)
             else:
-                all_files.append(f)
+                all_files.append(filename)
 
-        for f in all_files:
-            if self.matches_suffixes(f):
-                lint_files.append(f)
+        for filename in all_files:
+            if self.matches_suffixes(filename):
+                lint_files.append(filename)
         return lint_files
 
     def get_recursive_files(self):
@@ -283,9 +316,9 @@ class JsCodeStyle(object):
         if self.args.recurse:
             for start in self.args.recurse:
                 for root, _, files in os.walk(start):
-                    for f in files:
-                        if self.matches_suffixes(f):
-                            lint_files.append(os.path.join(root, f))
+                    for filename in files:
+                        if self.matches_suffixes(filename):
+                            lint_files.append(os.path.join(root, filename))
         return lint_files
 
     def filter_files(self, files):
@@ -313,26 +346,25 @@ class JsCodeStyle(object):
             ignore_dirs_regexs.append(re.compile(r'(^|[\\/])%s[\\/]' % ignore))
 
         result_files = []
-        for f in files:
+        for filename in files:
             add_file = True
             for exclude in excluded_files:
-                if f.endswith('/' + exclude) or f == exclude:
+                if filename.endswith('/' + exclude) or filename == exclude:
                     add_file = False
                     break
             for ignore in ignore_dirs_regexs:
-                if ignore.search(f):
+                if ignore.search(filename):
                     # Break out of ignore loop so we don't add to
                     # filtered files.
-                    add_file = False
                     break
             if add_file:
                 # Convert everything to absolute paths so we can easily remove duplicates
                 # using a set.
-                result_files.append(os.path.abspath(f))
+                result_files.append(os.path.abspath(filename))
 
         skipped = num_files - len(result_files)
         if skipped:
-            print 'Skipping %d file(s).' % skipped
+            print('Skipping %d file(s).' % skipped)
 
         self.paths = set(result_files)
 
@@ -346,10 +378,203 @@ class JsCodeStyle(object):
 
         self.filter_files(files)
 
+
+    def _multiprocess_check_paths(self):
+        """Run _check_path over mutltiple processes.
+
+        Tokenization, passes, and checks are expensive operations.  Running in a
+        single process, they can only run on one CPU/core.  Instead,
+        shard out linting over all CPUs with multiprocessing to parallelize.
+
+        Args:
+          paths: paths to check.
+
+        Yields:
+          errorrecord.ErrorRecords for any found errors.
+        """
+
+        pool = multiprocessing.Pool()
+
+        path_results = pool.imap(_check_path, self.paths)
+        for results in path_results:
+            for result in results:
+                yield result
+
+        # Force destruct before returning, as this can sometimes raise spurious
+        # "interrupted system call" (EINTR), which we can ignore.
+        try:
+            pool.close()
+            pool.join()
+            del pool
+        except OSError as err:
+            if err.errno is not errno.EINTR:
+                raise err
+
+    def _check_paths(self):
+        """Run _check_path on all paths in one thread.
+
+        Args:
+          paths: paths to check.
+
+        Yields:
+          errorrecord.ErrorRecords for any found errors.
+        """
+
+        for path in self.paths:
+            results = self._check_path(path)
+            for record in results:
+                yield record
+
+    @staticmethod
+    def _check_path(path):
+        """Check a path and return any errors.
+
+        Args:
+          path: paths to check.
+
+        Returns:
+          A list of errorrecord.ErrorRecords for any found errors.
+        """
+
+        error_handler = erroraccumulator.ErrorAccumulator()
+        runner.Run(path, error_handler)
+
+        make_error_record = lambda err: errorrecord.make_error_record(path, err)
+        return map(make_error_record, error_handler.GetErrors())
+
+    def _print_file_summary(self, records):
+        """Print a detailed summary of the number of errors in each file."""
+
+        paths = list(self.paths)
+        paths.sort()
+
+        for path in paths:
+            path_errors = [e for e in records if e.path == path]
+            print('%s: %d' % (path, len(path_errors)))
+
+
+    @staticmethod
+    def _print_file_separator(path):
+        print('----- FILE  :  %s -----' % path)
+
+    def _print_error_records(self, error_records):
+        """Print error records strings in the expected format."""
+
+        current_path = None
+        for record in error_records:
+
+            if current_path != record.path:
+                current_path = record.path
+                if not self.args.unix_mode:
+                    self._print_file_separator(current_path)
+
+            print(record.error_string)
+
+    def _print_summary(self, paths, error_records):
+        """Print a summary of the number of errors and files."""
+
+        error_count = len(error_records)
+        all_paths = set(paths)
+        all_paths_count = len(all_paths)
+
+        if error_count is 0:
+            print ('%d files checked, no errors found.' % all_paths_count)
+
+        new_error_count = len([e for e in error_records if e.new_error])
+
+        error_paths = set([e.path for e in error_records])
+        error_paths_count = len(error_paths)
+        no_error_paths_count = all_paths_count - error_paths_count
+
+        if (error_count or new_error_count) and not self.args.quiet:
+            error_noun = 'error' if error_count == 1 else 'errors'
+            new_error_noun = 'error' if new_error_count == 1 else 'errors'
+            error_file_noun = 'file' if error_paths_count == 1 else 'files'
+            ok_file_noun = 'file' if no_error_paths_count == 1 else 'files'
+            print('Found %d %s, including %d new %s, in %d %s (%d %s OK).' %
+                  (error_count,
+                   error_noun,
+                   new_error_count,
+                   new_error_noun,
+                   error_paths_count,
+                   error_file_noun,
+                   no_error_paths_count,
+                   ok_file_noun))
+
+
+    @staticmethod
+    def _format_time(duration):
+        """Formats a duration as a human-readable string.
+
+        Args:
+          duration: A duration in seconds.
+
+        Returns:
+          A formatted duration string.
+        """
+        if duration < 1:
+            return '%dms' % round(duration * 1000)
+        return '%.2fs' % duration
+
+
     def check(self):
         """Check the JavaScript files for style."""
-        print(self.start_time)
-        print(self.paths)
+        if self.args.singleprocess:
+            records_iter = self._check_paths()
+        else:
+            records_iter = self._multiprocess_check_paths()
+
+        records_iter, records_iter_copy = itertools.tee(records_iter, 2)
+        self._print_error_records(records_iter_copy)
+
+        error_records = list(records_iter)
+        self._print_summary(self.paths, error_records)
+
+        exit_code = 0
+
+        # If there are any errors
+        if error_records:
+            exit_code += 1
+
+        # If there are any new errors
+        if [r for r in error_records if r.new_error]:
+            exit_code += 2
+
+        if exit_code:
+            if self.args.summary:
+                self._print_file_summary(error_records)
+
+            if self.args.beep:
+                # Make a beep noise.
+                sys.stdout.write(chr(7))
+
+            # Write out instructions for using fixjsstyle script to fix some of the
+            # reported errors.
+            fix_args = []
+            for flag in sys.argv[1:]:
+                for go_flag in GJSLINT_ONLY_FLAGS:
+                    if flag.startswith(go_flag):
+                        break
+                else:
+                    fix_args.append(flag)
+
+            if not self.args.quiet:
+                print("""
+          Some of the errors reported by GJsLint may be auto-fixable using the
+          command fixjsstyle. Please double check any changes it makes and report
+          any bugs. The command can be run by executing:
+
+          fixjsstyle %s """ % ' '.join(fix_args))
+
+        if self.args.time:
+            print ('Done in %s.' % self._format_time(time.time() -
+                                                     self.start_time))
+
+        sys.exit(exit_code)
+
+
+
+
 
 def main():
     """Used when called as a command line script."""
