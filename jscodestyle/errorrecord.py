@@ -20,6 +20,8 @@
 
 from jscodestyle import errors
 from jscodestyle.common import erroroutput
+from jscodestyle.common import erroraccumulator
+from jscodestyle import runner
 
 
 class ErrorRecord(object):
@@ -60,3 +62,23 @@ def make_error_record(path, error, unix_mode=False):
         error_string = erroroutput.GetErrorOutput(error, new_error=new_error)
 
     return ErrorRecord(path, error_string, new_error)
+
+
+def check_path(path, unix_mode=False):
+    """Check a path and return any errors.
+
+    Args:
+      path: paths to check.
+
+    Returns:
+      A list of errorrecord.ErrorRecords for any found errors.
+    """
+
+    error_handler = erroraccumulator.ErrorAccumulator()
+    runner.Run(path, error_handler)
+
+    make_error_fn = lambda err: make_error_record(
+        path,
+        err,
+        unix_mode)
+    return map(make_error_fn, error_handler.GetErrors())

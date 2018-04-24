@@ -43,35 +43,17 @@ import glob
 import re
 import multiprocessing
 import errno
-import itertools
+from itertools import tee
+from functools import partial
 
-from jscodestyle import errorrecord
-from jscodestyle import runner
-from jscodestyle.common import erroraccumulator
+from jscodestyle.errorrecord import check_path
+
 
 GJSLINT_ONLY_FLAGS = ['--unix_mode', '--beep', '--nobeep', '--time',
                       '--check_html', '--summary', '--quiet']
 
 # Comment - Below are all the arguments from gjslint. There are way
 # too many, we should think what is really useful and cull some.
-
-
-def _check_path(path):
-    """Check a path and return any errors.
-
-    Args:
-      path: paths to check.
-
-    Returns:
-      A list of errorrecord.ErrorRecords for any found errors.
-    """
-
-    error_handler = erroraccumulator.ErrorAccumulator()
-    runner.Run(path, error_handler)
-
-    make_error_record = lambda err: errorrecord.make_error_record(path, err)
-    return map(make_error_record, error_handler.GetErrors())
-
 
 
 # Perhaps we should rely more on a config file for advance setups
@@ -395,7 +377,9 @@ class JsCodeStyle(object):
 
         pool = multiprocessing.Pool()
 
-        path_results = pool.imap(_check_path, self.paths)
+        check_path_p = partial(check_path, unix_mode=self.args.unix_mode)
+
+        path_results = pool.imap(check_path_p, self.paths)
         for results in path_results:
             for result in results:
                 yield result
@@ -421,26 +405,9 @@ class JsCodeStyle(object):
         """
 
         for path in self.paths:
-            results = self._check_path(path)
+            results = check_path(path, self.args.unix_mode)
             for record in results:
                 yield record
-
-    @staticmethod
-    def _check_path(path):
-        """Check a path and return any errors.
-
-        Args:
-          path: paths to check.
-
-        Returns:
-          A list of errorrecord.ErrorRecords for any found errors.
-        """
-
-        error_handler = erroraccumulator.ErrorAccumulator()
-        runner.Run(path, error_handler)
-
-        make_error_record = lambda err: errorrecord.make_error_record(path, err)
-        return map(make_error_record, error_handler.GetErrors())
 
     def _print_file_summary(self, records):
         """Print a detailed summary of the number of errors in each file."""
@@ -524,7 +491,7 @@ class JsCodeStyle(object):
         else:
             records_iter = self._multiprocess_check_paths()
 
-        records_iter, records_iter_copy = itertools.tee(records_iter, 2)
+        records_iter, records_iter_copy = tee(records_iter, 2)
         self._print_error_records(records_iter_copy)
 
         error_records = list(records_iter)
