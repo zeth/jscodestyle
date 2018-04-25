@@ -17,8 +17,6 @@
 
 """Core methods for checking JS files for common style guide violations."""
 
-import gflags as flags
-
 from jscodestyle import aliaspass
 from jscodestyle import checkerbase
 from jscodestyle import closurizednamespacesinfo
