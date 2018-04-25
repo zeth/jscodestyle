@@ -18,8 +18,6 @@
 
 import traceback
 
-import gflags as flags
-
 from jscodestyle import checker
 from jscodestyle import ecmalintrules
 from jscodestyle import ecmametadatapass
@@ -31,10 +29,6 @@ from jscodestyle import javascripttokenizer
 from jscodestyle.common import error
 from jscodestyle.common import htmlutil
 from jscodestyle.common import tokens
-
-flags.ADOPT_module_key_flags(checker)
-flags.ADOPT_module_key_flags(ecmalintrules)
-flags.ADOPT_module_key_flags(error_check)
 
 
 def _GetLastNonWhiteSpaceToken(start_token):
