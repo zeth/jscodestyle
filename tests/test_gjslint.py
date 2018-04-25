@@ -31,7 +31,9 @@ import unittest
 from jscodestyle import error_check
 from jscodestyle import errors
 from jscodestyle import runner
+from jscodestyle import gjslint
 from jscodestyle.tools import filetestcase
+
 
 _RESOURCE_PREFIX = 'tests/testdata'
 
