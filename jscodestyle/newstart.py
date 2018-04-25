@@ -361,7 +361,7 @@ class JsCodeStyle(object):
         self.filter_files(files)
 
 
-    def _multiprocess_check_paths(self):
+    def _multiprocess_check_paths(self, check_fn):
         """Run _check_path over mutltiple processes.
 
         Tokenization, passes, and checks are expensive operations.  Running in a
@@ -377,11 +377,7 @@ class JsCodeStyle(object):
 
         pool = multiprocessing.Pool()
 
-        check_path_p = partial(check_path,
-                               unix_mode=self.args.unix_mode,
-                               limited_doc_files=self.args.limited_doc_files)
-
-        path_results = pool.imap(check_path_p, self.paths)
+        path_results = pool.imap(check_fn, self.paths)
         for results in path_results:
             for result in results:
                 yield result
@@ -396,7 +392,7 @@ class JsCodeStyle(object):
             if err.errno is not errno.EINTR:
                 raise err
 
-    def _check_paths(self):
+    def _check_paths(self, check_fn):
         """Run _check_path on all paths in one thread.
 
         Args:
@@ -407,9 +403,7 @@ class JsCodeStyle(object):
         """
 
         for path in self.paths:
-            results = check_path(path,
-                                 self.args.unix_mode,
-                                 self.args.limited_doc_files)
+            results = check_fn(path)
             for record in results:
                 yield record
 
@@ -490,10 +484,19 @@ class JsCodeStyle(object):
 
     def check(self):
         """Check the JavaScript files for style."""
+
+        check_path_p = partial(
+            check_path,
+            unix_mode=self.args.unix_mode,
+            limited_doc_files=self.args.limited_doc_files,
+            error_trace=self.args.error_trace)
+
+
+
         if self.args.singleprocess:
-            records_iter = self._check_paths()
+            records_iter = self._check_paths(check_path_p)
         else:
-            records_iter = self._multiprocess_check_paths()
+            records_iter = self._multiprocess_check_paths(check_path_p)
 
         records_iter, records_iter_copy = tee(records_iter, 2)
         self._print_error_records(records_iter_copy)

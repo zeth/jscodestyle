@@ -79,6 +79,8 @@ flags.DEFINE_list('limited_doc_files', ['dummy.js', 'externs.js'],
                   'report errors for missing documentation, some missing '
                   'descriptions, or methods whose @return tags don\'t have a '
                   'matching return statement.')
+flags.DEFINE_boolean('error_trace', False,
+                     'Whether to show error exceptions.')
 flags.ADOPT_module_key_flags(fileflags)
 flags.ADOPT_module_key_flags(runner)
 
@@ -146,7 +148,10 @@ def _check_path(path):
     """
 
     error_handler = erroraccumulator.ErrorAccumulator()
-    runner.Run(path, error_handler, flags.FLAGS.limited_doc_files)
+    runner.Run(path,
+               error_handler,
+               flags.FLAGS.limited_doc_files,
+               flags.FLAGS.error_trace)
 
     make_error_record = lambda err: errorrecord.make_error_record(path, err)
     return map(make_error_record, error_handler.GetErrors())

@@ -32,8 +32,6 @@ from jscodestyle.common import error
 from jscodestyle.common import htmlutil
 from jscodestyle.common import tokens
 
-flags.DEFINE_boolean('error_trace', False,
-                     'Whether to show error exceptions.')
 flags.ADOPT_module_key_flags(checker)
 flags.ADOPT_module_key_flags(ecmalintrules)
 flags.ADOPT_module_key_flags(error_check)
@@ -90,7 +88,8 @@ def _IsLimitedDocCheck(filename, limited_doc_files):
 def Run(filename,
         error_handler,
         source=None,
-        limited_doc_files=None):
+        limited_doc_files=None,
+        error_trace=None):
     """Tokenize, run passes, and check the given file.
 
     Args:
@@ -131,7 +130,11 @@ def Run(filename,
     error_token = None
 
     ecma_pass = ecmametadatapass.EcmaMetaDataPass()
-    error_token = RunMetaDataPass(token, ecma_pass, error_handler, filename)
+    error_token = RunMetaDataPass(token,
+                                  ecma_pass,
+                                  error_handler,
+                                  filename,
+                                  error_trace)
 
     is_limited_doc_check = (
         _IsLimitedDocCheck(filename, limited_doc_files))
@@ -144,7 +147,11 @@ def Run(filename,
     error_handler.FinishFile()
 
 
-def RunMetaDataPass(start_token, metadata_pass, error_handler, filename=''):
+def RunMetaDataPass(start_token,
+                    metadata_pass,
+                    error_handler,
+                    filename='',
+                    error_trace=None):
     """Run a metadata pass over a token stream.
 
     Args:
@@ -160,7 +167,7 @@ def RunMetaDataPass(start_token, metadata_pass, error_handler, filename=''):
     try:
         metadata_pass.Process(start_token)
     except ecmametadatapass.ParseError, parse_err:
-        if flags.FLAGS.error_trace:
+        if error_trace:
             traceback.print_exc()
         error_token = parse_err.token
         error_msg = str(parse_err)
