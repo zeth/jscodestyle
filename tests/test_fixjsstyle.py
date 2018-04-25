@@ -27,8 +27,10 @@ from jscodestyle import runner
 _RESOURCE_PREFIX = 'tests/testdata'
 
 flags.FLAGS.strict = True
-flags.FLAGS.limited_doc_files = ('dummy.js', 'externs.js')
-flags.FLAGS.closurized_namespaces = ('goog', 'dummy')
+
+LIMITED_DOC_FILES = ('dummy.js', 'externs.js')
+CLOSURIZED_NAMESPACES = ('goog', 'dummy')
+
 
 
 class FixJsStyleTest(unittest.TestCase):
@@ -71,7 +73,12 @@ class FixJsStyleTest(unittest.TestCase):
 
             # Autofix the file, sending output to a fake file.
             actual = StringIO.StringIO()
-            runner.Run(input_filename, error_fixer.ErrorFixer(actual))
+            runner.Run(input_filename,
+                       error_fixer.ErrorFixer(actual),
+                       None,
+                       LIMITED_DOC_FILES,
+                       None,
+                       CLOSURIZED_NAMESPACES)
 
             # Now compare the files.
             actual.seek(0)
@@ -590,7 +597,13 @@ class FixJsStyleTest(unittest.TestCase):
             expected = self._GetHeader() + expected
 
         actual = StringIO.StringIO()
-        runner.Run('testing.js', error_fixer.ErrorFixer(actual), original)
+        runner.Run('testing.js',
+                   error_fixer.ErrorFixer(actual),
+                   original,
+                   LIMITED_DOC_FILES,
+                   None,
+                   CLOSURIZED_NAMESPACES)
+
         actual.seek(0)
 
         expected = [x + '\n' for x in expected]

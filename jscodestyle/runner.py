@@ -89,7 +89,9 @@ def Run(filename,
         error_handler,
         source=None,
         limited_doc_files=None,
-        error_trace=None):
+        error_trace=None,
+        closurized_namespaces=None,
+        ignored_extra_namespaces=None):
     """Tokenize, run passes, and check the given file.
 
     Args:
@@ -100,6 +102,11 @@ def Run(filename,
     """
     if not limited_doc_files:
         limited_doc_files = []
+    if not closurized_namespaces:
+        closurized_namespaces = []
+    if not ignored_extra_namespaces:
+        ignored_extra_namespaces = []
+
     if not source:
         try:
             source = open(filename)
@@ -139,10 +146,13 @@ def Run(filename,
     is_limited_doc_check = (
         _IsLimitedDocCheck(filename, limited_doc_files))
 
-    _RunChecker(token, error_handler,
+    _RunChecker(token,
+                error_handler,
                 is_limited_doc_check,
-                is_html=_IsHtml(filename),
-                stop_token=error_token)
+                _IsHtml(filename),
+                error_token,
+                closurized_namespaces,
+                ignored_extra_namespaces)
 
     error_handler.FinishFile()
 
@@ -185,15 +195,21 @@ def RunMetaDataPass(start_token,
                 'Internal error in %s' % filename))
 
 
-def _RunChecker(start_token, error_handler,
-                limited_doc_checks, is_html,
-                stop_token=None):
+def _RunChecker(start_token,
+                error_handler,
+                limited_doc_checks,
+                is_html,
+                stop_token=None,
+                closurized_namespaces=None,
+                ignored_extra_namespaces=None):
 
     state_tracker = javascriptstatetracker.JavaScriptStateTracker()
 
     style_checker = checker.JavaScriptStyleChecker(
-        state_tracker=state_tracker,
-        error_handler=error_handler)
+        state_tracker,
+        error_handler,
+        closurized_namespaces,
+        ignored_extra_namespaces)
 
     style_checker.Check(start_token,
                         is_html=is_html,

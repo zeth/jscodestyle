@@ -81,6 +81,13 @@ flags.DEFINE_list('limited_doc_files', ['dummy.js', 'externs.js'],
                   'matching return statement.')
 flags.DEFINE_boolean('error_trace', False,
                      'Whether to show error exceptions.')
+flags.DEFINE_list('closurized_namespaces', '',
+                  'Namespace prefixes, used for testing of'
+                  'goog.provide/require')
+flags.DEFINE_list('ignored_extra_namespaces', '',
+                  'Fully qualified namespaces that should be not be reported '
+                  'as extra by the linter.')
+
 flags.ADOPT_module_key_flags(fileflags)
 flags.ADOPT_module_key_flags(runner)
 
@@ -150,8 +157,11 @@ def _check_path(path):
     error_handler = erroraccumulator.ErrorAccumulator()
     runner.Run(path,
                error_handler,
+               None,
                flags.FLAGS.limited_doc_files,
-               flags.FLAGS.error_trace)
+               flags.FLAGS.error_trace,
+               flags.FLAGS.closurized_namespaces,
+               flags.FLAGS.ignored_extra_namespaces)
 
     make_error_record = lambda err: errorrecord.make_error_record(path, err)
     return map(make_error_record, error_handler.GetErrors())

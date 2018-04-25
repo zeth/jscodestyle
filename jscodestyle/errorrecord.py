@@ -67,7 +67,9 @@ def make_error_record(path, error, unix_mode=False):
 def check_path(path,
                unix_mode=False,
                limited_doc_files=None,
-               error_trace=None):
+               error_trace=None,
+               closurized_namespaces=None,
+               ignored_extra_namespaces=None):
     """Check a path and return any errors.
 
     Args:
@@ -82,8 +84,11 @@ def check_path(path,
     error_handler = erroraccumulator.ErrorAccumulator()
     runner.Run(path,
                error_handler,
+               None,
                limited_doc_files,
-               error_trace)
+               error_trace,
+               closurized_namespaces,
+               ignored_extra_namespaces)
 
     make_error_fn = lambda err: make_error_record(
         path,

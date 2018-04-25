@@ -25,18 +25,14 @@ from jscodestyle import closurizednamespacesinfo
 from jscodestyle import javascriptlintrules
 
 
-flags.DEFINE_list('closurized_namespaces', '',
-                  'Namespace prefixes, used for testing of'
-                  'goog.provide/require')
-flags.DEFINE_list('ignored_extra_namespaces', '',
-                  'Fully qualified namespaces that should be not be reported '
-                  'as extra by the linter.')
-
-
 class JavaScriptStyleChecker(checkerbase.CheckerBase):
     """Checker that applies JavaScriptLintRules."""
 
-    def __init__(self, state_tracker, error_handler):
+    def __init__(self,
+                 state_tracker,
+                 error_handler,
+                 closurized_namespaces=None,
+                 ignored_extra_namespaces=None):
         """Initialize an JavaScriptStyleChecker object.
 
         Args:
@@ -45,14 +41,14 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         """
         self._namespaces_info = None
         self._alias_pass = None
-        if flags.FLAGS.closurized_namespaces:
+        if closurized_namespaces:
             self._namespaces_info = (
                 closurizednamespacesinfo.ClosurizedNamespacesInfo(
-                    flags.FLAGS.closurized_namespaces,
-                    flags.FLAGS.ignored_extra_namespaces))
+                    closurized_namespaces,
+                    ignored_extra_namespaces))
 
             self._alias_pass = aliaspass.AliasPass(
-                flags.FLAGS.closurized_namespaces, error_handler)
+                closurized_namespaces, error_handler)
 
         checkerbase.CheckerBase.__init__(
             self,
@@ -61,7 +57,10 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
                 self._namespaces_info),
             state_tracker=state_tracker)
 
-    def Check(self, start_token, limited_doc_checks=False, is_html=False,
+    def Check(self,
+              start_token,
+              is_html=False,
+              limited_doc_checks=False,
               stop_token=None):
         """Checks a token stream for lint warnings/errors.
 

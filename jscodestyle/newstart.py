@@ -489,9 +489,9 @@ class JsCodeStyle(object):
             check_path,
             unix_mode=self.args.unix_mode,
             limited_doc_files=self.args.limited_doc_files,
-            error_trace=self.args.error_trace)
-
-
+            error_trace=self.args.error_trace,
+            closurized_namespaces=self.args.closurized_namespaces,
+            ignored_extra_namespaces=self.args.ignored_extra_namespaces)
 
         if self.args.singleprocess:
             records_iter = self._check_paths(check_path_p)
