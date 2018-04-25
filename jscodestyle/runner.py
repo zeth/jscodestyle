@@ -32,11 +32,6 @@ from jscodestyle.common import error
 from jscodestyle.common import htmlutil
 from jscodestyle.common import tokens
 
-flags.DEFINE_list('limited_doc_files', ['dummy.js', 'externs.js'],
-                  'List of files with relaxed documentation checks. Will not '
-                  'report errors for missing documentation, some missing '
-                  'descriptions, or methods whose @return tags don\'t have a '
-                  'matching return statement.')
 flags.DEFINE_boolean('error_trace', False,
                      'Whether to show error exceptions.')
 flags.ADOPT_module_key_flags(checker)
@@ -92,7 +87,10 @@ def _IsLimitedDocCheck(filename, limited_doc_files):
     return False
 
 
-def Run(filename, error_handler, source=None):
+def Run(filename,
+        error_handler,
+        source=None,
+        limited_doc_files=None):
     """Tokenize, run passes, and check the given file.
 
     Args:
@@ -101,6 +99,8 @@ def Run(filename, error_handler, source=None):
       source: A file-like object with the file source. If omitted, the file will
         be read from the filename path.
     """
+    if not limited_doc_files:
+        limited_doc_files = []
     if not source:
         try:
             source = open(filename)
@@ -134,7 +134,7 @@ def Run(filename, error_handler, source=None):
     error_token = RunMetaDataPass(token, ecma_pass, error_handler, filename)
 
     is_limited_doc_check = (
-        _IsLimitedDocCheck(filename, flags.FLAGS.limited_doc_files))
+        _IsLimitedDocCheck(filename, limited_doc_files))
 
     _RunChecker(token, error_handler,
                 is_limited_doc_check,

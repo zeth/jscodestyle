@@ -74,6 +74,11 @@ flags.DEFINE_boolean('multiprocess',
                      'if the multiprocessing module is present (Python 2.6+). '
                      'Otherwise disabled by default. '
                      'Disabling may make debugging easier.')
+flags.DEFINE_list('limited_doc_files', ['dummy.js', 'externs.js'],
+                  'List of files with relaxed documentation checks. Will not '
+                  'report errors for missing documentation, some missing '
+                  'descriptions, or methods whose @return tags don\'t have a '
+                  'matching return statement.')
 flags.ADOPT_module_key_flags(fileflags)
 flags.ADOPT_module_key_flags(runner)
 
@@ -141,7 +146,7 @@ def _check_path(path):
     """
 
     error_handler = erroraccumulator.ErrorAccumulator()
-    runner.Run(path, error_handler)
+    runner.Run(path, error_handler, flags.FLAGS.limited_doc_files)
 
     make_error_record = lambda err: errorrecord.make_error_record(path, err)
     return map(make_error_record, error_handler.GetErrors())

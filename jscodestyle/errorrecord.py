@@ -64,7 +64,9 @@ def make_error_record(path, error, unix_mode=False):
     return ErrorRecord(path, error_string, new_error)
 
 
-def check_path(path, unix_mode=False):
+def check_path(path,
+               unix_mode=False,
+               limited_doc_files=None):
     """Check a path and return any errors.
 
     Args:
@@ -73,9 +75,11 @@ def check_path(path, unix_mode=False):
     Returns:
       A list of errorrecord.ErrorRecords for any found errors.
     """
+    if not limited_doc_files:
+        limited_doc_files = []
 
     error_handler = erroraccumulator.ErrorAccumulator()
-    runner.Run(path, error_handler)
+    runner.Run(path, error_handler, limited_doc_files)
 
     make_error_fn = lambda err: make_error_record(
         path,

@@ -377,7 +377,9 @@ class JsCodeStyle(object):
 
         pool = multiprocessing.Pool()
 
-        check_path_p = partial(check_path, unix_mode=self.args.unix_mode)
+        check_path_p = partial(check_path,
+                               unix_mode=self.args.unix_mode,
+                               limited_doc_files=self.args.limited_doc_files)
 
         path_results = pool.imap(check_path_p, self.paths)
         for results in path_results:
@@ -405,7 +407,9 @@ class JsCodeStyle(object):
         """
 
         for path in self.paths:
-            results = check_path(path, self.args.unix_mode)
+            results = check_path(path,
+                                 self.args.unix_mode,
+                                 self.args.limited_doc_files)
             for record in results:
                 yield record
 
