@@ -494,7 +494,8 @@ class JsCodeStyle(object):
             ignored_extra_namespaces=self.args.ignored_extra_namespaces,
             custom_jsdoc_tags=self.args.custom_jsdoc_tags,
             dot_on_next_line=self.args.dot_on_next_line,
-            check_trailing_comma=self.args.check_trailing_comma)
+            check_trailing_comma=self.args.check_trailing_comma,
+            debug_indentation=self.args.debug_indentation)
 
         if self.args.singleprocess:
             records_iter = self._check_paths(check_path_p)

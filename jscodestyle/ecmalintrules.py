@@ -89,7 +89,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
     def __init__(self,
                  custom_jsdoc_tags=None,
                  dot_on_next_line=False,
-                 check_trailing_comma=False):
+                 check_trailing_comma=False,
+                 debug_indentation=False):
         """Initialize this lint rule object."""
         checkerbase.LintRulesBase.__init__(self)
         if EcmaScriptLintRules.max_line_length == -1:
@@ -97,12 +98,14 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         self.custom_jsdoc_tags = custom_jsdoc_tags or []
         self.dot_on_next_line = dot_on_next_line
         self.check_trailing_comma = check_trailing_comma
+        self.debug_indentation = debug_indentation
 
     def Initialize(self, checker, limited_doc_checks, is_html):
         """Initialize this lint rule object before parsing a new file."""
         checkerbase.LintRulesBase.Initialize(self, checker, limited_doc_checks,
                                              is_html)
-        self._indentation = indentation.IndentationRules()
+        self._indentation = indentation.IndentationRules(
+            self.debug_indentation)
 
     def HandleMissingParameterDoc(self, token, param_name):
         """Handle errors associated with a parameter missing a @param tag."""

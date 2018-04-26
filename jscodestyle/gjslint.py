@@ -41,7 +41,8 @@ import time
 
 import gflags as flags
 
-from jscodestyle import errorrecord
+
+from jscodestyle.errorrecord import check_path
 from jscodestyle import runner
 from jscodestyle.common import erroraccumulator
 from jscodestyle.common import simplefileflags as fileflags
@@ -96,6 +97,8 @@ flags.DEFINE_boolean('dot_on_next_line', False, 'Require dots to be'
 
 flags.DEFINE_boolean('check_trailing_comma', False, 'Check trailing commas'
                      ' (ES3, not needed from ES5 onwards)')
+flags.DEFINE_boolean('debug_indentation', False,
+                     'Whether to print debugging information for indentation.')
 
 
 flags.ADOPT_module_key_flags(fileflags)
@@ -155,27 +158,18 @@ def _check_paths(paths):
 
 
 def _check_path(path):
-    """Check a path and return any errors.
+    return check_path(
+        path,
+        flags.FLAGS.unix_mode,
+        flags.FLAGS.limited_doc_files,
+        flags.FLAGS.error_trace,
+        flags.FLAGS.closurized_namespaces,
+        flags.FLAGS.ignored_extra_namespaces,
+        flags.FLAGS.custom_jsdoc_tags,
+        flags.FLAGS.dot_on_next_line,
+        flags.FLAGS.check_trailing_comma,
+        flags.FLAGS.debug_indentation)
 
-    Args:
-      path: paths to check.
-
-    Returns:
-      A list of errorrecord.ErrorRecords for any found errors.
-    """
-
-    error_handler = erroraccumulator.ErrorAccumulator()
-    runner.Run(path,
-               error_handler,
-               None,
-               flags.FLAGS.limited_doc_files,
-               flags.FLAGS.error_trace,
-               flags.FLAGS.closurized_namespaces,
-               flags.FLAGS.ignored_extra_namespaces,
-               flags.FLAGS.custom_jsdoc_tags)
-
-    make_error_record = lambda err: errorrecord.make_error_record(path, err)
-    return map(make_error_record, error_handler.GetErrors())
 
 
 def _get_file_paths(argv):

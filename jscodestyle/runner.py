@@ -86,7 +86,8 @@ def Run(filename,
         ignored_extra_namespaces=None,
         custom_jsdoc_tags=None,
         dot_on_next_line=None,
-        check_trailing_comma=None):
+        check_trailing_comma=None,
+        debug_indentation=None):
     """Tokenize, run passes, and check the given file.
 
     Args:

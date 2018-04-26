@@ -33,7 +33,8 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
                  ignored_extra_namespaces=None,
                  custom_jsdoc_tags=None,
                  dot_on_next_line=None,
-                 check_trailing_comma=None):
+                 check_trailing_comma=None,
+                 debug_indentation=None):
         """Initialize an JavaScriptStyleChecker object.
 
         Args:
@@ -58,7 +59,8 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
                 self._namespaces_info,
                 custom_jsdoc_tags,
                 dot_on_next_line,
-                check_trailing_comma),
+                check_trailing_comma,
+                debug_indentation),
             state_tracker=state_tracker)
 
     def Check(self,
