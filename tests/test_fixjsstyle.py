@@ -22,7 +22,7 @@ import gflags as flags
 import unittest
 from jscodestyle import error_fixer
 from jscodestyle import runner
-
+from jscodestyle import gjslint
 
 _RESOURCE_PREFIX = 'tests/testdata'
 
@@ -37,10 +37,10 @@ class FixJsStyleTest(unittest.TestCase):
     """Test case to for gjslint auto-fixing."""
 
     def setUp(self):
-        flags.FLAGS.dot_on_next_line = True
+        pass
 
     def tearDown(self):
-        flags.FLAGS.dot_on_next_line = False
+        pass
 
     def testFixJsStyle(self):
         test_cases = [
@@ -78,7 +78,9 @@ class FixJsStyleTest(unittest.TestCase):
                        None,
                        LIMITED_DOC_FILES,
                        None,
-                       CLOSURIZED_NAMESPACES)
+                       CLOSURIZED_NAMESPACES,
+                       dot_on_next_line=True,
+                       check_trailing_comma=True)
 
             # Now compare the files.
             actual.seek(0)

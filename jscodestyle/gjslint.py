@@ -89,6 +89,15 @@ flags.DEFINE_list('ignored_extra_namespaces', '',
                   'as extra by the linter.')
 flags.DEFINE_list('custom_jsdoc_tags', '', 'Extra jsdoc tags to allow')
 
+# TODO(user): When flipping this to True, remove logic from unit tests
+# that overrides this flag.
+flags.DEFINE_boolean('dot_on_next_line', False, 'Require dots to be'
+                     'placed on the next line for wrapped expressions')
+
+flags.DEFINE_boolean('check_trailing_comma', False, 'Check trailing commas'
+                     ' (ES3, not needed from ES5 onwards)')
+
+
 flags.ADOPT_module_key_flags(fileflags)
 flags.ADOPT_module_key_flags(runner)
 

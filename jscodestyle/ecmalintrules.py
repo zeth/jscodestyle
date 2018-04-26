@@ -36,16 +36,6 @@ from jscodestyle.common import error
 from jscodestyle.common import position
 
 
-FLAGS = flags.FLAGS
-
-# TODO(user): When flipping this to True, remove logic from unit tests
-# that overrides this flag.
-flags.DEFINE_boolean('dot_on_next_line', False, 'Require dots to be'
-                     'placed on the next line for wrapped expressions')
-
-flags.DEFINE_boolean('check_trailing_comma', False, 'Check trailing commas'
-                     ' (ES3, not needed from ES5 onwards)')
-
 # TODO(robbyw): Check for extra parens on return statements
 # TODO(robbyw): Check for 0px in strings
 # TODO(robbyw): Ensure inline jsDoc is in {}
@@ -98,12 +88,17 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
     JSDOC_FLAGS_DESCRIPTION_NOT_REQUIRED = frozenset([
         '@fileoverview', '@param', '@return', '@returns'])
 
-    def __init__(self, custom_jsdoc_tags=None):
+    def __init__(self,
+                 custom_jsdoc_tags=None,
+                 dot_on_next_line=False,
+                 check_trailing_comma=False):
         """Initialize this lint rule object."""
         checkerbase.LintRulesBase.__init__(self)
         if EcmaScriptLintRules.max_line_length == -1:
             EcmaScriptLintRules.max_line_length = errorrules.GetMaxLineLength()
         self.custom_jsdoc_tags = custom_jsdoc_tags or []
+        self.dot_on_next_line = dot_on_next_line
+        self.check_trailing_comma = check_trailing_comma
 
     def Initialize(self, checker, limited_doc_checks, is_html):
         """Initialize this lint rule object before parsing a new file."""
@@ -252,7 +247,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         wrapped_before = last_code and last_code.line_number != token.line_number
         wrapped_after = next_code and next_code.line_number != token.line_number
 
-        if FLAGS.dot_on_next_line and is_dot and wrapped_after:
+        if self.dot_on_next_line and is_dot and wrapped_after:
             self._HandleError(
                 errors.LINE_ENDS_WITH_DOT,
                 '"." must go on the following line',
@@ -346,7 +341,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         elif token_type == Type.END_BLOCK:
             last_code = token.metadata.last_code
 
-            if FLAGS.check_trailing_comma:
+            if self.check_trailing_comma:
                 if last_code.IsOperator(','):
                     self._HandleError(
                         errors.COMMA_AT_END_OF_LITERAL,
@@ -460,7 +455,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
             # beginning of a line.
 
             last_code = token.metadata.last_code
-            if FLAGS.check_trailing_comma and token_type == Type.END_BRACKET:
+            if self.check_trailing_comma and token_type == Type.END_BRACKET:
                 if last_code.IsOperator(','):
                     self._HandleError(
                         errors.COMMA_AT_END_OF_LITERAL,

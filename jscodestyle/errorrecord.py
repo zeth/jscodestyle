@@ -70,7 +70,9 @@ def check_path(path,
                error_trace=None,
                closurized_namespaces=None,
                ignored_extra_namespaces=None,
-               custom_jsdoc_tags=None):
+               custom_jsdoc_tags=None,
+               dot_on_next_line=None,
+               check_trailing_comma=None):
     """Check a path and return any errors.
 
     Args:
@@ -90,7 +92,9 @@ def check_path(path,
                error_trace,
                closurized_namespaces,
                ignored_extra_namespaces,
-               custom_jsdoc_tags)
+               custom_jsdoc_tags,
+               dot_on_next_line,
+               check_trailing_comma)
 
     make_error_fn = lambda err: make_error_record(
         path,

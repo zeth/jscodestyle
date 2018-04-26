@@ -31,7 +31,9 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
                  error_handler,
                  closurized_namespaces=None,
                  ignored_extra_namespaces=None,
-                 custom_jsdoc_tags=None):
+                 custom_jsdoc_tags=None,
+                 dot_on_next_line=None,
+                 check_trailing_comma=None):
         """Initialize an JavaScriptStyleChecker object.
 
         Args:
@@ -54,7 +56,9 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
             error_handler=error_handler,
             lint_rules=javascriptlintrules.JavaScriptLintRules(
                 self._namespaces_info,
-                custom_jsdoc_tags),
+                custom_jsdoc_tags,
+                dot_on_next_line,
+                check_trailing_comma),
             state_tracker=state_tracker)
 
     def Check(self,
