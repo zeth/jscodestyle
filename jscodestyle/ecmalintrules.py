@@ -20,8 +20,6 @@
 
 import re
 
-import gflags as flags
-
 from jscodestyle import checkerbase
 from jscodestyle import ecmametadatapass
 from jscodestyle import error_check
