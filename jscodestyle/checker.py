@@ -30,7 +30,8 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
                  state_tracker,
                  error_handler,
                  closurized_namespaces=None,
-                 ignored_extra_namespaces=None):
+                 ignored_extra_namespaces=None,
+                 custom_jsdoc_tags=None):
         """Initialize an JavaScriptStyleChecker object.
 
         Args:
@@ -52,7 +53,8 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
             self,
             error_handler=error_handler,
             lint_rules=javascriptlintrules.JavaScriptLintRules(
-                self._namespaces_info),
+                self._namespaces_info,
+                custom_jsdoc_tags),
             state_tracker=state_tracker)
 
     def Check(self,

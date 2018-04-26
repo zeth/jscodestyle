@@ -37,7 +37,7 @@ from jscodestyle.common import position
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_list('custom_jsdoc_tags', '', 'Extra jsdoc tags to allow')
+
 # TODO(user): When flipping this to True, remove logic from unit tests
 # that overrides this flag.
 flags.DEFINE_boolean('dot_on_next_line', False, 'Require dots to be'
@@ -98,11 +98,12 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
     JSDOC_FLAGS_DESCRIPTION_NOT_REQUIRED = frozenset([
         '@fileoverview', '@param', '@return', '@returns'])
 
-    def __init__(self):
+    def __init__(self, custom_jsdoc_tags=None):
         """Initialize this lint rule object."""
         checkerbase.LintRulesBase.__init__(self)
         if EcmaScriptLintRules.max_line_length == -1:
             EcmaScriptLintRules.max_line_length = errorrules.GetMaxLineLength()
+        self.custom_jsdoc_tags = custom_jsdoc_tags or []
 
     def Initialize(self, checker, limited_doc_checks, is_html):
         """Initialize this lint rule object before parsing a new file."""
@@ -169,7 +170,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
             # Custom tags like @requires may have url like descriptions, so ignore
             # the tag, similar to how we handle @see.
-            custom_tags = set(['@%s' % f for f in FLAGS.custom_jsdoc_tags])
+            custom_tags = set(['@%s' % f for f in self.custom_jsdoc_tags])
             if (len(parts.difference(self.LONG_LINE_IGNORE | custom_tags))
                 > max_parts):
                 self._HandleError(
@@ -607,7 +608,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
         if token_type in (Type.DOC_FLAG, Type.DOC_INLINE_FLAG):
             if (token.values['name'] not in state.GetDocFlag().LEGAL_DOC and
-                token.values['name'] not in FLAGS.custom_jsdoc_tags):
+                token.values['name'] not in self.custom_jsdoc_tags):
                 self._HandleError(
                     errors.INVALID_JSDOC_TAG,
                     'Invalid JsDoc tag: %s' % token.values['name'], token)

@@ -83,7 +83,8 @@ def Run(filename,
         limited_doc_files=None,
         error_trace=None,
         closurized_namespaces=None,
-        ignored_extra_namespaces=None):
+        ignored_extra_namespaces=None,
+        custom_jsdoc_tags=None):
     """Tokenize, run passes, and check the given file.
 
     Args:
@@ -144,7 +145,8 @@ def Run(filename,
                 _IsHtml(filename),
                 error_token,
                 closurized_namespaces,
-                ignored_extra_namespaces)
+                ignored_extra_namespaces,
+                custom_jsdoc_tags)
 
     error_handler.FinishFile()
 
@@ -193,7 +195,8 @@ def _RunChecker(start_token,
                 is_html,
                 stop_token=None,
                 closurized_namespaces=None,
-                ignored_extra_namespaces=None):
+                ignored_extra_namespaces=None,
+                custom_jsdoc_tags=None):
 
     state_tracker = javascriptstatetracker.JavaScriptStateTracker()
 
@@ -201,7 +204,8 @@ def _RunChecker(start_token,
         state_tracker,
         error_handler,
         closurized_namespaces,
-        ignored_extra_namespaces)
+        ignored_extra_namespaces,
+        custom_jsdoc_tags)
 
     style_checker.Check(start_token,
                         is_html=is_html,

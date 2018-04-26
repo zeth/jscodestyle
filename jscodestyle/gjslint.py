@@ -87,6 +87,7 @@ flags.DEFINE_list('closurized_namespaces', '',
 flags.DEFINE_list('ignored_extra_namespaces', '',
                   'Fully qualified namespaces that should be not be reported '
                   'as extra by the linter.')
+flags.DEFINE_list('custom_jsdoc_tags', '', 'Extra jsdoc tags to allow')
 
 flags.ADOPT_module_key_flags(fileflags)
 flags.ADOPT_module_key_flags(runner)
@@ -161,7 +162,8 @@ def _check_path(path):
                flags.FLAGS.limited_doc_files,
                flags.FLAGS.error_trace,
                flags.FLAGS.closurized_namespaces,
-               flags.FLAGS.ignored_extra_namespaces)
+               flags.FLAGS.ignored_extra_namespaces,
+               flags.FLAGS.custom_jsdoc_tags)
 
     make_error_record = lambda err: errorrecord.make_error_record(path, err)
     return map(make_error_record, error_handler.GetErrors())
