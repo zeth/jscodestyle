@@ -47,14 +47,16 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                  custom_jsdoc_tags,
                  dot_on_next_line,
                  check_trailing_comma,
-                 debug_indentation):
+                 debug_indentation,
+                 max_line_length):
         """Initializes a JavaScriptLintRules instance."""
         ecmalintrules.EcmaScriptLintRules.__init__(
             self,
             custom_jsdoc_tags,
             dot_on_next_line,
             check_trailing_comma,
-            debug_indentation)
+            debug_indentation,
+            max_line_length)
         self._namespaces_info = namespaces_info
         self._declared_private_member_tokens = {}
         self._declared_private_members = set()

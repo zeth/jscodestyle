@@ -27,19 +27,9 @@ flags.DEFINE_boolean('jsdoc', True,
 flags.DEFINE_list('disable', None,
                   'Disable specific error. Usage Ex.: gjslint --disable 1,'
                   '0011 foo.js.')
-flags.DEFINE_integer('max_line_length', 80, 'Maximum line length allowed '
-                     'without warning.', lower_bound=1)
 
 disabled_error_nums = None
 
-
-def GetMaxLineLength():
-    """Returns allowed maximum length of line.
-
-    Returns:
-      Length of line allowed without any warning.
-    """
-    return FLAGS.max_line_length
 
 
 def ShouldReportError(error):

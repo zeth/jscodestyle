@@ -90,11 +90,12 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                  custom_jsdoc_tags=None,
                  dot_on_next_line=False,
                  check_trailing_comma=False,
-                 debug_indentation=False):
+                 debug_indentation=False,
+                 max_line_length=80):
         """Initialize this lint rule object."""
         checkerbase.LintRulesBase.__init__(self)
         if EcmaScriptLintRules.max_line_length == -1:
-            EcmaScriptLintRules.max_line_length = errorrules.GetMaxLineLength()
+            EcmaScriptLintRules.max_line_length = max_line_length
         self.custom_jsdoc_tags = custom_jsdoc_tags or []
         self.dot_on_next_line = dot_on_next_line
         self.check_trailing_comma = check_trailing_comma

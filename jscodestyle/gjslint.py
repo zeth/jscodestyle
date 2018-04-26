@@ -99,6 +99,8 @@ flags.DEFINE_boolean('check_trailing_comma', False, 'Check trailing commas'
                      ' (ES3, not needed from ES5 onwards)')
 flags.DEFINE_boolean('debug_indentation', False,
                      'Whether to print debugging information for indentation.')
+flags.DEFINE_integer('max_line_length', 80, 'Maximum line length allowed '
+                     'without warning.', lower_bound=1)
 
 
 flags.ADOPT_module_key_flags(fileflags)
@@ -168,7 +170,8 @@ def _check_path(path):
         flags.FLAGS.custom_jsdoc_tags,
         flags.FLAGS.dot_on_next_line,
         flags.FLAGS.check_trailing_comma,
-        flags.FLAGS.debug_indentation)
+        flags.FLAGS.debug_indentation,
+        flags.FLAGS.max_line_length)
 
 
 
