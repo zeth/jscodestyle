@@ -16,8 +16,6 @@
 
 """Methods for checking EcmaScript files for indentation issues."""
 
-import gflags as flags
-
 from jscodestyle import ecmametadatapass
 from jscodestyle import errors
 from jscodestyle import javascripttokens
