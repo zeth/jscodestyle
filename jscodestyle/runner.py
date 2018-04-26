@@ -19,9 +19,7 @@
 import traceback
 
 from jscodestyle import checker
-from jscodestyle import ecmalintrules
 from jscodestyle import ecmametadatapass
-from jscodestyle import error_check
 from jscodestyle import errors
 from jscodestyle import javascriptstatetracker
 from jscodestyle import javascripttokenizer
