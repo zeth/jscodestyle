@@ -24,7 +24,10 @@ from jscodestyle.common import error
 class LintRulesBase(object):
     """Base class for all classes defining the lint rules for a language."""
 
-    def __init__(self, error_handler, limited_doc_checks, is_html):
+    def __init__(self,
+                 error_handler,
+                 limited_doc_checks,
+                 is_html):
         """Initializes to prepare to check a file.
 
         Args:
