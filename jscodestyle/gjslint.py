@@ -38,6 +38,11 @@ import os
 import platform
 import sys
 import time
+import glob
+import os
+import re
+
+
 
 import gflags as flags
 
@@ -45,7 +50,6 @@ import gflags as flags
 from jscodestyle.errorrecord import check_path
 from jscodestyle import runner
 from jscodestyle.common import erroraccumulator
-from jscodestyle.common import simplefileflags as fileflags
 
 # Attempt import of multiprocessing (should be available in Python 2.6 and up).
 try:
@@ -102,8 +106,24 @@ flags.DEFINE_boolean('debug_indentation', False,
 flags.DEFINE_integer('max_line_length', 80, 'Maximum line length allowed '
                      'without warning.', lower_bound=1)
 
+flags.DEFINE_multistring(
+    'recurse',
+    None,
+    'Recurse in to the subdirectories of the given path',
+    short_name='r')
+flags.DEFINE_list(
+    'exclude_directories',
+    ('_demos'),
+    'Exclude the specified directories (only applicable along with -r or '
+    '--presubmit)',
+    short_name='e')
+flags.DEFINE_list(
+    'exclude_files',
+    ('deps.js'),
+    'Exclude the specified files',
+    short_name='x')
 
-flags.ADOPT_module_key_flags(fileflags)
+
 flags.ADOPT_module_key_flags(runner)
 
 
@@ -182,7 +202,7 @@ def _get_file_paths(argv):
         suffixes += ['.%s' % ext for ext in FLAGS.additional_extensions]
     if FLAGS.check_html:
         suffixes += ['.html', '.htm']
-    return fileflags.GetFileList(argv, 'JavaScript', suffixes)
+    return GetFileList(argv, 'JavaScript', suffixes)
 
 
 # Error printing functions
@@ -288,7 +308,7 @@ def main(argv=None):
         suffixes += ['.%s' % ext for ext in FLAGS.additional_extensions]
     if FLAGS.check_html:
         suffixes += ['.html', '.htm']
-    paths = fileflags.GetFileList(argv, 'JavaScript', suffixes)
+    paths = GetFileList(argv, 'JavaScript', suffixes)
 
     if FLAGS.multiprocess:
         records_iter = _multiprocess_check_paths(paths)
@@ -341,6 +361,152 @@ def main(argv=None):
         print 'Done in %s.' % _format_time(time.time() - start_time)
 
     sys.exit(exit_code)
+
+
+
+def MatchesSuffixes(filename, suffixes):
+    """Returns whether the given filename matches one of the given suffixes.
+
+    Args:
+      filename: Filename to check.
+      suffixes: Sequence of suffixes to check.
+
+    Returns:
+      Whether the given filename matches one of the given suffixes.
+    """
+    suffix = filename[filename.rfind('.'):]
+    return suffix in suffixes
+
+
+def _GetUserSpecifiedFiles(argv, suffixes):
+    """Returns files to be linted, specified directly on the command line.
+
+    Can handle the '*' wildcard in filenames, but no other wildcards.
+
+    Args:
+      argv: Sequence of command line arguments. The second and following arguments
+        are assumed to be files that should be linted.
+      suffixes: Expected suffixes for the file type being checked.
+
+    Returns:
+      A sequence of files to be linted.
+    """
+    files = argv[1:] or []
+    all_files = []
+    lint_files = []
+
+     # Perform any necessary globs.
+    for f in files:
+        if f.find('*') != -1:
+            for result in glob.glob(f):
+                all_files.append(result)
+        else:
+            all_files.append(f)
+
+    for f in all_files:
+        if MatchesSuffixes(f, suffixes):
+            lint_files.append(f)
+    return lint_files
+
+
+def _GetRecursiveFiles(suffixes):
+    """Returns files to be checked specified by the --recurse flag.
+
+    Args:
+      suffixes: Expected suffixes for the file type being checked.
+
+    Returns:
+      A list of files to be checked.
+    """
+    lint_files = []
+    # Perform any request recursion
+    if FLAGS.recurse:
+        for start in FLAGS.recurse:
+            for root, subdirs, files in os.walk(start):
+                for f in files:
+                    if MatchesSuffixes(f, suffixes):
+                        lint_files.append(os.path.join(root, f))
+    return lint_files
+
+
+def GetAllSpecifiedFiles(argv, suffixes):
+    """Returns all files specified by the user on the commandline.
+
+    Args:
+      argv: Sequence of command line arguments. The second and following arguments
+        are assumed to be files that should be linted.
+      suffixes: Expected suffixes for the file type
+
+    Returns:
+      A list of all files specified directly or indirectly (via flags) on the
+      command line by the user.
+    """
+    files = _GetUserSpecifiedFiles(argv, suffixes)
+
+    if FLAGS.recurse:
+        files += _GetRecursiveFiles(suffixes)
+
+    return FilterFiles(files)
+
+
+def FilterFiles(files):
+    """Filters the list of files to be linted be removing any excluded files.
+
+    Filters out files excluded using --exclude_files and  --exclude_directories.
+
+    Args:
+      files: Sequence of files that needs filtering.
+
+    Returns:
+      Filtered list of files to be linted.
+    """
+    num_files = len(files)
+
+    ignore_dirs_regexs = []
+    for ignore in FLAGS.exclude_directories:
+        ignore_dirs_regexs.append(re.compile(r'(^|[\\/])%s[\\/]' % ignore))
+
+    result_files = []
+    for f in files:
+        add_file = True
+        for exclude in FLAGS.exclude_files:
+            if f.endswith('/' + exclude) or f == exclude:
+                add_file = False
+                break
+        for ignore in ignore_dirs_regexs:
+            if ignore.search(f):
+                # Break out of ignore loop so we don't add to
+                # filtered files.
+                add_file = False
+                break
+        if add_file:
+            # Convert everything to absolute paths so we can easily remove duplicates
+            # using a set.
+            result_files.append(os.path.abspath(f))
+
+    skipped = num_files - len(result_files)
+    if skipped:
+        print 'Skipping %d file(s).' % skipped
+
+    return set(result_files)
+
+
+def GetFileList(argv, file_type, suffixes):
+    """Parse the flags and return the list of files to check.
+
+    Args:
+      argv: Sequence of command line arguments.
+      suffixes: Sequence of acceptable suffixes for the file type.
+
+    Returns:
+      The list of files to check.
+    """
+    return sorted(GetAllSpecifiedFiles(argv, suffixes))
+
+
+def IsEmptyArgumentList(argv):
+    return not (len(argv[1:]) or FLAGS.recurse)
+
 
 
 if __name__ == '__main__':
