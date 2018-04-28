@@ -56,7 +56,8 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
                 closurized_namespaces, error_handler)
 
         lint_rules = javascriptlintrules.JavaScriptLintRules(
-            self,
+            self.namespaces_info,
+            error_handler,
             custom_jsdoc_tags,
             dot_on_next_line,
             check_trailing_comma,

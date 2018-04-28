@@ -87,7 +87,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         '@fileoverview', '@param', '@return', '@returns'])
 
     def __init__(self,
-                 checker,
+                 error_handler,
                  limited_doc_checks,
                  is_html,
                  custom_jsdoc_tags,
@@ -97,7 +97,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                  max_line_length):
         """Initialize this lint rule object."""
         super(EcmaScriptLintRules, self).__init__(
-            checker,
+            error_handler,
             limited_doc_checks,
             is_html)
 
