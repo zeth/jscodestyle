@@ -122,7 +122,11 @@ flags.DEFINE_list(
     ('deps.js'),
     'Exclude the specified files',
     short_name='x')
-
+flags.DEFINE_boolean('jsdoc', True,
+                     'Whether to report errors for missing JsDoc.')
+flags.DEFINE_list('disable', None,
+                  'Disable specific error. Usage Ex.: gjslint --disable 1,'
+                  '0011 foo.js.')
 
 flags.ADOPT_module_key_flags(runner)
 
@@ -191,8 +195,9 @@ def _check_path(path):
         flags.FLAGS.dot_on_next_line,
         flags.FLAGS.check_trailing_comma,
         flags.FLAGS.debug_indentation,
+        flags.FLAGS.jsdoc,
+        flags.FLAGS.disable,
         flags.FLAGS.max_line_length)
-
 
 
 def _get_file_paths(argv):

@@ -74,6 +74,8 @@ def check_path(path,
                dot_on_next_line,
                check_trailing_comma,
                debug_indentation,
+               jsdoc,
+               disable,
                max_line_length):
     """Check a path and return any errors.
 
@@ -99,6 +101,8 @@ def check_path(path,
                dot_on_next_line,
                check_trailing_comma,
                debug_indentation,
+               jsdoc,
+               disable,
                max_line_length)
 
     make_error_fn = lambda err: make_error_record(

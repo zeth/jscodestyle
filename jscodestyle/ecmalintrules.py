@@ -90,6 +90,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                  error_handler,
                  limited_doc_checks,
                  is_html,
+                 jsdoc,
+                 disable,
                  custom_jsdoc_tags,
                  dot_on_next_line,
                  check_trailing_comma,
@@ -99,7 +101,9 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         super(EcmaScriptLintRules, self).__init__(
             error_handler,
             limited_doc_checks,
-            is_html)
+            is_html,
+            jsdoc,
+            disable)
 
         if EcmaScriptLintRules.max_line_length == -1:
             EcmaScriptLintRules.max_line_length = max_line_length

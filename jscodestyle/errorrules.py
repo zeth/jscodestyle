@@ -17,22 +17,17 @@
 
 """Linter error rules class for Closure Linter."""
 
-import gflags as flags
+
 from jscodestyle import errors
 
 
-FLAGS = flags.FLAGS
-flags.DEFINE_boolean('jsdoc', True,
-                     'Whether to report errors for missing JsDoc.')
-flags.DEFINE_list('disable', None,
-                  'Disable specific error. Usage Ex.: gjslint --disable 1,'
-                  '0011 foo.js.')
 
 disabled_error_nums = None
 
 
+# This should just be a method of LintRulesBase
 
-def ShouldReportError(error):
+def ShouldReportError(jsdoc, disable, error):
     """Whether the given error should be reported.
 
     Returns:
@@ -43,8 +38,8 @@ def ShouldReportError(error):
     global disabled_error_nums
     if disabled_error_nums is None:
         disabled_error_nums = []
-        if FLAGS.disable:
-            for error_str in FLAGS.disable:
+        if disable:
+            for error_str in disable:
                 error_num = 0
                 try:
                     error_num = int(error_str)
@@ -52,10 +47,10 @@ def ShouldReportError(error):
                     pass
                 disabled_error_nums.append(error_num)
 
-    return ((FLAGS.jsdoc or error not in (
+    return ((jsdoc or error not in (
         errors.MISSING_PARAMETER_DOCUMENTATION,
         errors.MISSING_RETURN_DOCUMENTATION,
         errors.MISSING_MEMBER_DOCUMENTATION,
         errors.MISSING_PRIVATE,
         errors.MISSING_JSDOC_TAG_THIS)) and
-            (not FLAGS.disable or error not in disabled_error_nums))
+            (not disable or error not in disabled_error_nums))

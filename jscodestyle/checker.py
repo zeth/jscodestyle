@@ -37,7 +37,9 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
                  debug_indentation,
                  max_line_length,
                  limited_doc_checks,
-                 is_html):
+                 is_html,
+                 jsdoc,
+                 disable):
         """Initialize an JavaScriptStyleChecker object.
 
         Args:
@@ -64,7 +66,9 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
             debug_indentation,
             max_line_length,
             limited_doc_checks,
-            is_html)
+            is_html,
+            jsdoc,
+            disable)
 
         super(JavaScriptStyleChecker, self).__init__(
             error_handler,

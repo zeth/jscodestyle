@@ -496,6 +496,8 @@ class JsCodeStyle(object):
             dot_on_next_line=self.args.dot_on_next_line,
             check_trailing_comma=self.args.check_trailing_comma,
             debug_indentation=self.args.debug_indentation,
+            jsdoc=self.args.jsdoc,
+            disable=self.args.disable,
             max_line_length=self.args.max_line_length)
 
         if self.args.singleprocess:

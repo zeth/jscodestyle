@@ -88,6 +88,8 @@ def Run(filename,
         dot_on_next_line=None,
         check_trailing_comma=None,
         debug_indentation=None,
+        jsdoc=None,
+        disable=None,
         max_line_length=80):
     """Tokenize, run passes, and check the given file.
 
@@ -154,7 +156,9 @@ def Run(filename,
                 dot_on_next_line,
                 check_trailing_comma,
                 debug_indentation,
-                max_line_length)
+                max_line_length,
+                jsdoc,
+                disable)
 
     error_handler.FinishFile()
 
@@ -208,7 +212,9 @@ def _RunChecker(start_token,
                 dot_on_next_line,
                 check_trailing_comma,
                 debug_indentation,
-                max_line_length):
+                max_line_length,
+                jsdoc,
+                disable):
 
     state_tracker = javascriptstatetracker.JavaScriptStateTracker()
 
@@ -223,6 +229,8 @@ def _RunChecker(start_token,
         debug_indentation,
         max_line_length,
         limited_doc_checks,
-        is_html)
+        is_html,
+        jsdoc,
+        disable)
 
     style_checker.Check(start_token, stop_token)

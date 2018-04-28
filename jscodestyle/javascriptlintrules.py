@@ -51,12 +51,16 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                  debug_indentation,
                  max_line_length,
                  limited_doc_checks,
-                 is_html):
+                 is_html,
+                 jsdoc,
+                 disable):
         """Initializes a JavaScriptLintRules instance."""
         super(JavaScriptLintRules, self).__init__(
             error_handler,
             limited_doc_checks,
             is_html,
+            jsdoc,
+            disable,
             custom_jsdoc_tags,
             dot_on_next_line,
             check_trailing_comma,

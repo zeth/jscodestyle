@@ -27,22 +27,28 @@ class LintRulesBase(object):
     def __init__(self,
                  error_handler,
                  limited_doc_checks,
-                 is_html):
+                 is_html,
+                 jsdoc,
+                 disable):
         """Initializes to prepare to check a file.
 
         Args:
           checker: Class to report errors to.
           limited_doc_checks: Whether doc checking is relaxed for this file.
           is_html: Whether the file is an HTML file with extracted contents.
+          jsdoc: Whether to report errors for missing JsDoc.
+          disable: Disable specific error.
         """
         self.error_handler = error_handler
         self._limited_doc_checks = limited_doc_checks
         self._is_html = is_html
+        self.jsdoc = jsdoc
+        self.disable = disable
 
     def _HandleError(self, code, message, token, position=None,
                      fix_data=None):
         """Call the HandleError function for the checker we are associated with."""
-        if errorrules.ShouldReportError(code):
+        if errorrules.ShouldReportError(self.jsdoc, self.disable, code):
             self.error_handler.HandleError(
                 error.Error(code, message, token, position, fix_data))
 
