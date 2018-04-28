@@ -17,7 +17,7 @@
 
 """Base classes for writing checkers that operate on tokens."""
 
-from jscodestyle import errorrules
+from jscodestyle import errors
 from jscodestyle.common import error
 
 
@@ -48,7 +48,7 @@ class LintRulesBase(object):
     def _HandleError(self, code, message, token, position=None,
                      fix_data=None):
         """Call the HandleError function for the checker we are associated with."""
-        if errorrules.ShouldReportError(self.jsdoc, self.disable, code):
+        if self.should_report_error(code):
             self.error_handler.HandleError(
                 error.Error(code, message, token, position, fix_data))
 
@@ -82,6 +82,33 @@ class LintRulesBase(object):
           TypeError: If not overridden.
         """
         raise TypeError('Abstract method Finalize not implemented')
+
+    def should_report_error(self, error):
+        """Whether the given error should be reported.
+
+        Returns:
+          True for all errors except missing documentation errors and disabled
+          errors.  For missing documentation, it returns the value of the
+          jsdoc flag.
+        """
+
+        disabled_error_nums = []
+        if self.disable:
+            for error_str in self.disable:
+                error_num = 0
+                try:
+                    error_num = int(error_str)
+                except ValueError:
+                    pass
+                disabled_error_nums.append(error_num)
+
+        return ((self.jsdoc or error not in (
+            errors.MISSING_PARAMETER_DOCUMENTATION,
+            errors.MISSING_RETURN_DOCUMENTATION,
+            errors.MISSING_MEMBER_DOCUMENTATION,
+            errors.MISSING_PRIVATE,
+            errors.MISSING_JSDOC_TAG_THIS)) and
+                (not self.disable or error not in disabled_error_nums))
 
 
 class CheckerBase(object):
