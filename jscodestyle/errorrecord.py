@@ -65,16 +65,16 @@ def make_error_record(path, error, unix_mode=False):
 
 
 def check_path(path,
-               unix_mode=False,
-               limited_doc_files=None,
-               error_trace=None,
-               closurized_namespaces=None,
-               ignored_extra_namespaces=None,
-               custom_jsdoc_tags=None,
-               dot_on_next_line=None,
-               check_trailing_comma=None,
-               debug_indentation=None,
-               max_line_length=80):
+               unix_mode,
+               limited_doc_files,
+               error_trace,
+               closurized_namespaces,
+               ignored_extra_namespaces,
+               custom_jsdoc_tags,
+               dot_on_next_line,
+               check_trailing_comma,
+               debug_indentation,
+               max_line_length):
     """Check a path and return any errors.
 
     Args:

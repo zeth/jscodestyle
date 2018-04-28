@@ -88,7 +88,7 @@ def Run(filename,
         dot_on_next_line=None,
         check_trailing_comma=None,
         debug_indentation=None,
-        max_line_length=None):
+        max_line_length=80):
     """Tokenize, run passes, and check the given file.
 
     Args:

@@ -24,7 +24,7 @@ Tests errors that can be thrown by gjslint when in strict mode.
 import unittest
 
 import gflags as flags
-import unittest
+
 
 from jscodestyle import errors
 from jscodestyle import runner
