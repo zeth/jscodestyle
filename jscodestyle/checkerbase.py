@@ -24,10 +24,7 @@ from jscodestyle.common import error
 class LintRulesBase(object):
     """Base class for all classes defining the lint rules for a language."""
 
-    def __init__(self):
-        self.__checker = None
-
-    def Initialize(self, checker, limited_doc_checks, is_html):
+    def __init__(self, checker, limited_doc_checks, is_html):
         """Initializes to prepare to check a file.
 
         Args:
@@ -38,6 +35,8 @@ class LintRulesBase(object):
         self.__checker = checker
         self._limited_doc_checks = limited_doc_checks
         self._is_html = is_html
+
+
 
     def _HandleError(self, code, message, token, position=None,
                      fix_data=None):
@@ -80,7 +79,10 @@ class LintRulesBase(object):
 class CheckerBase(object):
     """This class handles checking a LintRules object against a file."""
 
-    def __init__(self, error_handler, lint_rules, state_tracker):
+    def __init__(self,
+                 error_handler,
+                 lint_rules,
+                 state_tracker):
         """Initialize a checker object.
 
         Args:
@@ -120,8 +122,7 @@ class CheckerBase(object):
         """
         return self._has_errors
 
-    def Check(self, start_token, limited_doc_checks=False, is_html=False,
-              stop_token=None):
+    def Check(self, start_token, stop_token=None):
         """Checks a token stream, reporting errors to the error reporter.
 
         Args:
@@ -132,7 +133,6 @@ class CheckerBase(object):
           stop_token: If given, check should stop at this token.
         """
 
-        self._lint_rules.Initialize(self, limited_doc_checks, is_html)
         self._ExecutePass(start_token, self._LintPass, stop_token=stop_token)
         self._lint_rules.Finalize(self._state_tracker)
 

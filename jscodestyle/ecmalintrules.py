@@ -87,24 +87,26 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         '@fileoverview', '@param', '@return', '@returns'])
 
     def __init__(self,
-                 custom_jsdoc_tags=None,
-                 dot_on_next_line=False,
-                 check_trailing_comma=False,
-                 debug_indentation=False,
-                 max_line_length=80):
+                 checker,
+                 limited_doc_checks,
+                 is_html,
+                 custom_jsdoc_tags,
+                 dot_on_next_line,
+                 check_trailing_comma,
+                 debug_indentation,
+                 max_line_length):
         """Initialize this lint rule object."""
-        checkerbase.LintRulesBase.__init__(self)
+        super(EcmaScriptLintRules, self).__init__(
+            checker,
+            limited_doc_checks,
+            is_html)
+
         if EcmaScriptLintRules.max_line_length == -1:
             EcmaScriptLintRules.max_line_length = max_line_length
         self.custom_jsdoc_tags = custom_jsdoc_tags or []
         self.dot_on_next_line = dot_on_next_line
         self.check_trailing_comma = check_trailing_comma
         self.debug_indentation = debug_indentation
-
-    def Initialize(self, checker, limited_doc_checks, is_html):
-        """Initialize this lint rule object before parsing a new file."""
-        checkerbase.LintRulesBase.Initialize(self, checker, limited_doc_checks,
-                                             is_html)
         self._indentation = indentation.IndentationRules(
             self.debug_indentation)
 

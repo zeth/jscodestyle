@@ -29,23 +29,25 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
     def __init__(self,
                  state_tracker,
                  error_handler,
-                 closurized_namespaces=None,
-                 ignored_extra_namespaces=None,
-                 custom_jsdoc_tags=None,
-                 dot_on_next_line=None,
-                 check_trailing_comma=None,
-                 debug_indentation=None,
-                 max_line_length=80):
+                 closurized_namespaces,
+                 ignored_extra_namespaces,
+                 custom_jsdoc_tags,
+                 dot_on_next_line,
+                 check_trailing_comma,
+                 debug_indentation,
+                 max_line_length,
+                 limited_doc_checks,
+                 is_html):
         """Initialize an JavaScriptStyleChecker object.
 
         Args:
           state_tracker: State tracker.
           error_handler: Error handler to pass all errors to.
         """
-        self._namespaces_info = None
+        self.namespaces_info = None
         self._alias_pass = None
         if closurized_namespaces:
-            self._namespaces_info = (
+            self.namespaces_info = (
                 closurizednamespacesinfo.ClosurizedNamespacesInfo(
                     closurized_namespaces,
                     ignored_extra_namespaces))
@@ -53,22 +55,23 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
             self._alias_pass = aliaspass.AliasPass(
                 closurized_namespaces, error_handler)
 
-        checkerbase.CheckerBase.__init__(
+        lint_rules = javascriptlintrules.JavaScriptLintRules(
             self,
-            error_handler=error_handler,
-            lint_rules=javascriptlintrules.JavaScriptLintRules(
-                self._namespaces_info,
-                custom_jsdoc_tags,
-                dot_on_next_line,
-                check_trailing_comma,
-                debug_indentation,
-                max_line_length),
-            state_tracker=state_tracker)
+            custom_jsdoc_tags,
+            dot_on_next_line,
+            check_trailing_comma,
+            debug_indentation,
+            max_line_length,
+            limited_doc_checks,
+            is_html)
+
+        super(JavaScriptStyleChecker, self).__init__(
+            error_handler,
+            lint_rules,
+            state_tracker)
 
     def Check(self,
               start_token,
-              is_html=False,
-              limited_doc_checks=False,
               stop_token=None):
         """Checks a token stream for lint warnings/errors.
 
@@ -81,8 +84,6 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
           is_html: Whether this token stream is HTML.
           stop_token: If given, checks should stop at this token.
         """
-        self._lint_rules.Initialize(self, limited_doc_checks, is_html)
-
         self._state_tracker.DocFlagPass(start_token, self._error_handler)
 
         if self._alias_pass:
@@ -90,8 +91,8 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
 
         # To maximize the amount of errors that get reported before a parse error
         # is displayed, don't run the dependency pass if a parse error exists.
-        if self._namespaces_info:
-            self._namespaces_info.Reset()
+        if self.namespaces_info:
+            self.namespaces_info.Reset()
             self._ExecutePass(start_token, self._DependencyPass, stop_token)
 
         self._ExecutePass(start_token, self._LintPass, stop_token)
@@ -110,4 +111,4 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         Args:
           token: The token to process.
         """
-        self._namespaces_info.ProcessToken(token, self._state_tracker)
+        self.namespaces_info.ProcessToken(token, self._state_tracker)

@@ -43,21 +43,25 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
     """JavaScript lint rules that catch JavaScript specific style errors."""
 
     def __init__(self,
-                 namespaces_info,
+                 checker,
                  custom_jsdoc_tags,
                  dot_on_next_line,
                  check_trailing_comma,
                  debug_indentation,
-                 max_line_length):
+                 max_line_length,
+                 limited_doc_checks,
+                 is_html):
         """Initializes a JavaScriptLintRules instance."""
-        ecmalintrules.EcmaScriptLintRules.__init__(
-            self,
+        super(JavaScriptLintRules, self).__init__(
+            checker,
+            limited_doc_checks,
+            is_html,
             custom_jsdoc_tags,
             dot_on_next_line,
             check_trailing_comma,
             debug_indentation,
             max_line_length)
-        self._namespaces_info = namespaces_info
+        self._namespaces_info = checker.namespaces_info
         self._declared_private_member_tokens = {}
         self._declared_private_members = set()
         self._used_private_members = set()

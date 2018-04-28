@@ -153,6 +153,7 @@ def Run(filename,
                 custom_jsdoc_tags,
                 dot_on_next_line,
                 check_trailing_comma,
+                debug_indentation,
                 max_line_length)
 
     error_handler.FinishFile()
@@ -200,13 +201,14 @@ def _RunChecker(start_token,
                 error_handler,
                 limited_doc_checks,
                 is_html,
-                stop_token=None,
-                closurized_namespaces=None,
-                ignored_extra_namespaces=None,
-                custom_jsdoc_tags=None,
-                dot_on_next_line=None,
-                check_trailing_comma=None,
-                max_line_length=None):
+                stop_token,
+                closurized_namespaces,
+                ignored_extra_namespaces,
+                custom_jsdoc_tags,
+                dot_on_next_line,
+                check_trailing_comma,
+                debug_indentation,
+                max_line_length):
 
     state_tracker = javascriptstatetracker.JavaScriptStateTracker()
 
@@ -218,9 +220,9 @@ def _RunChecker(start_token,
         custom_jsdoc_tags,
         dot_on_next_line,
         check_trailing_comma,
-        max_line_length)
+        debug_indentation,
+        max_line_length,
+        limited_doc_checks,
+        is_html)
 
-    style_checker.Check(start_token,
-                        is_html=is_html,
-                        limited_doc_checks=limited_doc_checks,
-                        stop_token=stop_token)
+    style_checker.Check(start_token, stop_token)

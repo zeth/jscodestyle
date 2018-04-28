@@ -87,6 +87,7 @@ def check_path(path,
         limited_doc_files = []
 
     error_handler = erroraccumulator.ErrorAccumulator()
+
     runner.Run(path,
                error_handler,
                None,
