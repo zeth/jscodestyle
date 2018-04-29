@@ -47,7 +47,7 @@ from itertools import tee
 from functools import partial
 
 from jscodestyle.errorrecord import check_path
-
+from jscodestyle.error_check import STRICT_DOC, JSLINT_ERROR_DOC
 
 GJSLINT_ONLY_FLAGS = ['--unix_mode', '--beep', '--nobeep', '--time',
                       '--check_html', '--summary', '--quiet']
@@ -113,8 +113,7 @@ class JsCodeStyle(object):
             help=('Additional file extensions (not js) that should '
                   'be treated as JavaScript files e.g. es, es6 or ts.'),
             metavar='ext',
-            nargs='+'
-        )
+            nargs='+')
 
         parser.add_argument(
             '-r', '--recurse',
@@ -225,7 +224,17 @@ class JsCodeStyle(object):
             help='(fixjscodestyle) do not modify the file, only print it.',
             action='store_true')
 
-        # Don't forget everything in error_check.py
+        parser.add_argument(
+            '--strict',
+            help=STRICT_DOC,
+            action='store_true')
+
+        parser.add_argument(
+            '--jslint_error',
+            help=JSLINT_ERROR_DOC,
+            action='append',
+            nargs='+')
+
         self.args = parser.parse_args()
 
         # Emacs sets the environment variable INSIDE_EMACS in the subshell.
@@ -484,7 +493,6 @@ class JsCodeStyle(object):
 
     def check(self):
         """Check the JavaScript files for style."""
-
         check_path_p = partial(
             check_path,
             unix_mode=self.args.unix_mode,
@@ -496,6 +504,8 @@ class JsCodeStyle(object):
             dot_on_next_line=self.args.dot_on_next_line,
             check_trailing_comma=self.args.check_trailing_comma,
             debug_indentation=self.args.debug_indentation,
+            jslint_error = self.args.jslint_error,
+            strict = self.args.strict,
             jsdoc=self.args.jsdoc,
             disable=self.args.disable,
             max_line_length=self.args.max_line_length)

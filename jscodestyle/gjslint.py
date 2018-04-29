@@ -50,6 +50,8 @@ import gflags as flags
 from jscodestyle.errorrecord import check_path
 from jscodestyle import runner
 from jscodestyle.common import erroraccumulator
+from jscodestyle.error_check import STRICT_DOC, JSLINT_ERROR_DOC
+
 
 # Attempt import of multiprocessing (should be available in Python 2.6 and up).
 try:
@@ -127,6 +129,10 @@ flags.DEFINE_boolean('jsdoc', True,
 flags.DEFINE_list('disable', None,
                   'Disable specific error. Usage Ex.: gjslint --disable 1,'
                   '0011 foo.js.')
+flags.DEFINE_boolean('strict', False, STRICT_DOC)
+flags.DEFINE_multistring('jslint_error', [], JSLINT_ERROR_DOC)
+
+
 
 flags.ADOPT_module_key_flags(runner)
 
@@ -182,7 +188,6 @@ def _check_paths(paths):
         for record in results:
             yield record
 
-
 def _check_path(path):
     return check_path(
         path,
@@ -195,6 +200,8 @@ def _check_path(path):
         flags.FLAGS.dot_on_next_line,
         flags.FLAGS.check_trailing_comma,
         flags.FLAGS.debug_indentation,
+        flags.FLAGS.jslint_error,
+        flags.FLAGS.strict,
         flags.FLAGS.jsdoc,
         flags.FLAGS.disable,
         flags.FLAGS.max_line_length)
