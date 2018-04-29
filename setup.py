@@ -40,7 +40,7 @@ setup(
     author='The JSCodeStyle Authors',
     author_email='theology@gmail.com',
     url='https://github.com/zeth/jscodestyle',
-    install_requires=['python-gflags'],
+    install_requires=[],
     tests_require=TESTS_REQUIRE,
     package_dir={'jscodestyle': 'jscodestyle'},
     packages=['jscodestyle', 'jscodestyle.common'],
