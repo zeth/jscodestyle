@@ -23,7 +23,6 @@ import re
 from jscodestyle import checkerbase
 from jscodestyle import ecmametadatapass
 from jscodestyle import error_check
-from jscodestyle import errorrules
 from jscodestyle import errors
 from jscodestyle import indentation
 from jscodestyle import javascripttokenizer
