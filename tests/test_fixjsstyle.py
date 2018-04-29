@@ -14,19 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Medium tests for the gpylint auto-fixer."""
-
-import StringIO
-
-import gflags as flags
+"""Medium tests for the gjslint auto-fixer."""
 import unittest
 from jscodestyle import error_fixer
 from jscodestyle import runner
-from jscodestyle import gjslint
 
 _RESOURCE_PREFIX = 'tests/testdata'
-
-flags.FLAGS.strict = True
 
 LIMITED_DOC_FILES = ('dummy.js', 'externs.js')
 CLOSURIZED_NAMESPACES = ('goog', 'dummy')
@@ -80,7 +73,8 @@ class FixJsStyleTest(unittest.TestCase):
                        None,
                        CLOSURIZED_NAMESPACES,
                        dot_on_next_line=True,
-                       check_trailing_comma=True)
+                       check_trailing_comma=True,
+                       strict=True)
 
             # Now compare the files.
             fixer.output_buffer.seek(0)
@@ -604,7 +598,8 @@ class FixJsStyleTest(unittest.TestCase):
                    original,
                    LIMITED_DOC_FILES,
                    None,
-                   CLOSURIZED_NAMESPACES)
+                   CLOSURIZED_NAMESPACES,
+                   strict=True)
 
         fixer.output_buffer.seek(0)
 
