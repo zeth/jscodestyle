@@ -19,7 +19,6 @@
 
 import re
 
-import gflags as flags
 from jscodestyle import errors
 from jscodestyle import javascriptstatetracker
 from jscodestyle import javascripttokens
@@ -44,19 +43,14 @@ INVERTED_AUTHOR_SPEC = re.compile(r'(?P<leading_whitespace>\s*)'
                                   r'\)'
                                   r'(?P<trailing_characters>.*)')
 
-FLAGS = flags.FLAGS
-flags.DEFINE_boolean('disable_indentation_fixing', False,
-                     'Whether to disable automatic fixing of indentation.')
-flags.DEFINE_list('fix_error_codes', [], 'A list of specific error codes to '
-                  'fix. Defaults to all supported error codes when empty. '
-                  'See errors.py for a list of error codes.')
-
 
 class ErrorFixer(errorhandler.ErrorHandler):
     """Object that fixes simple style errors."""
 
     def __init__(self,
-                 dry_run=False):
+                 dry_run=False,
+                 disable_indentation_fixing=False,
+                 fix_error_codes=None):
         """Initialize the error fixer.
 
         Args:
@@ -67,6 +61,8 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
         self._file_name = None
         self._file_token = None
+        self.disable_indentation_fixing = disable_indentation_fixing
+        self.fix_error_codes = None or []
         self.dry_run = dry_run
         self.output_buffer = None
         if self.dry_run:
@@ -74,7 +70,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
         try:
             self._fix_error_codes = set([errors.ByName(error.upper()) for error in
-                                         FLAGS.fix_error_codes])
+                                         self.fix_error_codes])
         except KeyError as ke:
             raise ValueError('Unknown error code ' + ke.args[0])
 
@@ -390,7 +386,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 self._AddFix(token)
 
         elif (code == errors.WRONG_INDENTATION and
-              not FLAGS.disable_indentation_fixing):
+              not self.disable_indentation_fixing):
             token = tokenutil.GetFirstTokenInSameLine(token)
             actual = error.position.start
             expected = error.position.length

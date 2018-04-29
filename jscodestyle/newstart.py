@@ -222,11 +222,6 @@ class JsCodeStyle(object):
             default=80)
 
         parser.add_argument(
-            '--dry_run',
-            help='(fixjscodestyle) do not modify the file, only print it.',
-            action='store_true')
-
-        parser.add_argument(
             '--strict',
             help=STRICT_DOC,
             action='store_true')
@@ -236,6 +231,25 @@ class JsCodeStyle(object):
             help=JSLINT_ERROR_DOC,
             action='append',
             nargs='+')
+
+        parser.add_argument(
+            '--dry_run',
+            help='(fixjscodestyle) do not modify the file, only print it.',
+            action='store_true')
+
+        parser.add_argument(
+            '--disable_indentation_fixing',
+            help='(fixjscodestyle) disable automatic fixing of indentation.',
+            action='store_true')
+
+        parser.add_argument(
+            '--fix_error_codes',
+            help=('(fixjscodestyle) list of specific error codes to '
+                  'fix. Defaults to all supported error codes when empty. '
+                  'See errors.py for a list of error codes.'),
+            action='append',
+            nargs='+',
+            metavar='error_num')
 
         self.args = parser.parse_args()
 
@@ -569,7 +583,10 @@ class JsCodeStyle(object):
     def fix(self):
         """Fix the code style of the JavaScript files."""
 
-        fixer = ErrorFixer(dry_run=self.args.dry_run)
+        fixer = ErrorFixer(
+            dry_run=self.args.dry_run,
+            disable_indentation_fixing=self.args.disable_indentation_fixing,
+            fix_error_codes=self.args.fix_error_codes)
 
         # Check the list of files.
         for path in self.paths:

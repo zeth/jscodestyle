@@ -131,6 +131,11 @@ flags.DEFINE_list('disable', None,
                   '0011 foo.js.')
 flags.DEFINE_boolean('strict', False, STRICT_DOC)
 flags.DEFINE_multistring('jslint_error', [], JSLINT_ERROR_DOC)
+flags.DEFINE_boolean('disable_indentation_fixing', False,
+                     'Whether to disable automatic fixing of indentation.')
+flags.DEFINE_list('fix_error_codes', [], 'A list of specific error codes to '
+                  'fix. Defaults to all supported error codes when empty. '
+                  'See errors.py for a list of error codes.')
 
 
 
