@@ -45,9 +45,11 @@ import multiprocessing
 import errno
 from itertools import tee
 from functools import partial
+import StringIO
 
-from jscodestyle.errorrecord import check_path
+from jscodestyle.errorrecord import check_path, fix_path
 from jscodestyle.error_check import STRICT_DOC, JSLINT_ERROR_DOC
+from jscodestyle.error_fixer import ErrorFixer
 
 GJSLINT_ONLY_FLAGS = ['--unix_mode', '--beep', '--nobeep', '--time',
                       '--check_html', '--summary', '--quiet']
@@ -564,8 +566,20 @@ class JsCodeStyle(object):
         sys.exit(exit_code)
 
 
+    def fix(self):
+        """Fix the code style of the JavaScript files."""
+
+        fixer = ErrorFixer(dry_run=self.args.dry_run)
+
+        # Check the list of files.
+        for path in self.paths:
+            fix_path(path, fixer)
 
 
+def fix()
+    """Automatically fix simple style guide violations."""
+    style_checker = JsCodeStyle()
+    style_checker.fix()
 
 def main():
     """Used when called as a command line script."""

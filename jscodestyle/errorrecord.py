@@ -114,3 +114,11 @@ def check_path(path,
         err,
         unix_mode)
     return map(make_error_fn, error_handler.GetErrors())
+
+
+# TODO integrate it with above check_path
+# Todo: respect all the other relevant flags too
+def fix_path(path, error_handler):
+    runner.Run(path, error_handler)
+    if error_handler.dry_run:
+        print(error_handler.output_buffer.getvalue())

@@ -26,6 +26,7 @@ from jscodestyle import javascripttokens
 from jscodestyle import requireprovidesorter
 from jscodestyle import tokenutil
 from jscodestyle.common import errorhandler
+import StringIO
 
 # Shorthand
 Token = javascripttokens.JavaScriptToken
@@ -54,7 +55,8 @@ flags.DEFINE_list('fix_error_codes', [], 'A list of specific error codes to '
 class ErrorFixer(errorhandler.ErrorHandler):
     """Object that fixes simple style errors."""
 
-    def __init__(self, external_file=None):
+    def __init__(self,
+                 dry_run=False):
         """Initialize the error fixer.
 
         Args:
@@ -65,7 +67,10 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
         self._file_name = None
         self._file_token = None
-        self._external_file = external_file
+        self.dry_run = dry_run
+        self.output_buffer = None
+        if self.dry_run:
+            self.output_buffer = StringIO.StringIO()
 
         try:
             self._fix_error_codes = set([errors.ByName(error.upper()) for error in
@@ -570,7 +575,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 original_lines = f.readlines()
                 f.close()
 
-            f = self._external_file
+            f = self.output_buffer
             if not f:
                 error_noun = 'error' if self._file_fix_count == 1 else 'errors'
                 print 'Fixed %d %s in %s' % (
@@ -611,6 +616,6 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
                 token = token.next
 
-            if not self._external_file:
+            if not self.output_buffer:
                 # Close the file if we created it
                 f.close()
