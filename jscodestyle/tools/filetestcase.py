@@ -22,9 +22,8 @@ on devtools/javascript/gpylint/full_test.py.
 """
 
 import re
-
-import gflags as flags
 import unittest
+
 from jscodestyle.common import erroraccumulator
 
 
@@ -53,13 +52,7 @@ class AnnotatedFileTestCase(unittest.TestCase):
         self._messages = []
         self._lint_callable = lint_callable
         self._converter = converter
-        self._kwargs = kawrgs or {}
-
-    def setUp(self):
-        flags.FLAGS.dot_on_next_line = True
-
-    def tearDown(self):
-        flags.FLAGS.dot_on_next_line = False
+        self._kwargs = kwargs or {}
 
     def shortDescription(self):
         """Provides a description for the test."""
@@ -103,7 +96,10 @@ class AnnotatedFileTestCase(unittest.TestCase):
     def _ProcessFileAndGetMessages(self, filename):
         """Trap gjslint's output parse it to get messages added."""
         error_accumulator = erroraccumulator.ErrorAccumulator()
-        self._lint_callable(filename, error_accumulator, **self._kwargs)
+        self._lint_callable(filename,
+                            error_accumulator,
+                            dot_on_next_line=True,
+                            **self._kwargs)
 
         errors = error_accumulator.GetErrors()
 
