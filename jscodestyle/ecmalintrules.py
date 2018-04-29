@@ -113,7 +113,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         self.debug_indentation = debug_indentation
         self._indentation = indentation.IndentationRules(
             self.debug_indentation)
-        self.jslint_error = jslint_error or []
+        self.jslint_error = jslint_error or ['all']
         self.strict = strict
 
     def HandleMissingParameterDoc(self, token, param_name):
