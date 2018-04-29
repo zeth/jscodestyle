@@ -45,7 +45,6 @@ import multiprocessing
 import errno
 from itertools import tee
 from functools import partial
-import StringIO
 
 from jscodestyle.errorrecord import check_path, fix_path
 from jscodestyle.error_check import STRICT_DOC, JSLINT_ERROR_DOC
