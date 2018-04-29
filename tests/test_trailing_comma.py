@@ -19,8 +19,6 @@ Tests for trailing commas (ES3) errors
 
 """
 
-
-import gflags as flags
 import unittest
 
 from jscodestyle import errors
