@@ -576,7 +576,7 @@ class JsCodeStyle(object):
             fix_path(path, fixer)
 
 
-def fix()
+def fix():
     """Automatically fix simple style guide violations."""
     style_checker = JsCodeStyle()
     style_checker.fix()
