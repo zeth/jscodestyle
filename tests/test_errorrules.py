@@ -19,32 +19,26 @@
 Currently its just verifying that warnings can't be disabled.
 """
 
-
-
-import gflags as flags
 import unittest
 
 from jscodestyle import errors
 from jscodestyle import runner
 from jscodestyle.common import erroraccumulator
 
-flags.FLAGS.strict = True
-flags.FLAGS.limited_doc_files = ('dummy.js', 'externs.js')
-flags.FLAGS.closurized_namespaces = ('goog', 'dummy')
+
+KWARGS = {
+    "strict": True,
+    "limited_doc_files": ('dummy.js', 'externs.js'),
+    "closurized_namespaces": ('goog', 'dummy')
+}
 
 
 class ErrorRulesTest(unittest.TestCase):
     """Test case to for gjslint errorrules."""
 
-    def testNoMaxLineLengthFlagExists(self):
-        """Tests that --max_line_length flag does not exists."""
-        flag = flags.FLAGS.FlagDict()['max_line_length'].value
-        self.assertEqual(flag, 80)
-
     def testGetMaxLineLength(self):
         """Tests warning are reported for line greater than 80.
         """
-
         # One line > 100 and one line > 80 and < 100. So should produce two
         # line too long error.
         original = [
@@ -63,11 +57,6 @@ class ErrorRulesTest(unittest.TestCase):
         expected = [errors.LINE_TOO_LONG, errors.LINE_TOO_LONG]
 
         self._AssertErrors(original, expected)
-
-    def testNoDisableFlagExists(self):
-        """Tests that --disable flag does not exists."""
-        flag = flags.FLAGS.FlagDict()['disable'].value
-        self.assertIsNone(flag)
 
     def testWarningsNotDisabled(self):
         """Tests warnings are reported when nothing is disabled.
@@ -96,7 +85,7 @@ class ErrorRulesTest(unittest.TestCase):
 
         # Trap gjslint's output parse it to get messages added.
         error_accumulator = erroraccumulator.ErrorAccumulator()
-        runner.Run('testing.js', error_accumulator, source=original)
+        runner.Run('testing.js', error_accumulator, source=original, **KWARGS)
         error_nums = [e.code for e in error_accumulator.GetErrors()]
 
         error_nums.sort()
