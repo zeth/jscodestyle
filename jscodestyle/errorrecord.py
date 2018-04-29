@@ -63,7 +63,6 @@ def make_error_record(path, error, unix_mode=False):
 
     return ErrorRecord(path, error_string, new_error)
 
-
 def check_path(path,
                unix_mode,
                limited_doc_files,
@@ -116,9 +115,38 @@ def check_path(path,
     return map(make_error_fn, error_handler.GetErrors())
 
 
-# TODO integrate it with above check_path
-# Todo: respect all the other relevant flags too
-def fix_path(path, error_handler):
-    runner.Run(path, error_handler)
+# TODO: integrate it with above check_path
+def fix_path(path,
+             error_handler,
+             source,
+             limited_doc_files,
+             error_trace,
+             closurized_namespaces,
+             ignored_extra_namespaces,
+             custom_jsdoc_tags,
+             dot_on_next_line,
+             check_trailing_comma,
+             debug_indentation,
+             jslint_error,
+             strict,
+             jsdoc,
+             disable,
+             max_line_length):
+    runner.Run(path,
+               error_handler,
+               source,
+               limited_doc_files,
+               error_trace,
+               closurized_namespaces,
+               ignored_extra_namespaces,
+               custom_jsdoc_tags,
+               dot_on_next_line,
+               check_trailing_comma,
+               debug_indentation,
+               jslint_error,
+               strict,
+               jsdoc,
+               disable,
+               max_line_length)
     if error_handler.dry_run:
         print(error_handler.output_buffer.getvalue())

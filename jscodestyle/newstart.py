@@ -589,7 +589,23 @@ class JsCodeStyle(object):
 
         # Check the list of files.
         for path in self.paths:
-            fix_path(path, fixer)
+            fix_path(
+                path,
+                fixer,
+                None,
+                limited_doc_files=self.args.limited_doc_files,
+                error_trace=self.args.error_trace,
+                closurized_namespaces=self.args.closurized_namespaces,
+                ignored_extra_namespaces=self.args.ignored_extra_namespaces,
+                custom_jsdoc_tags=self.args.custom_jsdoc_tags,
+                dot_on_next_line=self.args.dot_on_next_line,
+                check_trailing_comma=self.args.check_trailing_comma,
+                debug_indentation=self.args.debug_indentation,
+                jslint_error = self.args.jslint_error,
+                strict = self.args.strict,
+                jsdoc=self.args.jsdoc,
+                disable=self.args.disable,
+                max_line_length=self.args.max_line_length)
 
 
 def fix():
