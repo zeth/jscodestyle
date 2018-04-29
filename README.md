@@ -9,6 +9,10 @@ After installing, you get two helper applications installed into `/usr/local/bin
 * `gjslint.py` - runs the linter and checks for errors
 * `fixjsstyle.py` - tries to fix errors automatically
 
+## Development
+
+To run the tests, use `python setup.py test`
+
 ## History
 
 gjslint stands for Google JavaScript Linter (I guess?). At some point
