@@ -39,7 +39,7 @@ class AnnotatedFileTestCase(unittest.TestCase):
     _EXPECTED_RE = re.compile(r'\s*//\s*(?:(?P<line>[+-]?[0-9]+):)?'
                               r'\s*(?P<msgs>%(msg)s(?:,\s*%(msg)s)*)' % _MESSAGE)
 
-    def __init__(self, filename, lint_callable, converter, kwargs):
+    def __init__(self, filename, lint_callable, converter, kwargs=None):
         """Create a single file lint test case.
 
         Args:
@@ -53,7 +53,7 @@ class AnnotatedFileTestCase(unittest.TestCase):
         self._messages = []
         self._lint_callable = lint_callable
         self._converter = converter
-        self._kwargs = kawrgs
+        self._kwargs = kawrgs or {}
 
     def setUp(self):
         flags.FLAGS.dot_on_next_line = True
