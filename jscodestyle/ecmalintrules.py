@@ -23,6 +23,7 @@ import re
 from jscodestyle import checkerbase
 from jscodestyle import ecmametadatapass
 from jscodestyle.error_check import Rule
+from jscodestyle.error_fixer import ErrorFixer
 from jscodestyle import errors
 from jscodestyle import indentation
 from jscodestyle import javascripttokenizer
@@ -115,6 +116,15 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
             self.debug_indentation)
         self.jslint_error = jslint_error or ['all']
         self.strict = strict
+
+        # Are we checking or fixing?
+        # Currently checking can handle more types of style problems
+        # than fixing.
+        if isinstance(error_handler, ErrorFixer):
+            self.fix = True
+        else:
+            self.fix = False
+
 
     def HandleMissingParameterDoc(self, token, param_name):
         """Handle errors associated with a parameter missing a @param tag."""
@@ -320,7 +330,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         token_type = token.type
 
         # Process the line change.
-        if not self._is_html and self.should_check(Rule.INDENTATION):
+        if not self._is_html and not self.fix and self.should_check(Rule.INDENTATION):
             # TODO(robbyw): Support checking indentation in HTML files.
             indentation_errors = self._indentation.CheckToken(token, state)
             for indentation_error in indentation_errors:
