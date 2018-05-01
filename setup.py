@@ -40,16 +40,16 @@ setup(
     author='The JSCodeStyle Authors',
     author_email='theology@gmail.com',
     url='https://github.com/zeth/jscodestyle',
-    install_requires=['python-gflags'],
+    install_requires=[],
     tests_require=TESTS_REQUIRE,
     package_dir={'jscodestyle': 'jscodestyle'},
     packages=['jscodestyle', 'jscodestyle.common'],
     test_suite="tests",
     entry_points={
         'console_scripts': [
-            'jscodestyle = jscodestyle.gjslint:main',
-            'gjslint = jscodestyle.gjslint:main',
-            'fixjsstyle = jscodestyle.fixjsstyle:main'
+            'jscodestyle = jscodestyle.main:main',
+            'fixjsstyle = jscodestyle.main:fix',
+            'gjslint = jscodestyle.main:main',
         ]
     }
 )

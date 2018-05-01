@@ -17,33 +17,40 @@
 
 """Base classes for writing checkers that operate on tokens."""
 
-from jscodestyle import errorrules
+from jscodestyle import errors
 from jscodestyle.common import error
 
 
 class LintRulesBase(object):
     """Base class for all classes defining the lint rules for a language."""
 
-    def __init__(self):
-        self.__checker = None
-
-    def Initialize(self, checker, limited_doc_checks, is_html):
+    def __init__(self,
+                 error_handler,
+                 limited_doc_checks,
+                 is_html,
+                 jsdoc,
+                 disable):
         """Initializes to prepare to check a file.
 
         Args:
           checker: Class to report errors to.
           limited_doc_checks: Whether doc checking is relaxed for this file.
           is_html: Whether the file is an HTML file with extracted contents.
+          jsdoc: Whether to report errors for missing JsDoc.
+          disable: Disable specific error.
         """
-        self.__checker = checker
+        self.error_handler = error_handler
         self._limited_doc_checks = limited_doc_checks
         self._is_html = is_html
+        self.jsdoc = jsdoc
+        self.disable = disable
 
     def _HandleError(self, code, message, token, position=None,
                      fix_data=None):
         """Call the HandleError function for the checker we are associated with."""
-        if errorrules.ShouldReportError(code):
-            self.__checker.HandleError(code, message, token, position, fix_data)
+        if self.should_report_error(code):
+            self.error_handler.HandleError(
+                error.Error(code, message, token, position, fix_data))
 
     def _SetLimitedDocChecks(self, limited_doc_checks):
         """Sets whether doc checking is relaxed for this file.
@@ -76,11 +83,41 @@ class LintRulesBase(object):
         """
         raise TypeError('Abstract method Finalize not implemented')
 
+    def should_report_error(self, error):
+        """Whether the given error should be reported.
+
+        Returns:
+          True for all errors except missing documentation errors and disabled
+          errors.  For missing documentation, it returns the value of the
+          jsdoc flag.
+        """
+
+        disabled_error_nums = []
+        if self.disable:
+            for error_str in self.disable:
+                error_num = 0
+                try:
+                    error_num = int(error_str)
+                except ValueError:
+                    pass
+                disabled_error_nums.append(error_num)
+
+        return ((self.jsdoc or error not in (
+            errors.MISSING_PARAMETER_DOCUMENTATION,
+            errors.MISSING_RETURN_DOCUMENTATION,
+            errors.MISSING_MEMBER_DOCUMENTATION,
+            errors.MISSING_PRIVATE,
+            errors.MISSING_JSDOC_TAG_THIS)) and
+                (not self.disable or error not in disabled_error_nums))
+
 
 class CheckerBase(object):
     """This class handles checking a LintRules object against a file."""
 
-    def __init__(self, error_handler, lint_rules, state_tracker):
+    def __init__(self,
+                 error_handler,
+                 lint_rules,
+                 state_tracker):
         """Initialize a checker object.
 
         Args:
@@ -120,8 +157,7 @@ class CheckerBase(object):
         """
         return self._has_errors
 
-    def Check(self, start_token, limited_doc_checks=False, is_html=False,
-              stop_token=None):
+    def Check(self, start_token, stop_token=None):
         """Checks a token stream, reporting errors to the error reporter.
 
         Args:
@@ -132,7 +168,6 @@ class CheckerBase(object):
           stop_token: If given, check should stop at this token.
         """
 
-        self._lint_rules.Initialize(self, limited_doc_checks, is_html)
         self._ExecutePass(start_token, self._LintPass, stop_token=stop_token)
         self._lint_rules.Finalize(self._state_tracker)
 

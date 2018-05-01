@@ -16,18 +16,12 @@
 
 """Methods for checking EcmaScript files for indentation issues."""
 
-import gflags as flags
-
 from jscodestyle import ecmametadatapass
 from jscodestyle import errors
 from jscodestyle import javascripttokens
 from jscodestyle import tokenutil
 from jscodestyle.common import error
 from jscodestyle.common import position
-
-
-flags.DEFINE_boolean('debug_indentation', False,
-                     'Whether to print debugging information for indentation.')
 
 
 # Shorthand
@@ -109,9 +103,10 @@ class IndentationRules(object):
     other Ecma like scripting languages.
     """
 
-    def __init__(self):
+    def __init__(self, debug_indentation=False):
         """Initializes the IndentationRules checker."""
         self._stack = []
+        self.debug_indentation = debug_indentation
 
         # Map from line number to number of characters it is off in indentation.
         self._start_index_offset = {}
@@ -185,7 +180,7 @@ class IndentationRules(object):
 
         if (is_first and
             token_type not in (Type.COMMENT, Type.DOC_PREFIX, Type.STRING_TEXT)):
-            if flags.FLAGS.debug_indentation:
+            if self.debug_indentation:
                 print 'Line #%d: stack %r' % (token.line_number, stack)
 
             # Ignore lines that start in JsDoc since we don't check them properly yet.

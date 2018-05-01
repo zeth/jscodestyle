@@ -17,51 +17,70 @@
 
 """Core methods for checking JS files for common style guide violations."""
 
-import gflags as flags
-
 from jscodestyle import aliaspass
 from jscodestyle import checkerbase
 from jscodestyle import closurizednamespacesinfo
 from jscodestyle import javascriptlintrules
 
 
-flags.DEFINE_list('closurized_namespaces', '',
-                  'Namespace prefixes, used for testing of'
-                  'goog.provide/require')
-flags.DEFINE_list('ignored_extra_namespaces', '',
-                  'Fully qualified namespaces that should be not be reported '
-                  'as extra by the linter.')
-
-
 class JavaScriptStyleChecker(checkerbase.CheckerBase):
     """Checker that applies JavaScriptLintRules."""
 
-    def __init__(self, state_tracker, error_handler):
+    def __init__(self,
+                 state_tracker,
+                 error_handler,
+                 closurized_namespaces,
+                 ignored_extra_namespaces,
+                 custom_jsdoc_tags,
+                 dot_on_next_line,
+                 check_trailing_comma,
+                 debug_indentation,
+                 jslint_error,
+                 strict,
+                 max_line_length,
+                 limited_doc_checks,
+                 is_html,
+                 jsdoc,
+                 disable):
         """Initialize an JavaScriptStyleChecker object.
 
         Args:
           state_tracker: State tracker.
           error_handler: Error handler to pass all errors to.
         """
-        self._namespaces_info = None
+        self.namespaces_info = None
         self._alias_pass = None
-        if flags.FLAGS.closurized_namespaces:
-            self._namespaces_info = (
+        if closurized_namespaces:
+            self.namespaces_info = (
                 closurizednamespacesinfo.ClosurizedNamespacesInfo(
-                    flags.FLAGS.closurized_namespaces,
-                    flags.FLAGS.ignored_extra_namespaces))
+                    closurized_namespaces,
+                    ignored_extra_namespaces))
 
             self._alias_pass = aliaspass.AliasPass(
-                flags.FLAGS.closurized_namespaces, error_handler)
+                closurized_namespaces, error_handler)
 
-        checkerbase.CheckerBase.__init__(
-            self,
-            error_handler=error_handler,
-            lint_rules=javascriptlintrules.JavaScriptLintRules(
-                self._namespaces_info),
-            state_tracker=state_tracker)
+        lint_rules = javascriptlintrules.JavaScriptLintRules(
+            self.namespaces_info,
+            error_handler,
+            custom_jsdoc_tags,
+            dot_on_next_line,
+            check_trailing_comma,
+            debug_indentation,
+            jslint_error,
+            strict,
+            max_line_length,
+            limited_doc_checks,
+            is_html,
+            jsdoc,
+            disable)
 
-    def Check(self, start_token, limited_doc_checks=False, is_html=False,
+        super(JavaScriptStyleChecker, self).__init__(
+            error_handler,
+            lint_rules,
+            state_tracker)
+
+    def Check(self,
+              start_token,
               stop_token=None):
         """Checks a token stream for lint warnings/errors.
 
@@ -74,8 +93,6 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
           is_html: Whether this token stream is HTML.
           stop_token: If given, checks should stop at this token.
         """
-        self._lint_rules.Initialize(self, limited_doc_checks, is_html)
-
         self._state_tracker.DocFlagPass(start_token, self._error_handler)
 
         if self._alias_pass:
@@ -83,8 +100,8 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
 
         # To maximize the amount of errors that get reported before a parse error
         # is displayed, don't run the dependency pass if a parse error exists.
-        if self._namespaces_info:
-            self._namespaces_info.Reset()
+        if self.namespaces_info:
+            self.namespaces_info.Reset()
             self._ExecutePass(start_token, self._DependencyPass, stop_token)
 
         self._ExecutePass(start_token, self._LintPass, stop_token)
@@ -103,4 +120,4 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         Args:
           token: The token to process.
         """
-        self._namespaces_info.ProcessToken(token, self._state_tracker)
+        self.namespaces_info.ProcessToken(token, self._state_tracker)

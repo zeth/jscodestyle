@@ -19,18 +19,11 @@
 Tests errors that can be thrown by gjslint when in strict mode.
 """
 
-
-
-import unittest
-
-import gflags as flags
 import unittest
 
 from jscodestyle import errors
 from jscodestyle import runner
 from jscodestyle.common import erroraccumulator
-
-flags.FLAGS.strict = True
 
 
 class StrictTest(unittest.TestCase):
@@ -57,7 +50,10 @@ class StrictTest(unittest.TestCase):
 
         # Trap gjslint's output parse it to get messages added.
         error_accumulator = erroraccumulator.ErrorAccumulator()
-        runner.Run('testing.js', error_accumulator, source=original)
+        runner.Run('testing.js',
+                   error_accumulator,
+                   source=original,
+                   strict=True)
         error_nums = [e.code for e in error_accumulator.GetErrors()]
 
         error_nums.sort()

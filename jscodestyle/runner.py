@@ -18,12 +18,8 @@
 
 import traceback
 
-import gflags as flags
-
 from jscodestyle import checker
-from jscodestyle import ecmalintrules
 from jscodestyle import ecmametadatapass
-from jscodestyle import error_check
 from jscodestyle import errors
 from jscodestyle import javascriptstatetracker
 from jscodestyle import javascripttokenizer
@@ -31,17 +27,6 @@ from jscodestyle import javascripttokenizer
 from jscodestyle.common import error
 from jscodestyle.common import htmlutil
 from jscodestyle.common import tokens
-
-flags.DEFINE_list('limited_doc_files', ['dummy.js', 'externs.js'],
-                  'List of files with relaxed documentation checks. Will not '
-                  'report errors for missing documentation, some missing '
-                  'descriptions, or methods whose @return tags don\'t have a '
-                  'matching return statement.')
-flags.DEFINE_boolean('error_trace', False,
-                     'Whether to show error exceptions.')
-flags.ADOPT_module_key_flags(checker)
-flags.ADOPT_module_key_flags(ecmalintrules)
-flags.ADOPT_module_key_flags(error_check)
 
 
 def _GetLastNonWhiteSpaceToken(start_token):
@@ -92,7 +77,22 @@ def _IsLimitedDocCheck(filename, limited_doc_files):
     return False
 
 
-def Run(filename, error_handler, source=None):
+def Run(filename,
+        error_handler,
+        source=None,
+        limited_doc_files=None,
+        error_trace=None,
+        closurized_namespaces=None,
+        ignored_extra_namespaces=None,
+        custom_jsdoc_tags=None,
+        dot_on_next_line=None,
+        check_trailing_comma=None,
+        debug_indentation=None,
+        jslint_error=None,
+        strict=None,
+        jsdoc=None,
+        disable=None,
+        max_line_length=80):
     """Tokenize, run passes, and check the given file.
 
     Args:
@@ -101,6 +101,13 @@ def Run(filename, error_handler, source=None):
       source: A file-like object with the file source. If omitted, the file will
         be read from the filename path.
     """
+    if not limited_doc_files:
+        limited_doc_files = []
+    if not closurized_namespaces:
+        closurized_namespaces = []
+    if not ignored_extra_namespaces:
+        ignored_extra_namespaces = []
+
     if not source:
         try:
             source = open(filename)
@@ -131,20 +138,40 @@ def Run(filename, error_handler, source=None):
     error_token = None
 
     ecma_pass = ecmametadatapass.EcmaMetaDataPass()
-    error_token = RunMetaDataPass(token, ecma_pass, error_handler, filename)
+    error_token = RunMetaDataPass(token,
+                                  ecma_pass,
+                                  error_handler,
+                                  filename,
+                                  error_trace)
 
     is_limited_doc_check = (
-        _IsLimitedDocCheck(filename, flags.FLAGS.limited_doc_files))
+        _IsLimitedDocCheck(filename, limited_doc_files))
 
-    _RunChecker(token, error_handler,
+    _RunChecker(token,
+                error_handler,
                 is_limited_doc_check,
-                is_html=_IsHtml(filename),
-                stop_token=error_token)
+                _IsHtml(filename),
+                error_token,
+                closurized_namespaces,
+                ignored_extra_namespaces,
+                custom_jsdoc_tags,
+                dot_on_next_line,
+                check_trailing_comma,
+                debug_indentation,
+                jslint_error,
+                strict,
+                max_line_length,
+                jsdoc,
+                disable)
 
     error_handler.FinishFile()
 
 
-def RunMetaDataPass(start_token, metadata_pass, error_handler, filename=''):
+def RunMetaDataPass(start_token,
+                    metadata_pass,
+                    error_handler,
+                    filename='',
+                    error_trace=None):
     """Run a metadata pass over a token stream.
 
     Args:
@@ -160,7 +187,7 @@ def RunMetaDataPass(start_token, metadata_pass, error_handler, filename=''):
     try:
         metadata_pass.Process(start_token)
     except ecmametadatapass.ParseError, parse_err:
-        if flags.FLAGS.error_trace:
+        if error_trace:
             traceback.print_exc()
         error_token = parse_err.token
         error_msg = str(parse_err)
@@ -178,17 +205,40 @@ def RunMetaDataPass(start_token, metadata_pass, error_handler, filename=''):
                 'Internal error in %s' % filename))
 
 
-def _RunChecker(start_token, error_handler,
-                limited_doc_checks, is_html,
-                stop_token=None):
+def _RunChecker(start_token,
+                error_handler,
+                limited_doc_checks,
+                is_html,
+                stop_token,
+                closurized_namespaces,
+                ignored_extra_namespaces,
+                custom_jsdoc_tags,
+                dot_on_next_line,
+                check_trailing_comma,
+                debug_indentation,
+                jslint_error,
+                strict,
+                max_line_length,
+                jsdoc,
+                disable):
 
     state_tracker = javascriptstatetracker.JavaScriptStateTracker()
 
     style_checker = checker.JavaScriptStyleChecker(
-        state_tracker=state_tracker,
-        error_handler=error_handler)
+        state_tracker,
+        error_handler,
+        closurized_namespaces,
+        ignored_extra_namespaces,
+        custom_jsdoc_tags,
+        dot_on_next_line,
+        check_trailing_comma,
+        debug_indentation,
+        jslint_error,
+        strict,
+        max_line_length,
+        limited_doc_checks,
+        is_html,
+        jsdoc,
+        disable)
 
-    style_checker.Check(start_token,
-                        is_html=is_html,
-                        limited_doc_checks=limited_doc_checks,
-                        stop_token=stop_token)
+    style_checker.Check(start_token, stop_token)

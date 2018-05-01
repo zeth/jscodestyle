@@ -14,31 +14,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Medium tests for the gpylint auto-fixer."""
-
-import StringIO
-
-import gflags as flags
+"""Medium tests for the gjslint auto-fixer."""
 import unittest
 from jscodestyle import error_fixer
 from jscodestyle import runner
 
-
 _RESOURCE_PREFIX = 'tests/testdata'
 
-flags.FLAGS.strict = True
-flags.FLAGS.limited_doc_files = ('dummy.js', 'externs.js')
-flags.FLAGS.closurized_namespaces = ('goog', 'dummy')
+LIMITED_DOC_FILES = ('dummy.js', 'externs.js')
+CLOSURIZED_NAMESPACES = ('goog', 'dummy')
+
 
 
 class FixJsStyleTest(unittest.TestCase):
     """Test case to for gjslint auto-fixing."""
 
     def setUp(self):
-        flags.FLAGS.dot_on_next_line = True
+        pass
 
     def tearDown(self):
-        flags.FLAGS.dot_on_next_line = False
+        pass
 
     def testFixJsStyle(self):
         test_cases = [
@@ -70,18 +65,26 @@ class FixJsStyleTest(unittest.TestCase):
                                     'with a new line.' % (input_filename))
 
             # Autofix the file, sending output to a fake file.
-            actual = StringIO.StringIO()
-            runner.Run(input_filename, error_fixer.ErrorFixer(actual))
+            fixer = error_fixer.ErrorFixer(dry_run=True)
+            runner.Run(input_filename,
+                       fixer,
+                       None,
+                       LIMITED_DOC_FILES,
+                       None,
+                       CLOSURIZED_NAMESPACES,
+                       dot_on_next_line=True,
+                       check_trailing_comma=True,
+                       strict=True)
 
             # Now compare the files.
-            actual.seek(0)
+            fixer.output_buffer.seek(0)
             expected = open(golden_filename, 'r')
 
             # Uncomment to generate new golden files and run
             # open('/'.join(golden_filename.split('/')[4:]), 'w').write(actual.read())
             # actual.seek(0)
 
-            self.assertEqual(actual.readlines(), expected.readlines())
+            self.assertEqual(fixer.output_buffer.readlines(), expected.readlines())
 
     def testAddProvideFirstLine(self):
         """Tests handling of case where goog.provide is added."""
@@ -589,13 +592,20 @@ class FixJsStyleTest(unittest.TestCase):
             original = self._GetHeader() + original
             expected = self._GetHeader() + expected
 
-        actual = StringIO.StringIO()
-        runner.Run('testing.js', error_fixer.ErrorFixer(actual), original)
-        actual.seek(0)
+        fixer = error_fixer.ErrorFixer(dry_run=True)
+        runner.Run('testing.js',
+                   fixer,
+                   original,
+                   LIMITED_DOC_FILES,
+                   None,
+                   CLOSURIZED_NAMESPACES,
+                   strict=True)
+
+        fixer.output_buffer.seek(0)
 
         expected = [x + '\n' for x in expected]
 
-        self.assertListEqual(actual.readlines(), expected)
+        self.assertListEqual(fixer.output_buffer.readlines(), expected)
 
     def _GetHeader(self):
         """Returns a fake header for a JavaScript file."""

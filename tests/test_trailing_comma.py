@@ -19,15 +19,13 @@ Tests for trailing commas (ES3) errors
 
 """
 
-
-import gflags as flags
 import unittest
 
 from jscodestyle import errors
 from jscodestyle import runner
 from jscodestyle.common import erroraccumulator
 
-flags.FLAGS.check_trailing_comma = True
+
 class TrailingCommaTest(unittest.TestCase):
     """Test case to for gjslint errorrules."""
 
@@ -56,7 +54,10 @@ class TrailingCommaTest(unittest.TestCase):
 
         # Trap gjslint's output parse it to get messages added.
         error_accumulator = erroraccumulator.ErrorAccumulator()
-        runner.Run('testing.js', error_accumulator, source=original)
+        runner.Run('testing.js',
+                   error_accumulator,
+                   source=original,
+                   check_trailing_comma=True)
         error_nums = [e.code for e in error_accumulator.GetErrors()]
 
         self.assertIn(expected, error_nums)

@@ -25,22 +25,24 @@ import os
 import sys
 import unittest
 
-import gflags as flags
-import unittest
-
 from jscodestyle import error_check
 from jscodestyle import errors
 from jscodestyle import runner
-from jscodestyle.tools import filetestcase
+from testtools import filetestcase
+
 
 _RESOURCE_PREFIX = 'tests/testdata'
 
-flags.FLAGS.strict = True
-flags.FLAGS.custom_jsdoc_tags = ('customtag', 'requires')
-flags.FLAGS.closurized_namespaces = ('goog', 'dummy')
-flags.FLAGS.limited_doc_files = ('externs.js', 'dummy.js',
-                                 'limited_doc_checks.js')
-flags.FLAGS.jslint_error = error_check.Rule.ALL
+KWARGS = {
+    'strict': True,
+    'custom_jsdoc_tags': ('customtag', 'requires'),
+    'closurized_namespaces': ('goog', 'dummy'),
+    'limited_doc_files': ('externs.js', 'dummy.js',
+                          'limited_doc_checks.js'),
+    'jslint_error': error_check.Rule.ALL,
+}
+
+
 
 # List of files under testdata to test.
 # We need to list files explicitly since pyglib can't list directories.
@@ -113,7 +115,8 @@ class GJsLintTestSuite(unittest.TestSuite):
                 filetestcase.AnnotatedFileTestCase(
                     resource_path,
                     runner.Run,
-                    errors.ByName))
+                    errors.ByName,
+                    KWARGS))
 
 if __name__ == '__main__':
     # Don't let main parse args; it happens in the TestSuite.

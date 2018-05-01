@@ -20,26 +20,23 @@
 Tests errors that can be thrown by gjslint when not in strict mode.
 """
 
-
-
 import os
 import sys
 import unittest
 
-import gflags as flags
-import unittest
-
 from jscodestyle import errors
 from jscodestyle import runner
-from jscodestyle.tools import filetestcase
+from testtools import filetestcase
 
 _RESOURCE_PREFIX = 'tests/testdata'
 
-flags.FLAGS.strict = False
-flags.FLAGS.custom_jsdoc_tags = ('customtag', 'requires')
-flags.FLAGS.closurized_namespaces = ('goog', 'dummy')
-flags.FLAGS.limited_doc_files = ('externs.js', 'dummy.js',
-                                 'limited_doc_checks.js')
+KWARGS = {
+    "strict": False,
+    "custom_jsdoc_tags": ('customtag', 'requires'),
+    "closurized_namespaces": ('goog', 'dummy'),
+    "limited_doc_files": ('externs.js', 'dummy.js',
+                          'limited_doc_checks.js')
+}
 
 
 # List of files under testdata to test.
@@ -68,7 +65,8 @@ class GJsLintTestSuite(unittest.TestSuite):
             resource_path = os.path.join(_RESOURCE_PREFIX, test_file)
             self.addTest(filetestcase.AnnotatedFileTestCase(resource_path,
                                                             runner.Run,
-                                                            errors.ByName))
+                                                            errors.ByName,
+                                                            KWARGS))
 
 if __name__ == '__main__':
     # Don't let main parse args; it happens in the TestSuite.

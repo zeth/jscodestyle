@@ -17,12 +17,11 @@
 
 """A simple, pickle-serializable class to represent a lint error."""
 
-import gflags as flags
 
 from jscodestyle import errors
 from jscodestyle.common import erroroutput
-
-FLAGS = flags.FLAGS
+from jscodestyle.common import erroraccumulator
+from jscodestyle import runner
 
 
 class ErrorRecord(object):
@@ -40,7 +39,7 @@ class ErrorRecord(object):
         self.new_error = new_error
 
 
-def make_error_record(path, error):
+def make_error_record(path, error, unix_mode=False):
     """Make an error record with correctly formatted error string.
 
     Errors are not able to be serialized (pickled) over processes because of
@@ -56,10 +55,98 @@ def make_error_record(path, error):
     """
     new_error = error.code in errors.NEW_ERRORS
 
-    if FLAGS.unix_mode:
+    if unix_mode:
         error_string = erroroutput.GetUnixErrorOutput(
             path, error, new_error=new_error)
     else:
         error_string = erroroutput.GetErrorOutput(error, new_error=new_error)
 
     return ErrorRecord(path, error_string, new_error)
+
+def check_path(path,
+               unix_mode,
+               limited_doc_files,
+               error_trace,
+               closurized_namespaces,
+               ignored_extra_namespaces,
+               custom_jsdoc_tags,
+               dot_on_next_line,
+               check_trailing_comma,
+               debug_indentation,
+               jslint_error,
+               strict,
+               jsdoc,
+               disable,
+               max_line_length):
+    """Check a path and return any errors.
+
+    Args:
+      path: paths to check.
+
+    Returns:
+      A list of errorrecord.ErrorRecords for any found errors.
+    """
+    if not limited_doc_files:
+        limited_doc_files = []
+
+    error_handler = erroraccumulator.ErrorAccumulator()
+
+    runner.Run(path,
+               error_handler,
+               None,
+               limited_doc_files,
+               error_trace,
+               closurized_namespaces,
+               ignored_extra_namespaces,
+               custom_jsdoc_tags,
+               dot_on_next_line,
+               check_trailing_comma,
+               debug_indentation,
+               jslint_error,
+               strict,
+               jsdoc,
+               disable,
+               max_line_length)
+
+    make_error_fn = lambda err: make_error_record(
+        path,
+        err,
+        unix_mode)
+    return map(make_error_fn, error_handler.GetErrors())
+
+
+# TODO: integrate it with above check_path
+def fix_path(path,
+             error_handler,
+             source,
+             limited_doc_files,
+             error_trace,
+             closurized_namespaces,
+             ignored_extra_namespaces,
+             custom_jsdoc_tags,
+             dot_on_next_line,
+             check_trailing_comma,
+             debug_indentation,
+             jslint_error,
+             strict,
+             jsdoc,
+             disable,
+             max_line_length):
+    runner.Run(path,
+               error_handler,
+               source,
+               limited_doc_files,
+               error_trace,
+               closurized_namespaces,
+               ignored_extra_namespaces,
+               custom_jsdoc_tags,
+               dot_on_next_line,
+               check_trailing_comma,
+               debug_indentation,
+               jslint_error,
+               strict,
+               jsdoc,
+               disable,
+               max_line_length)
+    if error_handler.dry_run:
+        print(error_handler.output_buffer.getvalue())

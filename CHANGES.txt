@@ -1,0 +1,6 @@
+List of changes the user needs to be aware of
+=============================================
+
+
+--additional_extensions
+Previously required a comma separated arguments, now requires space separated arguments.

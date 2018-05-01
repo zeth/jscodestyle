@@ -20,12 +20,10 @@
 
 import re
 
-import gflags as flags
-
 from jscodestyle import checkerbase
 from jscodestyle import ecmametadatapass
-from jscodestyle import error_check
-from jscodestyle import errorrules
+from jscodestyle.error_check import Rule
+from jscodestyle.error_fixer import ErrorFixer
 from jscodestyle import errors
 from jscodestyle import indentation
 from jscodestyle import javascripttokenizer
@@ -35,16 +33,6 @@ from jscodestyle import tokenutil
 from jscodestyle.common import error
 from jscodestyle.common import position
 
-
-FLAGS = flags.FLAGS
-flags.DEFINE_list('custom_jsdoc_tags', '', 'Extra jsdoc tags to allow')
-# TODO(user): When flipping this to True, remove logic from unit tests
-# that overrides this flag.
-flags.DEFINE_boolean('dot_on_next_line', False, 'Require dots to be'
-                     'placed on the next line for wrapped expressions')
-
-flags.DEFINE_boolean('check_trailing_comma', False, 'Check trailing commas'
-                     ' (ES3, not needed from ES5 onwards)')
 
 # TODO(robbyw): Check for extra parens on return statements
 # TODO(robbyw): Check for 0px in strings
@@ -56,7 +44,6 @@ Context = ecmametadatapass.EcmaContext
 Error = error.Error
 Modes = javascripttokenizer.JavaScriptModes
 Position = position.Position
-Rule = error_check.Rule
 Type = javascripttokens.JavaScriptTokenType
 
 
@@ -98,17 +85,37 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
     JSDOC_FLAGS_DESCRIPTION_NOT_REQUIRED = frozenset([
         '@fileoverview', '@param', '@return', '@returns'])
 
-    def __init__(self):
+    def __init__(self,
+                 error_handler,
+                 limited_doc_checks,
+                 is_html,
+                 jsdoc,
+                 disable,
+                 custom_jsdoc_tags,
+                 dot_on_next_line,
+                 check_trailing_comma,
+                 debug_indentation,
+                 jslint_error,
+                 strict,
+                 max_line_length):
         """Initialize this lint rule object."""
-        checkerbase.LintRulesBase.__init__(self)
-        if EcmaScriptLintRules.max_line_length == -1:
-            EcmaScriptLintRules.max_line_length = errorrules.GetMaxLineLength()
+        super(EcmaScriptLintRules, self).__init__(
+            error_handler,
+            limited_doc_checks,
+            is_html,
+            jsdoc,
+            disable)
 
-    def Initialize(self, checker, limited_doc_checks, is_html):
-        """Initialize this lint rule object before parsing a new file."""
-        checkerbase.LintRulesBase.Initialize(self, checker, limited_doc_checks,
-                                             is_html)
-        self._indentation = indentation.IndentationRules()
+        if EcmaScriptLintRules.max_line_length == -1:
+            EcmaScriptLintRules.max_line_length = max_line_length
+        self.custom_jsdoc_tags = custom_jsdoc_tags or []
+        self.dot_on_next_line = dot_on_next_line
+        self.check_trailing_comma = check_trailing_comma
+        self.debug_indentation = debug_indentation
+        self._indentation = indentation.IndentationRules(
+            self.debug_indentation)
+        self.jslint_error = jslint_error or []
+        self.strict = strict
 
     def HandleMissingParameterDoc(self, token, param_name):
         """Handle errors associated with a parameter missing a @param tag."""
@@ -169,7 +176,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
             # Custom tags like @requires may have url like descriptions, so ignore
             # the tag, similar to how we handle @see.
-            custom_tags = set(['@%s' % f for f in FLAGS.custom_jsdoc_tags])
+            custom_tags = set(['@%s' % f for f in self.custom_jsdoc_tags])
             if (len(parts.difference(self.LONG_LINE_IGNORE | custom_tags))
                 > max_parts):
                 self._HandleError(
@@ -251,7 +258,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         wrapped_before = last_code and last_code.line_number != token.line_number
         wrapped_after = next_code and next_code.line_number != token.line_number
 
-        if FLAGS.dot_on_next_line and is_dot and wrapped_after:
+        if self.dot_on_next_line and is_dot and wrapped_after:
             self._HandleError(
                 errors.LINE_ENDS_WITH_DOT,
                 '"." must go on the following line',
@@ -314,7 +321,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         token_type = token.type
 
         # Process the line change.
-        if not self._is_html and error_check.should_check(Rule.INDENTATION):
+        if not self._is_html and self.should_check(Rule.INDENTATION):
             # TODO(robbyw): Support checking indentation in HTML files.
             indentation_errors = self._indentation.CheckToken(token, state)
             for indentation_error in indentation_errors:
@@ -345,7 +352,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         elif token_type == Type.END_BLOCK:
             last_code = token.metadata.last_code
 
-            if FLAGS.check_trailing_comma:
+            if self.check_trailing_comma:
                 if last_code.IsOperator(','):
                     self._HandleError(
                         errors.COMMA_AT_END_OF_LITERAL,
@@ -459,7 +466,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
             # beginning of a line.
 
             last_code = token.metadata.last_code
-            if FLAGS.check_trailing_comma and token_type == Type.END_BRACKET:
+            if self.check_trailing_comma and token_type == Type.END_BRACKET:
                 if last_code.IsOperator(','):
                     self._HandleError(
                         errors.COMMA_AT_END_OF_LITERAL,
@@ -537,7 +544,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                                 errors.INVALID_SUPPRESS_TYPE,
                                 'Invalid suppression type: %s' % suppress_type, token)
 
-            elif (error_check.should_check(Rule.WELL_FORMED_AUTHOR) and
+            elif (self.should_check(Rule.WELL_FORMED_AUTHOR) and
                   flag.flag_type == 'author'):
                 # TODO(user): In non strict mode check the author tag for as much as
                 # it exists, though the full form checked below isn't required.
@@ -598,7 +605,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 if flag.jstype and not flag.jstype.IsEmpty():
                     self._CheckJsDocType(token, flag.jstype)
 
-                    if error_check.should_check(Rule.BRACES_AROUND_TYPE) and (
+                    if self.should_check(Rule.BRACES_AROUND_TYPE) and (
                         flag.type_start_token.type != Type.DOC_START_BRACE or
                         flag.type_end_token.type != Type.DOC_END_BRACE):
                         self._HandleError(
@@ -607,12 +614,12 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
         if token_type in (Type.DOC_FLAG, Type.DOC_INLINE_FLAG):
             if (token.values['name'] not in state.GetDocFlag().LEGAL_DOC and
-                token.values['name'] not in FLAGS.custom_jsdoc_tags):
+                token.values['name'] not in self.custom_jsdoc_tags):
                 self._HandleError(
                     errors.INVALID_JSDOC_TAG,
                     'Invalid JsDoc tag: %s' % token.values['name'], token)
 
-            if (error_check.should_check(Rule.NO_BRACES_AROUND_INHERIT_DOC) and
+            if (self.should_check(Rule.NO_BRACES_AROUND_INHERIT_DOC) and
                 token.values['name'] == 'inheritDoc' and
                 token_type == Type.DOC_INLINE_FLAG):
                 self._HandleError(errors.UNNECESSARY_BRACES_AROUND_INHERIT_DOC,
@@ -860,3 +867,24 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
     def InExplicitlyTypedLanguage(self):
         """Returns whether this ecma implementation is explicitly typed."""
         return False
+
+    def should_check(self, rule):
+        """Returns whether the optional rule should be checked.
+
+        Computes different flags (strict, jslint_error, jslint_noerror) to
+        find out if this specific rule should be checked.
+
+        Args:
+          rule: Name of the rule (see Rule).
+
+        Returns:
+          True if the rule should be checked according to the flags,
+          otherwise False.
+
+        """
+        if 'no_' + rule in self.jslint_error:
+            return False
+        if rule in self.jslint_error or Rule.ALL in self.jslint_error:
+            return True
+        # Checks strict rules.
+        return self.strict and rule in Rule.CLOSURE_RULES
