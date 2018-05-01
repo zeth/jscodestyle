@@ -47,9 +47,9 @@ setup(
     test_suite="tests",
     entry_points={
         'console_scripts': [
-            'jscodestyle = jscodestyle.newstart:main',
-            'fixjsstyle = jscodestyle.newstart:fix',
-            'gjslint = jscodestyle.newstart:main',
+            'jscodestyle = jscodestyle.main:main',
+            'fixjsstyle = jscodestyle.main:fix',
+            'gjslint = jscodestyle.main:main',
         ]
     }
 )
