@@ -263,7 +263,8 @@ class JsCodeStyle(object):
 
         self.suffixes = ['.js']
         if self.args.additional_extensions:
-            self.suffixes += ['.%s' % ext for ext in self.args.additional_extensions]
+            self.suffixes += ['.%s' % ext for ext in
+                              self.args.additional_extensions]
         if self.args.check_html:
             self.suffixes += ['.html', '.htm']
         self.paths = None
@@ -288,8 +289,9 @@ class JsCodeStyle(object):
         Can handle the '*' wildcard in filenames, but no other wildcards.
 
         Args:
-          argv: Sequence of command line arguments. The second and following arguments
-            are assumed to be files that should be linted.
+          argv: Sequence of command line arguments.
+                The second and following arguments
+                are assumed to be files that should be linted.
           suffixes: Expected suffixes for the file type being checked.
 
         Returns:
@@ -298,7 +300,7 @@ class JsCodeStyle(object):
         all_files = []
         lint_files = []
 
-         # Perform any necessary globs.
+        # Perform any necessary globs.
         for filename in self.args.paths:
             if filename.find('*') != -1:
                 for result in glob.glob(filename):
@@ -330,7 +332,8 @@ class JsCodeStyle(object):
     def filter_files(self, files):
         """Filters the list of files to be linted be removing any excluded files.
 
-        Filters out files excluded using --exclude_files and  --exclude_directories.
+        Filters out files excluded using --exclude_files and
+        --exclude_directories.
 
         Args:
           files: Sequence of files that needs filtering.
@@ -364,8 +367,8 @@ class JsCodeStyle(object):
                     # filtered files.
                     break
             if add_file:
-                # Convert everything to absolute paths so we can easily remove duplicates
-                # using a set.
+                # Convert everything to absolute paths so we can
+                # easily remove duplicates using a set.
                 result_files.append(os.path.abspath(filename))
 
         skipped = num_files - len(result_files)
@@ -373,7 +376,6 @@ class JsCodeStyle(object):
             print('Skipping %d file(s).' % skipped)
 
         self.paths = set(result_files)
-
 
     def _get_paths(self):
         """Finds all files specified by the user on the commandline."""
@@ -384,19 +386,20 @@ class JsCodeStyle(object):
 
         self.filter_files(files)
 
-
     def _multiprocess_check_paths(self, check_fn):
         """Run _check_path over mutltiple processes.
 
-        Tokenization, passes, and checks are expensive operations.  Running in a
-        single process, they can only run on one CPU/core.  Instead,
-        shard out linting over all CPUs with multiprocessing to parallelize.
+        Tokenization, passes, and checks are expensive operations.
+        Running in a single process, they can only run on one
+        CPU/core.  Instead, shard out linting over all CPUs with
+        multiprocessing to parallelize.
 
         Args:
           paths: paths to check.
 
         Yields:
           errorrecord.ErrorRecords for any found errors.
+
         """
 
         pool = multiprocessing.Pool()
@@ -441,7 +444,6 @@ class JsCodeStyle(object):
             path_errors = [e for e in records if e.path == path]
             print('%s: %d' % (path, len(path_errors)))
 
-
     @staticmethod
     def _print_file_separator(path):
         print('----- FILE  :  %s -----' % path)
@@ -467,7 +469,7 @@ class JsCodeStyle(object):
         all_paths_count = len(all_paths)
 
         if error_count is 0:
-            print ('%d files checked, no errors found.' % all_paths_count)
+            print('%d files checked, no errors found.' % all_paths_count)
 
         new_error_count = len([e for e in error_records if e.new_error])
 
@@ -490,7 +492,6 @@ class JsCodeStyle(object):
                    no_error_paths_count,
                    ok_file_noun))
 
-
     @staticmethod
     def _format_time(duration):
         """Formats a duration as a human-readable string.
@@ -505,6 +506,37 @@ class JsCodeStyle(object):
             return '%dms' % round(duration * 1000)
         return '%.2fs' % duration
 
+    def output_errors(self, error_records):
+        """Output the code style errors that we have found."""
+        if self.args.summary:
+            self._print_file_summary(error_records)
+
+        if self.args.beep:
+            # Make a beep noise.
+            sys.stdout.write(chr(7))
+
+        # Write out instructions for using fixjsstyle script to fix some of the
+        # reported errors.
+        fix_args = []
+        for flag in sys.argv[1:]:
+            for go_flag in GJSLINT_ONLY_FLAGS:
+                if flag.startswith(go_flag):
+                    break
+                else:
+                    fix_args.append(flag)
+
+        if not self.args.quiet:
+            print("""
+            Some of the errors reported by GJsLint may be auto-fixable using
+            the command fixjsstyle. Please double check any changes it
+            makes and report any bugs. The command can be run by
+            executing:
+
+            fixjsstyle %s """ % ' '.join(fix_args))
+
+        if self.args.time:
+            print('Done in %s.' % self._format_time(time.time() -
+                                                    self.start_time))
 
     def check(self):
         """Check the JavaScript files for style."""
@@ -519,8 +551,8 @@ class JsCodeStyle(object):
             dot_on_next_line=self.args.dot_on_next_line,
             check_trailing_comma=self.args.check_trailing_comma,
             debug_indentation=self.args.debug_indentation,
-            jslint_error = self.args.jslint_error,
-            strict = self.args.strict,
+            jslint_error=self.args.jslint_error,
+            strict=self.args.strict,
             jsdoc=self.args.jsdoc,
             disable=self.args.disable,
             max_line_length=self.args.max_line_length)
@@ -547,37 +579,9 @@ class JsCodeStyle(object):
             exit_code += 2
 
         if exit_code:
-            if self.args.summary:
-                self._print_file_summary(error_records)
-
-            if self.args.beep:
-                # Make a beep noise.
-                sys.stdout.write(chr(7))
-
-            # Write out instructions for using fixjsstyle script to fix some of the
-            # reported errors.
-            fix_args = []
-            for flag in sys.argv[1:]:
-                for go_flag in GJSLINT_ONLY_FLAGS:
-                    if flag.startswith(go_flag):
-                        break
-                else:
-                    fix_args.append(flag)
-
-            if not self.args.quiet:
-                print("""
-          Some of the errors reported by GJsLint may be auto-fixable using the
-          command fixjsstyle. Please double check any changes it makes and report
-          any bugs. The command can be run by executing:
-
-          fixjsstyle %s """ % ' '.join(fix_args))
-
-        if self.args.time:
-            print ('Done in %s.' % self._format_time(time.time() -
-                                                     self.start_time))
+            self.output_errors(error_records)
 
         sys.exit(exit_code)
-
 
     def fix(self):
         """Fix the code style of the JavaScript files."""
@@ -601,8 +605,8 @@ class JsCodeStyle(object):
                 dot_on_next_line=self.args.dot_on_next_line,
                 check_trailing_comma=self.args.check_trailing_comma,
                 debug_indentation=self.args.debug_indentation,
-                jslint_error = self.args.jslint_error,
-                strict = self.args.strict,
+                jslint_error=self.args.jslint_error,
+                strict=self.args.strict,
                 jsdoc=self.args.jsdoc,
                 disable=self.args.disable,
                 max_line_length=self.args.max_line_length)
@@ -612,6 +616,7 @@ def fix():
     """Automatically fix simple style guide violations."""
     style_checker = JsCodeStyle()
     style_checker.fix()
+
 
 def main():
     """Used when called as a command line script."""
