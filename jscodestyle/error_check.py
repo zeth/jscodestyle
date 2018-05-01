@@ -19,7 +19,6 @@
 """Specific JSLint errors checker."""
 
 
-
 class Rule(object):
     """Different rules to check."""
 
@@ -46,6 +45,7 @@ class Rule(object):
                                BRACES_AROUND_TYPE,
                                OPTIONAL_TYPE_MARKER,
                                VARIABLE_ARG_MARKER])
+
 
 STRICT_DOC = ('Whether to validate against the stricter Closure style. '
               'This includes ' + (', '.join(Rule.CLOSURE_RULES)) + '.')

@@ -17,6 +17,7 @@
 
 """A simple, pickle-serializable class to represent a lint error."""
 
+from __future__ import print_function
 
 from jscodestyle import errors
 from jscodestyle.common import erroroutput
@@ -62,6 +63,7 @@ def make_error_record(path, error, unix_mode=False):
         error_string = erroroutput.GetErrorOutput(error, new_error=new_error)
 
     return ErrorRecord(path, error_string, new_error)
+
 
 def check_path(path,
                unix_mode,
@@ -115,7 +117,6 @@ def check_path(path,
     return map(make_error_fn, error_handler.GetErrors())
 
 
-# TODO: integrate it with above check_path
 def fix_path(path,
              error_handler,
              source,
@@ -132,6 +133,7 @@ def fix_path(path,
              jsdoc,
              disable,
              max_line_length):
+    """Check a path and fix any errors."""
     runner.Run(path,
                error_handler,
                source,

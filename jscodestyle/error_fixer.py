@@ -69,7 +69,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             self.output_buffer = StringIO.StringIO()
 
         try:
-            self._fix_error_codes = set([errors.ByName(error.upper()) for error in
+            self._fix_error_codes = set([errors.by_name(error.upper()) for error in
                                          self.fix_error_codes])
         except KeyError as ke:
             raise ValueError('Unknown error code ' + ke.args[0])

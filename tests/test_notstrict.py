@@ -65,7 +65,7 @@ class GJsLintTestSuite(unittest.TestSuite):
             resource_path = os.path.join(_RESOURCE_PREFIX, test_file)
             self.addTest(filetestcase.AnnotatedFileTestCase(resource_path,
                                                             runner.Run,
-                                                            errors.ByName,
+                                                            errors.by_name,
                                                             KWARGS))
 
 if __name__ == '__main__':

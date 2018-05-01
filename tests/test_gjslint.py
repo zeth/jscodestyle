@@ -115,7 +115,7 @@ class GJsLintTestSuite(unittest.TestSuite):
                 filetestcase.AnnotatedFileTestCase(
                     resource_path,
                     runner.Run,
-                    errors.ByName,
+                    errors.by_name,
                     KWARGS))
 
 if __name__ == '__main__':

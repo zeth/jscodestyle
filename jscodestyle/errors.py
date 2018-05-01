@@ -16,7 +16,8 @@
 
 """Error codes for JavaScript style checker."""
 
-def ByName(name):
+
+def by_name(name):
     """Get the error code for the given error name.
 
     Args:
