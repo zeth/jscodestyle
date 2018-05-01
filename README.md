@@ -48,7 +48,7 @@ Java and node.js. So I picked it up.
 
 I liked the lightweight approach of this tool, I don't need to install
 half of NPM just to check if I have forgotten some semi-colons or made
-some basic other style error.
+some other basic style error.
 
 It is still based on ES5, it doesn't yet do anything special for ES6,
 although I hope to change that.
