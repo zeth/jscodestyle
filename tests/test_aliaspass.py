@@ -39,7 +39,7 @@ class AliasPassTest(unittest.TestCase):
         error_accumulator = erroraccumulator.ErrorAccumulator()
         alias_pass = aliaspass.AliasPass(
             error_handler=error_accumulator)
-        alias_pass.Process(start_token)
+        alias_pass.process(start_token)
 
         alias_errors = error_accumulator.GetErrors()
         self.assertEquals(1, len(alias_errors))
@@ -52,7 +52,7 @@ class AliasPassTest(unittest.TestCase):
     def testAliasedIdentifiers(self):
         start_token = testutil.TokenizeSourceAndRunEcmaPass(_TEST_ALIAS_SCRIPT)
         alias_pass = aliaspass.AliasPass(set(['goog', 'myproject']))
-        alias_pass.Process(start_token)
+        alias_pass.process(start_token)
 
         alias_token = _GetTokenByLineAndString(start_token, 'Event', 4)
         self.assertTrue(alias_token.metadata.is_alias_definition)
@@ -83,7 +83,7 @@ class AliasPassTest(unittest.TestCase):
         tracker.DocFlagPass(start_token, error_handler=None)
 
         alias_pass = aliaspass.AliasPass(set(['goog', 'myproject']))
-        alias_pass.Process(start_token)
+        alias_pass.process(start_token)
 
         flag_token = _GetTokenByLineAndString(start_token, '@type', 22)
         self.assertEquals(
@@ -97,7 +97,7 @@ class AliasPassTest(unittest.TestCase):
     Alias.use();
     """)
         alias_pass = aliaspass.AliasPass(set(['goog']))
-        alias_pass.Process(start_token)
+        alias_pass.process(start_token)
         alias_token = _GetTokenByLineAndString(start_token, 'Alias', 3)
         self.assertTrue(alias_token.metadata.is_alias_definition)
 
@@ -110,7 +110,7 @@ class AliasPassTest(unittest.TestCase):
         alias_pass = aliaspass.AliasPass(
             set(['goog', 'myproject']),
             error_handler=error_accumulator)
-        alias_pass.Process(start_token)
+        alias_pass.process(start_token)
 
         alias_errors = error_accumulator.GetErrors()
 

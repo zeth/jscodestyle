@@ -96,7 +96,7 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         self._state_tracker.DocFlagPass(start_token, self._error_handler)
 
         if self._alias_pass:
-            self._alias_pass.Process(start_token)
+            self._alias_pass.process(start_token)
 
         # To maximize the amount of errors that get reported before a parse error
         # is displayed, don't run the dependency pass if a parse error exists.

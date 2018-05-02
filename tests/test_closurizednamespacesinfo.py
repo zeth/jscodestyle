@@ -850,7 +850,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         state_tracker.DocFlagPass(token, error_handler=None)
 
         alias_pass = aliaspass.AliasPass(closurized_namespaces)
-        alias_pass.Process(token)
+        alias_pass.process(token)
 
         while token:
             state_tracker.HandleToken(token, state_tracker.GetLastNonSpaceToken())
