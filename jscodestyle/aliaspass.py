@@ -18,7 +18,7 @@
 
 from jscodestyle import ecmametadatapass
 from jscodestyle import errors
-from jscodestyle import javascripttokens
+from jscodestyle.javascripttokens import JavaScriptTokenType
 from jscodestyle import scopeutil
 from jscodestyle import tokenutil
 from jscodestyle.common import error
@@ -116,8 +116,9 @@ class AliasPass(object):
         """Check goog.scope calls for lint/usage errors."""
 
         def IsScopeToken(token):
-            return (token.type is javascripttokens.JavaScriptTokenType.IDENTIFIER and
-                    token.string == 'goog.scope')
+            return (token.type is
+                    JavaScriptTokenType.IDENTIFIER
+                    and token.string == 'goog.scope')
 
         # Find all the goog.scope tokens in the file
         scope_tokens = [t for t in start_token if IsScopeToken(t)]
@@ -125,8 +126,10 @@ class AliasPass(object):
         for token in scope_tokens:
             scope_context = token.metadata.context
 
-            if not (scope_context.type == ecmametadatapass.EcmaContext.STATEMENT and
-                    scope_context.parent.type == ecmametadatapass.EcmaContext.ROOT):
+            if not (scope_context.type ==
+                    ecmametadatapass.EcmaContext.STATEMENT and
+                    scope_context.parent.type ==
+                    ecmametadatapass.EcmaContext.ROOT):
                 self._MaybeReportError(
                     error.Error(errors.INVALID_USE_OF_GOOG_SCOPE,
                                 'goog.scope call not in global scope', token))
@@ -183,14 +186,17 @@ class AliasPass(object):
         for context in root_context.children:
             if context.type == ecmametadatapass.EcmaContext.STATEMENT:
                 for statement_child in context.children:
-                    if statement_child.type == ecmametadatapass.EcmaContext.VAR:
+                    if (statement_child.type ==
+                            ecmametadatapass.EcmaContext.VAR):
                         match = scopeutil.MatchModuleAlias(statement_child)
                         if match:
-                            # goog.require aliases cannot use further aliases, the symbol is
-                            # the second part of match, directly.
+                            # goog.require aliases cannot use further
+                            # aliases, the symbol is the second part
+                            # of match, directly.
                             symbol = match[1]
-                            if scopeutil.IsInClosurizedNamespace(symbol,
-                                                                 self._closurized_namespaces):
+                            if scopeutil.IsInClosurizedNamespace(
+                                    symbol,
+                                    self._closurized_namespaces):
                                 global_alias_map[match[0]] = symbol
 
         # Process each block to find aliases.
@@ -201,9 +207,10 @@ class AliasPass(object):
         """Scans a goog.scope block to find aliases and mark alias tokens."""
         alias_map = global_alias_map.copy()
 
-        # Iterate over every token in the context. Each token points to one
-        # context, but multiple tokens may point to the same context. We only want
-        # to check each context once, so keep track of those we've seen.
+        # Iterate over every token in the context. Each token points
+        # to one context, but multiple tokens may point to the same
+        # context. We only want to check each context once, so keep
+        # track of those we've seen.
         seen_contexts = set()
         token = context.start_token
         while token and self._IsTokenInParentBlock(token, context):
@@ -215,28 +222,33 @@ class AliasPass(object):
 
                 # If this is a alias statement in the goog.scope block.
                 if (token_context.type == ecmametadatapass.EcmaContext.VAR and
-                    scopeutil.IsGoogScopeBlock(token_context.parent.parent)):
+                        scopeutil.IsGoogScopeBlock(
+                            token_context.parent.parent)):
                     match = scopeutil.MatchAlias(token_context)
 
                     # If this is an alias, remember it in the map.
                     if match:
                         alias, symbol = match
-                        symbol = _GetAliasForIdentifier(symbol, alias_map) or symbol
-                        if scopeutil.IsInClosurizedNamespace(symbol,
-                                                             self._closurized_namespaces):
+                        symbol = _GetAliasForIdentifier(
+                            symbol,
+                            alias_map) or symbol
+                        if scopeutil.IsInClosurizedNamespace(
+                                symbol,
+                                self._closurized_namespaces):
                             alias_map[alias] = symbol
 
             # If this token is an identifier that matches an alias,
             # mark the token as an alias to the original symbol.
-            if (token.type is javascripttokens.JavaScriptTokenType.SIMPLE_LVALUE or
-                token.type is javascripttokens.JavaScriptTokenType.IDENTIFIER):
+            if (token.type is JavaScriptTokenType.SIMPLE_LVALUE or
+                    token.type is JavaScriptTokenType.IDENTIFIER):
                 identifier = tokenutil.GetIdentifierForToken(token)
                 if identifier:
-                    aliased_symbol = _GetAliasForIdentifier(identifier, alias_map)
+                    aliased_symbol = _GetAliasForIdentifier(
+                        identifier, alias_map)
                     if aliased_symbol:
                         token.metadata.aliased_symbol = aliased_symbol
 
-            elif token.type == javascripttokens.JavaScriptTokenType.DOC_FLAG:
+            elif token.type == JavaScriptTokenType.DOC_FLAG:
                 flag = token.attached_object
                 if flag and flag.HasType() and flag.jstype:
                     _SetTypeAlias(flag.jstype, alias_map)
