@@ -52,7 +52,7 @@ class LintRulesBase(object):
             self.error_handler.handle_error(
                 error.Error(code, message, token, position, fix_data))
 
-    def _SetLimitedDocChecks(self, limited_doc_checks):
+    def _set_limited_doc_checks(self, limited_doc_checks):
         """Sets whether doc checking is relaxed for this file.
 
         Args:
@@ -60,7 +60,7 @@ class LintRulesBase(object):
         """
         self._limited_doc_checks = limited_doc_checks
 
-    def CheckToken(self, token, parser_state):
+    def check_token(self, token, parser_state):
         """Checks a token, given the current parser_state, for warnings and errors.
 
         Args:
@@ -70,7 +70,7 @@ class LintRulesBase(object):
         Raises:
           TypeError: If not overridden.
         """
-        raise TypeError('Abstract method CheckToken not implemented')
+        raise TypeError('Abstract method check_token not implemented')
 
     def Finalize(self, parser_state):
         """Perform all checks that need to occur after all lines are processed.
@@ -180,7 +180,7 @@ class CheckerBase(object):
         Args:
           token: The token to check.
         """
-        self._lint_rules.CheckToken(token, self._state_tracker)
+        self._lint_rules.check_token(token, self._state_tracker)
 
     def _ExecutePass(self, token, pass_function, stop_token=None):
         """Calls the given function for every token in the given token stream.

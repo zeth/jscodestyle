@@ -84,7 +84,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                           'Missing docs for parameter: "%s"' % param_name, token)
 
     # pylint: disable=too-many-statements
-    def CheckToken(self, token, state):
+    def check_token(self, token, state):
         """Checks a token, given the current parser_state, for warnings and errors.
 
         Args:
@@ -92,8 +92,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
           state: parser_state object that indicates the current state in the page
         """
 
-        # Call the base class's CheckToken function.
-        super(JavaScriptLintRules, self).CheckToken(token, state)
+        # Call the base class's check_token function.
+        super(JavaScriptLintRules, self).check_token(token, state)
 
         # Store some convenience variables
         namespaces_info = self._namespaces_info
@@ -209,7 +209,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             # When @externs appears in a @fileoverview comment, it should trigger
             # the same limited doc checks as a special filename like externs.js.
             if doc_comment.HasFlag('fileoverview') and doc_comment.HasFlag('externs'):
-                self._SetLimitedDocChecks(True)
+                self._set_limited_doc_checks(True)
 
             if (self.should_check(Rule.BLANK_LINES_AT_TOP_LEVEL) and
                 not self._is_html and

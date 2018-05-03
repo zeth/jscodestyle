@@ -306,7 +306,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
         return True
 
-    def CheckToken(self, token, state):
+    def check_token(self, token, state):
         """Checks a token, given the current parser_state, for warnings and errors.
 
         Args:
@@ -323,7 +323,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         # Process the line change.
         if not self._is_html and self.should_check(Rule.INDENTATION):
             # TODO(robbyw): Support checking indentation in HTML files.
-            indentation_errors = self._indentation.CheckToken(token, state)
+            indentation_errors = self._indentation.check_token(token, state)
             for indentation_error in indentation_errors:
                 self._handle_error(*indentation_error)
 

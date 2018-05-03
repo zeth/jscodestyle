@@ -118,7 +118,7 @@ class IndentationRules(object):
             raise Exception('INTERNAL ERROR: indentation stack is not empty: %r' %
                             old_stack)
 
-    def CheckToken(self, token, state):
+    def check_token(self, token, state):
         """Checks a token for indentation errors.
 
         Args:
