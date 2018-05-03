@@ -102,7 +102,7 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         # is displayed, don't run the dependency pass if a parse error exists.
         if self.namespaces_info:
             self.namespaces_info.Reset()
-            self._execute_pass(start_token, self._DependencyPass, stop_token)
+            self._execute_pass(start_token, self._dependency_pass, stop_token)
 
         self._execute_pass(start_token, self._lint_pass, stop_token)
 
@@ -111,7 +111,7 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         if not stop_token:
             self._lint_rules.finish(self._state_tracker)
 
-    def _DependencyPass(self, token):
+    def _dependency_pass(self, token):
         """Processes an individual token for dependency information.
 
         Used to encapsulate the logic needed to process an individual token so that
