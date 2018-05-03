@@ -241,4 +241,4 @@ def _RunChecker(start_token,
         jsdoc,
         disable)
 
-    style_checker.Check(start_token, stop_token)
+    style_checker.check(start_token, stop_token)

@@ -18,7 +18,7 @@
 """Base classes for writing checkers that operate on tokens."""
 
 from jscodestyle import errors
-from jscodestyle.common import error
+from jscodestyle.common.error import Error
 
 
 class LintRulesBase(object):
@@ -50,7 +50,7 @@ class LintRulesBase(object):
         """Call the handle_error function for the checker we are associated with."""
         if self.should_report_error(code):
             self.error_handler.handle_error(
-                error.Error(code, message, token, position, fix_data))
+                Error(code, message, token, position, fix_data))
 
     def _set_limited_doc_checks(self, limited_doc_checks):
         """Sets whether doc checking is relaxed for this file.
@@ -147,9 +147,9 @@ class CheckerBase(object):
         """
         self._has_errors = True
         self._error_handler.handle_error(
-            error.Error(code, message, token, position, fix_data))
+            Error(code, message, token, position, fix_data))
 
-    def HasErrors(self):
+    def has_errors(self):
         """Returns true if the style checker has found any errors.
 
         Returns:
@@ -157,7 +157,7 @@ class CheckerBase(object):
         """
         return self._has_errors
 
-    def Check(self, start_token, stop_token=None):
+    def check(self, start_token, stop_token=None):
         """Checks a token stream, reporting errors to the error reporter.
 
         Args:
@@ -168,21 +168,21 @@ class CheckerBase(object):
           stop_token: If given, check should stop at this token.
         """
 
-        self._ExecutePass(start_token, self._LintPass, stop_token=stop_token)
+        self._execute_pass(start_token, self._lint_pass, stop_token=stop_token)
         self._lint_rules.finish(self._state_tracker)
 
-    def _LintPass(self, token):
+    def _lint_pass(self, token):
         """Checks an individual token for lint warnings/errors.
 
         Used to encapsulate the logic needed to check an individual token so that it
-        can be passed to _ExecutePass.
+        can be passed to _execute_pass.
 
         Args:
           token: The token to check.
         """
         self._lint_rules.check_token(token, self._state_tracker)
 
-    def _ExecutePass(self, token, pass_function, stop_token=None):
+    def _execute_pass(self, token, pass_function, stop_token=None):
         """Calls the given function for every token in the given token stream.
 
         As each token is passed to the given function, state is kept up to date and,

@@ -79,7 +79,7 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
             lint_rules,
             state_tracker)
 
-    def Check(self,
+    def check(self,
               start_token,
               stop_token=None):
         """Checks a token stream for lint warnings/errors.
@@ -102,9 +102,9 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         # is displayed, don't run the dependency pass if a parse error exists.
         if self.namespaces_info:
             self.namespaces_info.Reset()
-            self._ExecutePass(start_token, self._DependencyPass, stop_token)
+            self._execute_pass(start_token, self._DependencyPass, stop_token)
 
-        self._ExecutePass(start_token, self._LintPass, stop_token)
+        self._execute_pass(start_token, self._lint_pass, stop_token)
 
         # If we have a stop_token, we didn't end up reading the whole file and,
         # thus, don't call finish to do end-of-file checks.
@@ -115,7 +115,7 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         """Processes an individual token for dependency information.
 
         Used to encapsulate the logic needed to process an individual token so that
-        it can be passed to _ExecutePass.
+        it can be passed to _execute_pass.
 
         Args:
           token: The token to process.
