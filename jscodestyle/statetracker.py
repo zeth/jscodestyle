@@ -937,7 +937,7 @@ class StateTracker(object):
         In languages such as ActionScript, a function is top level if it is directly
         within a class.
         """
-        raise TypeError('Abstract method InTopLevel not implemented')
+        raise NotImplementedError
 
     def GetBlockType(self, token):
         """Determine the block type given a START_BLOCK token.
@@ -949,7 +949,7 @@ class StateTracker(object):
         Returns:
           Code block type for current token.
         """
-        raise TypeError('Abstract method GetBlockType not implemented')
+        raise NotImplementedError
 
     def GetParams(self):
         """Returns the accumulated input params as an array.

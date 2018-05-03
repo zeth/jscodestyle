@@ -68,9 +68,9 @@ class LintRulesBase(object):
           parser_state: Object that indicates the parser state in the page.
 
         Raises:
-          TypeError: If not overridden.
+          NotImplementedError: If not overridden.
         """
-        raise TypeError('Abstract method check_token not implemented')
+        raise NotImplementedError
 
     def finish(self, parser_state):
         """Perform all checks that need to occur after all lines are processed.
@@ -79,9 +79,9 @@ class LintRulesBase(object):
           parser_state: State of the parser after parsing all tokens
 
         Raises:
-          TypeError: If not overridden.
+          NotImplementedError: If not overridden.
         """
-        raise TypeError('Abstract method finish not implemented')
+        raise NotImplementedError
 
     def should_report_error(self, error):
         """Whether the given error should be reported.

@@ -119,7 +119,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
     def HandleMissingParameterDoc(self, token, param_name):
         """Handle errors associated with a parameter missing a @param tag."""
-        raise TypeError('Abstract method HandleMissingParameterDoc not implemented')
+        raise NotImplementedError
 
     def _CheckLineLength(self, last_token, state):
         """Checks whether the line is too long.
