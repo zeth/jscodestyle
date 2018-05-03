@@ -111,7 +111,7 @@ class IndentationRules(object):
         # Map from line number to number of characters it is off in indentation.
         self._start_index_offset = {}
 
-    def Finalize(self):
+    def finish(self):
         if self._stack:
             old_stack = self._stack
             self._stack = []

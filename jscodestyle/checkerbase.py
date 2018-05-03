@@ -46,7 +46,7 @@ class LintRulesBase(object):
         self.disable = disable
 
     def _handle_error(self, code, message, token, position=None,
-                     fix_data=None):
+                      fix_data=None):
         """Call the handle_error function for the checker we are associated with."""
         if self.should_report_error(code):
             self.error_handler.handle_error(
@@ -72,7 +72,7 @@ class LintRulesBase(object):
         """
         raise TypeError('Abstract method check_token not implemented')
 
-    def Finalize(self, parser_state):
+    def finish(self, parser_state):
         """Perform all checks that need to occur after all lines are processed.
 
         Args:
@@ -81,7 +81,7 @@ class LintRulesBase(object):
         Raises:
           TypeError: If not overridden.
         """
-        raise TypeError('Abstract method Finalize not implemented')
+        raise TypeError('Abstract method finish not implemented')
 
     def should_report_error(self, error):
         """Whether the given error should be reported.
@@ -134,7 +134,7 @@ class CheckerBase(object):
         self._has_errors = False
 
     def handle_error(self, code, message, token, position=None,
-                    fix_data=None):
+                     fix_data=None):
         """Prints out the given error message including a line number.
 
         Args:
@@ -169,7 +169,7 @@ class CheckerBase(object):
         """
 
         self._ExecutePass(start_token, self._LintPass, stop_token=stop_token)
-        self._lint_rules.Finalize(self._state_tracker)
+        self._lint_rules.finish(self._state_tracker)
 
     def _LintPass(self, token):
         """Checks an individual token for lint warnings/errors.

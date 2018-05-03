@@ -107,9 +107,9 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         self._ExecutePass(start_token, self._LintPass, stop_token)
 
         # If we have a stop_token, we didn't end up reading the whole file and,
-        # thus, don't call Finalize to do end-of-file checks.
+        # thus, don't call finish to do end-of-file checks.
         if not stop_token:
-            self._lint_rules.Finalize(self._state_tracker)
+            self._lint_rules.finish(self._state_tracker)
 
     def _DependencyPass(self, token):
         """Processes an individual token for dependency information.

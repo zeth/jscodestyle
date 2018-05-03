@@ -81,7 +81,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
     def HandleMissingParameterDoc(self, token, param_name):
         """Handle errors associated with a parameter missing a param tag."""
         self._handle_error(errors.MISSING_PARAMETER_DOCUMENTATION,
-                          'Missing docs for parameter: "%s"' % param_name, token)
+                           'Missing docs for parameter: "%s"' % param_name, token)
 
     # pylint: disable=too-many-statements
     def check_token(self, token, state):
@@ -149,14 +149,14 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         # Check for variable arguments marker in type.
                         if flag.jstype.IsVarArgsType() and flag.name != 'var_args':
                             self._handle_error(errors.JSDOC_MISSING_VAR_ARGS_NAME,
-                                              'Variable length argument %s must be renamed '
-                                              'to var_args.' % flag.name,
-                                              token)
+                                               'Variable length argument %s must be renamed '
+                                               'to var_args.' % flag.name,
+                                               token)
                         elif not flag.jstype.IsVarArgsType() and flag.name == 'var_args':
                             self._handle_error(errors.JSDOC_MISSING_VAR_ARGS_TYPE,
-                                              'Variable length argument %s type must start '
-                                              'with \'...\'.' % flag.name,
-                                              token)
+                                               'Variable length argument %s type must start '
+                                               'with \'...\'.' % flag.name,
+                                               token)
 
                     if self.should_check(Rule.OPTIONAL_TYPE_MARKER):
                         # Check for optional marker in type.
@@ -169,9 +169,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         elif (not flag.jstype.opt_arg and
                               flag.name.startswith('opt_')):
                             self._handle_error(errors.JSDOC_MISSING_OPTIONAL_TYPE,
-                                              'Optional parameter %s type must end with =.' %
-                                              flag.name,
-                                              token)
+                                               'Optional parameter %s type must end with =.' %
+                                               flag.name,
+                                               token)
 
             if flag.flag_type in state.GetDocFlag().HAS_TYPE:
                 # Check for both missing type token and empty type braces '{}'
@@ -180,7 +180,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 if (flag.flag_type not in state.GetDocFlag().CAN_OMIT_TYPE
                     and (not flag.jstype or flag.jstype.IsEmpty())):
                     self._handle_error(errors.MISSING_JSDOC_TAG_TYPE,
-                                      'Missing type in %s tag' % token.string, token)
+                                       'Missing type in %s tag' % token.string, token)
 
                 elif flag.name_token and flag.type_end_token and tokenutil.Compare(
                     flag.type_end_token, flag.name_token) > 0:
@@ -689,10 +689,10 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 'required through any other symbol.' % namespace,
                 token, position=Position.AtBeginning())
 
-    def Finalize(self, state):
+    def finish(self, state):
         """Perform all checks that need to occur after all lines are processed."""
-        # Call the base class's Finalize function.
-        super(JavaScriptLintRules, self).Finalize(state)
+        # Call the base class's finish function.
+        super(JavaScriptLintRules, self).finish(state)
 
         if self.should_check(Rule.UNUSED_PRIVATE_MEMBERS):
             # Report an error for any declared private member that was never used.
@@ -701,9 +701,10 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
             for variable in unused_private_members:
                 token = self._declared_private_member_tokens[variable]
-                self._handle_error(errors.UNUSED_PRIVATE_MEMBER,
-                                  'Unused private member: %s.' % token.string,
-                                  token)
+                self._handle_error(
+                    errors.UNUSED_PRIVATE_MEMBER,
+                    'Unused private member: %s.' % token.string,
+                    token)
 
             # Clear state to prepare for the next file.
             self._declared_private_member_tokens = {}

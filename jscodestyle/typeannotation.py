@@ -96,7 +96,7 @@ class TypeAnnotation(object):
           item: The TypeAnnotation item to append.
         """
         # item is a TypeAnnotation instance, so pylint: disable=protected-access
-        self.sub_types.append(item._Finalize(self))
+        self.sub_types.append(item._finish(self))
 
     def __repr__(self):
         """Reconstructs the type definition."""
@@ -230,7 +230,7 @@ class TypeAnnotation(object):
 
         return False
 
-    def _Finalize(self, parent):
+    def _finish(self, parent):
         """Fixes some parsing issues once the TypeAnnotation is complete."""
 
         # Normalize functions whose definition ended up in the key type because

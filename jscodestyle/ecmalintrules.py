@@ -829,7 +829,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
             self._handle_error(errors.MISSING_SPACE, 'Missing space before "["',
                               token, position=Position.AtBeginning())
 
-    def Finalize(self, state):
+    def finish(self, state):
         """Perform all checks that need to occur after all lines are processed.
 
         Args:
@@ -849,7 +849,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 last_non_space_token)
 
         try:
-            self._indentation.Finalize()
+            self._indentation.finish()
         except Exception, e:
             self._handle_error(
                 errors.FILE_DOES_NOT_PARSE,
