@@ -53,7 +53,7 @@ class RunnerTest(unittest.TestCase):
         self.mock_error_handler.HandleFile.assert_called_once_with(
             'does_not_exist.js', None)
         self.assertIsInstance(
-            self.mock_error_handler.HandleError.call_args[0][0],
+            self.mock_error_handler.handle_error.call_args[0][0],
             error.Error)
         self.mock_error_handler.FinishFile.assert_called_once()
 
@@ -70,7 +70,7 @@ class RunnerTest(unittest.TestCase):
             self.mock_error_handler.HandleFile.call_args[0][1],
             tokens.Token)
         self.assertIsInstance(
-            self.mock_error_handler.HandleError.call_args[0][0],
+            self.mock_error_handler.handle_error.call_args[0][0],
             error.Error)
         self.mock_error_handler.FinishFile.assert_called_once()
 

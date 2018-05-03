@@ -113,7 +113,7 @@ def Run(filename,
             source = open(filename)
         except IOError:
             error_handler.HandleFile(filename, None)
-            error_handler.HandleError(
+            error_handler.handle_error(
                 error.Error(errors.FILE_NOT_FOUND, 'File not found'))
             error_handler.FinishFile()
             return
@@ -129,7 +129,7 @@ def Run(filename,
 
     # If we did not end in the basic mode, this a failed parse.
     if tokenizer_mode is not javascripttokenizer.JavaScriptModes.TEXT_MODE:
-        error_handler.HandleError(
+        error_handler.handle_error(
             error.Error(errors.FILE_IN_BLOCK,
                         'File ended in mode "%s".' % tokenizer_mode,
                         _GetLastNonWhiteSpaceToken(token)))
@@ -191,7 +191,7 @@ def RunMetaDataPass(start_token,
             traceback.print_exc()
         error_token = parse_err.token
         error_msg = str(parse_err)
-        error_handler.HandleError(
+        error_handler.handle_error(
             error.Error(errors.FILE_DOES_NOT_PARSE,
                         ('Error parsing file at token "%s". Unable to '
                          'check the rest of file.'
@@ -199,7 +199,7 @@ def RunMetaDataPass(start_token,
         return error_token
     except Exception:  # pylint: disable=broad-except
         traceback.print_exc()
-        error_handler.HandleError(
+        error_handler.handle_error(
             error.Error(
                 errors.FILE_DOES_NOT_PARSE,
                 'Internal error in %s' % filename))

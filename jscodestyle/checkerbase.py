@@ -45,11 +45,11 @@ class LintRulesBase(object):
         self.jsdoc = jsdoc
         self.disable = disable
 
-    def _HandleError(self, code, message, token, position=None,
+    def _handle_error(self, code, message, token, position=None,
                      fix_data=None):
-        """Call the HandleError function for the checker we are associated with."""
+        """Call the handle_error function for the checker we are associated with."""
         if self.should_report_error(code):
-            self.error_handler.HandleError(
+            self.error_handler.handle_error(
                 error.Error(code, message, token, position, fix_data))
 
     def _SetLimitedDocChecks(self, limited_doc_checks):
@@ -133,7 +133,7 @@ class CheckerBase(object):
 
         self._has_errors = False
 
-    def HandleError(self, code, message, token, position=None,
+    def handle_error(self, code, message, token, position=None,
                     fix_data=None):
         """Prints out the given error message including a line number.
 
@@ -146,7 +146,7 @@ class CheckerBase(object):
           fix_data: Metadata used for fixing the error.
         """
         self._has_errors = True
-        self._error_handler.HandleError(
+        self._error_handler.handle_error(
             error.Error(code, message, token, position, fix_data))
 
     def HasErrors(self):

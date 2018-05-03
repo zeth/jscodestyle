@@ -403,7 +403,7 @@ class TypeAnnotationParser(object):
     def Error(self, token, message):
         """Calls the error_handler to post an error message."""
         if self._error_handler:
-            self._error_handler.HandleError(error.Error(
+            self._error_handler.handle_error(error.Error(
                 errors.JSDOC_DOES_NOT_PARSE,
                 'Error parsing jsdoc type at token "%s" (column: %d): %s' %
                 (token.string, token.start_index, message), token))

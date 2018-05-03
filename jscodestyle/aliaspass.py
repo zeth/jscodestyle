@@ -140,7 +140,7 @@ class AliasPass(object):
     def _maybe_report_error(self, err):
         """Report an error to the handler (if registered)."""
         if self._error_handler:
-            self._error_handler.HandleError(err)
+            self._error_handler.handle_error(err)
 
     @classmethod
     def _yield_all_contexts(cls, context):

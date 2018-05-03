@@ -26,7 +26,7 @@ class ErrorAccumulator(errorhandler.ErrorHandler):
     def __init__(self):
         self._errors = []
 
-    def HandleError(self, error):
+    def handle_error(self, error):
         """Append the error to the list.
 
         Args:

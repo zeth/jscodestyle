@@ -140,7 +140,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                     self._AddFix(token)
                     break
 
-    def HandleError(self, error):
+    def handle_error(self, error):
         """Attempts to fix the error.
 
         Args:

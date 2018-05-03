@@ -80,7 +80,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
     def HandleMissingParameterDoc(self, token, param_name):
         """Handle errors associated with a parameter missing a param tag."""
-        self._HandleError(errors.MISSING_PARAMETER_DOCUMENTATION,
+        self._handle_error(errors.MISSING_PARAMETER_DOCUMENTATION,
                           'Missing docs for parameter: "%s"' % param_name, token)
 
     # pylint: disable=too-many-statements
@@ -148,12 +148,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     if self.should_check(Rule.VARIABLE_ARG_MARKER):
                         # Check for variable arguments marker in type.
                         if flag.jstype.IsVarArgsType() and flag.name != 'var_args':
-                            self._HandleError(errors.JSDOC_MISSING_VAR_ARGS_NAME,
+                            self._handle_error(errors.JSDOC_MISSING_VAR_ARGS_NAME,
                                               'Variable length argument %s must be renamed '
                                               'to var_args.' % flag.name,
                                               token)
                         elif not flag.jstype.IsVarArgsType() and flag.name == 'var_args':
-                            self._HandleError(errors.JSDOC_MISSING_VAR_ARGS_TYPE,
+                            self._handle_error(errors.JSDOC_MISSING_VAR_ARGS_TYPE,
                                               'Variable length argument %s type must start '
                                               'with \'...\'.' % flag.name,
                                               token)
@@ -162,13 +162,13 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         # Check for optional marker in type.
                         if (flag.jstype.opt_arg and
                             not flag.name.startswith('opt_')):
-                            self._HandleError(errors.JSDOC_MISSING_OPTIONAL_PREFIX,
+                            self._handle_error(errors.JSDOC_MISSING_OPTIONAL_PREFIX,
                                               'Optional parameter name %s must be prefixed '
                                               'with opt_.' % flag.name,
                                               token)
                         elif (not flag.jstype.opt_arg and
                               flag.name.startswith('opt_')):
-                            self._HandleError(errors.JSDOC_MISSING_OPTIONAL_TYPE,
+                            self._handle_error(errors.JSDOC_MISSING_OPTIONAL_TYPE,
                                               'Optional parameter %s type must end with =.' %
                                               flag.name,
                                               token)
@@ -179,12 +179,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # const, private, public and protected without types.
                 if (flag.flag_type not in state.GetDocFlag().CAN_OMIT_TYPE
                     and (not flag.jstype or flag.jstype.IsEmpty())):
-                    self._HandleError(errors.MISSING_JSDOC_TAG_TYPE,
+                    self._handle_error(errors.MISSING_JSDOC_TAG_TYPE,
                                       'Missing type in %s tag' % token.string, token)
 
                 elif flag.name_token and flag.type_end_token and tokenutil.Compare(
                     flag.type_end_token, flag.name_token) > 0:
-                    self._HandleError(
+                    self._handle_error(
                         errors.OUT_OF_ORDER_JSDOC_TAG_TYPE,
                         'Type should be immediately after %s tag' % token.string,
                         token)
@@ -197,7 +197,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     break
                 next_token = next_token.next
             else:
-                self._HandleError(
+                self._handle_error(
                     errors.UNNECESSARY_DOUBLE_QUOTED_STRING,
                     'Single-quoted string preferred over double-quoted string.',
                     token,
@@ -283,7 +283,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     expected_blank_lines = 2
 
                 if error_message:
-                    self._HandleError(
+                    self._handle_error(
                         errors.WRONG_BLANK_LINE_COUNT, error_message,
                         block_start, position=Position.AtBeginning(),
                         fix_data=expected_blank_lines - blank_lines)
@@ -301,7 +301,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         not function.doc.InheritsDocumentation() and
                         not function.doc.HasFlag('constructor')):
                         # Check for proper documentation of return value.
-                        self._HandleError(
+                        self._handle_error(
                             errors.MISSING_RETURN_DOCUMENTATION,
                             'Missing @return JsDoc in function with non-trivial return',
                             function.doc.end_token, position=Position.AtBeginning())
@@ -317,7 +317,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                             for sub_type in flag.jstype.IterTypeGroup())
 
                         if invalid_return:
-                            self._HandleError(
+                            self._handle_error(
                                 errors.UNNECESSARY_RETURN_DOCUMENTATION,
                                 'Found @return JsDoc on function that returns nothing',
                                 flag.flag_token, position=Position.AtBeginning())
@@ -370,7 +370,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     not function.is_interface and
                     '.prototype.' not in function.name and
                     not prototype_object_literal):
-                    self._HandleError(
+                    self._handle_error(
                         errors.MISSING_JSDOC_TAG_THIS,
                         'Missing @this JsDoc in function referencing "this". ('
                         'this usually means you are trying to reference "this" in '
@@ -381,7 +381,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         elif token.type == Type.IDENTIFIER:
             if token.string == 'goog.inherits' and not state.InFunction():
                 if state.GetLastNonSpaceToken().line_number == token.line_number:
-                    self._HandleError(
+                    self._handle_error(
                         errors.MISSING_LINE,
                         'Missing newline between constructor and goog.inherits',
                         token,
@@ -390,7 +390,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 extra_space = state.GetLastNonSpaceToken().next
                 while extra_space != token:
                     if extra_space.type == Type.BLANK_LINE:
-                        self._HandleError(
+                        self._handle_error(
                             errors.EXTRA_LINE,
                             'Extra line between constructor and goog.inherits',
                             extra_space)
@@ -416,7 +416,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                             msg += (' *Test namespaces must be mentioned in the '
                                     'goog.setTestOnly() call')
 
-                    self._HandleError(
+                    self._handle_error(
                         errors.EXTRA_GOOG_PROVIDE,
                         msg,
                         token, position=Position.AtBeginning())
@@ -466,7 +466,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     else:
                         msg = 'Unnecessary goog.require: ' + namespace
 
-                    self._HandleError(
+                    self._handle_error(
                         errors.EXTRA_GOOG_REQUIRE,
                         msg,
                         token, position=Position.AtBeginning())
@@ -497,7 +497,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 and token.next.type not in (Type.WHITESPACE, Type.END_PAREN,
                                             Type.END_BRACKET, Type.SEMICOLON,
                                             Type.START_BRACKET)):
-                self._HandleError(
+                self._handle_error(
                     errors.MISSING_SPACE,
                     'Missing space after "%s"' % token.string,
                     token,
@@ -512,7 +512,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 if (token.previous.type in (Type.START_PAREN, Type.START_BRACKET,
                                             Type.FUNCTION_NAME)
                     or token.next.type == Type.START_PARAMETERS):
-                    self._HandleError(
+                    self._handle_error(
                         errors.EXTRA_SPACE,
                         'Extra space after "%s"' % token.previous.string,
                         token,
@@ -521,14 +521,14 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             previous_token = tokenutil.SearchExcept(token, Type.NON_CODE_TYPES,
                                                     reverse=True)
             if not previous_token:
-                self._HandleError(
+                self._handle_error(
                     errors.REDUNDANT_SEMICOLON,
                     'Semicolon without any statement',
                     token,
                     position=Position.AtEnd(token.string))
             elif (previous_token.type == Type.KEYWORD and
                   previous_token.string not in ['break', 'continue', 'return']):
-                self._HandleError(
+                self._handle_error(
                     errors.REDUNDANT_SEMICOLON,
                     ('Semicolon after \'%s\' without any statement.'
                      ' Looks like an error.' % previous_token.string),
@@ -572,7 +572,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # Pop the stack and report any remaining locals as unused.
                 unused_local_variables = self._unused_local_variables_by_scope.pop()
                 for unused_token in unused_local_variables.values():
-                    self._HandleError(
+                    self._handle_error(
                         errors.UNUSED_LOCAL_VARIABLE,
                         'Unused local variable: %s.' % unused_token.string,
                         unused_token)
@@ -643,7 +643,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
              sorted(missing_provides)])
         missing_provides_msg += '\n'
 
-        self._HandleError(
+        self._handle_error(
             errors.MISSING_GOOG_PROVIDE,
             missing_provides_msg,
             token, position=Position.AtBeginning(),
@@ -674,7 +674,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
              sorted(missing_requires)])
         missing_requires_msg += '\n'
 
-        self._HandleError(
+        self._handle_error(
             errors.MISSING_GOOG_REQUIRE,
             missing_requires_msg,
             token, position=Position.AtBeginning(),
@@ -683,7 +683,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
     def _ReportIllegalAliasStatement(self, illegal_alias_statements):
         """Reports alias statements that would need a goog.require."""
         for namespace, token in illegal_alias_statements.iteritems():
-            self._HandleError(
+            self._handle_error(
                 errors.ALIAS_STMT_NEEDS_GOOG_REQUIRE,
                 'The alias definition would need the namespace \'%s\' which is not '
                 'required through any other symbol.' % namespace,
@@ -701,7 +701,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
             for variable in unused_private_members:
                 token = self._declared_private_member_tokens[variable]
-                self._HandleError(errors.UNUSED_PRIVATE_MEMBER,
+                self._handle_error(errors.UNUSED_PRIVATE_MEMBER,
                                   'Unused private member: %s.' % token.string,
                                   token)
 
@@ -743,7 +743,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         first_provide_token = sorter.CheckProvides(token)
         if first_provide_token:
             new_order = sorter.GetFixedProvideString(first_provide_token)
-            self._HandleError(
+            self._handle_error(
                 errors.GOOG_PROVIDES_NOT_ALPHABETIZED,
                 'goog.provide classes must be alphabetized.  The correct code is:\n' +
                 new_order,
@@ -754,7 +754,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         first_require_token = sorter.CheckRequires(token)
         if first_require_token:
             new_order = sorter.GetFixedRequireString(first_require_token)
-            self._HandleError(
+            self._handle_error(
                 errors.GOOG_REQUIRES_NOT_ALPHABETIZED,
                 'goog.require classes must be alphabetized.  The correct code is:\n' +
                 new_order,

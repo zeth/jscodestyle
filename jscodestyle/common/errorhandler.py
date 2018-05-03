@@ -38,7 +38,7 @@ class ErrorHandler(object):
           first_token: The first token of the file.
         """
 
-    def HandleError(self, error):
+    def handle_error(self, error):
         """Append the error to the list.
 
         Args:
