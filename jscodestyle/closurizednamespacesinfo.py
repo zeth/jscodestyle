@@ -85,6 +85,7 @@ class ClosurizedNamespacesInfo(object):
         self._closurized_namespaces = closurized_namespaces
         self._ignored_extra_namespaces = (ignored_extra_namespaces +
                                           DEFAULT_EXTRA_NAMESPACES)
+        self._scopified_file = False
         self.reset()
 
     def reset(self):
