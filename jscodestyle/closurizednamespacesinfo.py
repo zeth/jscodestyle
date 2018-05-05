@@ -398,7 +398,7 @@ class ClosurizedNamespacesInfo(object):
                 # gets treated as a regular goog.require (i.e. still gets sorted).
                 if self._HasSuppression(state_tracker, 'extraRequire'):
                     self._suppressed_requires.append(namespace)
-                    self._AddUsedNamespace(state_tracker, namespace, token)
+                    self._add_used_namespace(state_tracker, namespace, token)
 
             elif token.string == 'goog.provide':
                 self._provide_tokens.append(token)
@@ -438,7 +438,7 @@ class ClosurizedNamespacesInfo(object):
                     whole_identifier_string = token.metadata.aliased_symbol
                 elif (token.string == 'goog.module.get' and
                       not self._HasSuppression(state_tracker, 'extraRequire')):
-                    # Cannot use _AddUsedNamespace as this is not an identifier, but
+                    # Cannot use _add_used_namespace as this is not an identifier, but
                     # already the entire namespace that's required.
                     namespace = tokenutil.GetStringAfterToken(token)
                     namespace = UsedNamespace(namespace, namespace, token,
@@ -452,8 +452,8 @@ class ClosurizedNamespacesInfo(object):
                 else:
                     is_alias_definition = (token.metadata and
                                            token.metadata.is_alias_definition)
-                    self._AddUsedNamespace(state_tracker, whole_identifier_string,
-                                           token, is_alias_definition)
+                    self._add_used_namespace(state_tracker, whole_identifier_string,
+                                             token, is_alias_definition)
 
         elif token.type == JavaScriptTokenType.SIMPLE_LVALUE:
             identifier = token.values['identifier']
@@ -474,7 +474,7 @@ class ClosurizedNamespacesInfo(object):
             if identifier:
                 cnamespace = self.GetClosurizedNamespace(identifier)
                 if state_tracker.InFunction():
-                    self._AddUsedNamespace(state_tracker, identifier, token)
+                    self._add_used_namespace(state_tracker, identifier, token)
                 elif cnamespace and cnamespace != 'goog':
                     self._add_created_namespace(state_tracker,
                                                 identifier,
@@ -489,7 +489,7 @@ class ClosurizedNamespacesInfo(object):
                 if flag_type == 'implements' or (flag_type == 'extends'
                                                  and is_interface):
                     identifier = flag.jstype.alias or flag.jstype.identifier
-                    self._AddUsedNamespace(state_tracker, identifier, token)
+                    self._add_used_namespace(state_tracker, identifier, token)
                     # Since we process doctypes only for implements and extends, the
                     # type is a simple one and we don't need any iteration for subtypes.
 
@@ -515,8 +515,8 @@ class ClosurizedNamespacesInfo(object):
 
         self._created_namespaces.append([namespace, identifier, line_number])
 
-    def _AddUsedNamespace(self, state_tracker, identifier, token,
-                          is_alias_definition=False):
+    def _add_used_namespace(self, state_tracker, identifier, token,
+                            is_alias_definition=False):
         """Adds the namespace of an identifier to the list of used namespaces.
 
         If the identifier is annotated with a 'missingRequire' suppression, it is
