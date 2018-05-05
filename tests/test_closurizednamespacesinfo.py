@@ -285,7 +285,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         self.assertFalse(namespaces_info.is_extra_require(token),
                          'Should not be extra since it is for testing.')
 
-    def test_GetMissingProvides_provided(self):
+    def test_get_missing_provides_provided(self):
         """Tests that provided functions don't cause a missing provide."""
         input_lines = [
             'goog.provide(\'package.Foo\');',
@@ -295,9 +295,9 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         namespaces_info = self._GetNamespacesInfoForScript(
             input_lines, ['package'])
 
-        self.assertEquals(0, len(namespaces_info.GetMissingProvides()))
+        self.assertEquals(0, len(namespaces_info.get_missing_provides()))
 
-    def test_GetMissingProvides_providedIdentifier(self):
+    def test_get_missing_provides_providedIdentifier(self):
         """Tests that provided identifiers don't cause a missing provide."""
         input_lines = [
             'goog.provide(\'package.Foo.methodName\');',
@@ -305,9 +305,9 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        self.assertEquals(0, len(namespaces_info.GetMissingProvides()))
+        self.assertEquals(0, len(namespaces_info.get_missing_provides()))
 
-    def test_GetMissingProvides_providedParentIdentifier(self):
+    def test_get_missing_provides_providedParentIdentifier(self):
         """Tests that provided identifiers on a class don't cause a missing provide
         on objects attached to that class."""
         input_lines = [
@@ -317,28 +317,28 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        self.assertEquals(0, len(namespaces_info.GetMissingProvides()))
+        self.assertEquals(0, len(namespaces_info.get_missing_provides()))
 
-    def test_GetMissingProvides_unprovided(self):
+    def test_get_missing_provides_unprovided(self):
         """Tests that unprovided functions cause a missing provide."""
         input_lines = ['package.Foo = function() {};']
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
 
-        missing_provides = namespaces_info.GetMissingProvides()
+        missing_provides = namespaces_info.get_missing_provides()
         self.assertEquals(1, len(missing_provides))
         missing_provide = missing_provides.popitem()
         self.assertEquals('package.Foo', missing_provide[0])
         self.assertEquals(1, missing_provide[1])
 
-    def test_GetMissingProvides_privatefunction(self):
+    def test_get_missing_provides_privatefunction(self):
         """Tests that unprovided private functions don't cause a missing provide."""
         input_lines = ['package.Foo_ = function() {};']
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        self.assertEquals(0, len(namespaces_info.GetMissingProvides()))
+        self.assertEquals(0, len(namespaces_info.get_missing_provides()))
 
-    def test_GetMissingProvides_required(self):
+    def test_get_missing_provides_required(self):
         """Tests that required namespaces don't cause a missing provide."""
         input_lines = [
             'goog.require(\'package.Foo\');',
@@ -346,7 +346,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        self.assertEquals(0, len(namespaces_info.GetMissingProvides()))
+        self.assertEquals(0, len(namespaces_info.get_missing_provides()))
 
     def test_GetMissingRequires_required(self):
         """Tests that required namespaces don't cause a missing require."""
@@ -796,7 +796,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_provides = namespaces_info.GetMissingProvides()
+        missing_provides = namespaces_info.get_missing_provides()
         self.assertEquals({'goog.bar.Foo': 4}, missing_provides)
         _, illegal_alias_stmts = namespaces_info.GetMissingRequires()
         self.assertEquals({}, illegal_alias_stmts)

@@ -423,7 +423,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                 if namespaces_info.IsLastProvide(token):
                     # Report missing provide statements after the last existing provide.
-                    missing_provides = namespaces_info.GetMissingProvides()
+                    missing_provides = namespaces_info.get_missing_provides()
                     if missing_provides:
                         self._ReportMissingProvides(
                             missing_provides,
@@ -452,7 +452,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # reported before the first require.
                 if (namespaces_info.IsFirstRequire(token) and
                     not namespaces_info.get_provided_namespaces()):
-                    missing_provides = namespaces_info.GetMissingProvides()
+                    missing_provides = namespaces_info.get_missing_provides()
                     if missing_provides:
                         self._ReportMissingProvides(
                             missing_provides,
@@ -717,7 +717,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             # requires should be reported on line 1.
             if (not namespaces_info.get_provided_namespaces() and
                 not namespaces_info.get_required_namespaces()):
-                missing_provides = namespaces_info.GetMissingProvides()
+                missing_provides = namespaces_info.get_missing_provides()
                 if missing_provides:
                     self._ReportMissingProvides(
                         missing_provides, state.GetFirstToken(), None)

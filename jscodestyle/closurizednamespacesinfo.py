@@ -214,7 +214,7 @@ class ClosurizedNamespacesInfo(object):
 
         return True
 
-    def GetMissingProvides(self):
+    def get_missing_provides(self):
         """Returns the dict of missing provided namespaces for the current file.
 
         Returns:
