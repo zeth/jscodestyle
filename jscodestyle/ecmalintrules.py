@@ -740,9 +740,9 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                   and not jsdoc.InheritsDocumentation()
                   and not state.InObjectLiteralDescendant() and not
                   jsdoc.is_invalidated()):
-                distance, edit = jsdoc.CompareParameters(state.GetParams())
+                distance, edit = jsdoc.CompareParameters(state.get_params())
                 if distance:
-                    params_iter = iter(state.GetParams())
+                    params_iter = iter(state.get_params())
                     docs_iter = iter(jsdoc.ordered_params)
 
                     for operation in edit:

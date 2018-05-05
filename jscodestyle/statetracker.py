@@ -781,7 +781,7 @@ class StateTracker(object):
         self._documented_identifiers = set()
         self._variables_in_scope = []
 
-    def DocFlagPass(self, start_token, error_handler):
+    def doc_flag_pass(self, start_token, error_handler):
         """Parses doc flags.
 
         This pass needs to be executed before the aliaspass and we don't want to do
@@ -908,7 +908,7 @@ class StateTracker(object):
         """
         return bool(self._paren_depth)
 
-    def ParenthesesDepth(self):
+    def parentheses_depth(self):
         """Returns the number of parens surrounding the token.
 
         Returns:
@@ -916,7 +916,7 @@ class StateTracker(object):
         """
         return self._paren_depth
 
-    def BlockDepth(self):
+    def block_depth(self):
         """Returns the number of blocks in which the token is nested.
 
         Returns:
@@ -924,7 +924,7 @@ class StateTracker(object):
         """
         return self._block_depth
 
-    def FunctionDepth(self):
+    def function_depth(self):
         """Returns the number of functions in which the token is nested.
 
         Returns:
@@ -942,7 +942,7 @@ class StateTracker(object):
         """
         raise NotImplementedError
 
-    def GetBlockType(self, token):
+    def get_block_type(self, token):
         """Determine the block type given a START_BLOCK token.
 
         Code blocks come after parameters, keywords  like else, and closing parens.
@@ -954,7 +954,7 @@ class StateTracker(object):
         """
         raise NotImplementedError
 
-    def GetParams(self):
+    def get_params(self):
         """Returns the accumulated input params as an array.
 
         In some EcmasSript languages, input params are specified like
@@ -1113,13 +1113,13 @@ class StateTracker(object):
             # Subclasses need to handle block start very differently because
             # whether a block is a CODE or OBJECT_LITERAL block varies significantly
             # by language.
-            self._block_types.append(self.GetBlockType(token))
+            self._block_types.append(self.get_block_type(token))
 
             # When entering a function body, record its parameters.
             if self.InFunction():
                 function = self._function_stack[-1]
                 if self._block_depth == function.block_depth + 1:
-                    function.parameters = self.GetParams()
+                    function.parameters = self.get_params()
 
         # Track block depth.
         elif type == JSTTokenType.END_BLOCK:
@@ -1209,7 +1209,7 @@ class StateTracker(object):
 
         elif type == JSTTokenType.PARAMETERS:
             self._cumulative_params += token.string
-            self._variables_in_scope.extend(self.GetParams())
+            self._variables_in_scope.extend(self.get_params())
 
         elif type == JSTTokenType.KEYWORD and token.string == 'return':
             next_token = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES)

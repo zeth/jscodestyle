@@ -543,7 +543,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
           state: The state tracker.
         """
         # We don't use state.InFunction because that disregards scope functions.
-        in_function = state.FunctionDepth() > 0
+        in_function = state.function_depth() > 0
         if token.type == Type.SIMPLE_LVALUE or token.type == Type.IDENTIFIER:
             if in_function:
                 identifier = token.string

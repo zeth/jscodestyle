@@ -28,7 +28,6 @@ from jscodestyle import javascripttokens
 from testtools import testutil
 from jscodestyle import tokenutil
 
-# pylint: disable=g-bad-name
 TokenType = javascripttokens.JavaScriptTokenType
 
 
@@ -847,7 +846,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ecma_pass = ecmametadatapass.EcmaMetaDataPass()
         ecma_pass.Process(token)
 
-        state_tracker.DocFlagPass(token, error_handler=None)
+        state_tracker.doc_flag_pass(token, error_handler=None)
 
         alias_pass = aliaspass.AliasPass(closurized_namespaces)
         alias_pass.process(token)

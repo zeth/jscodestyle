@@ -83,7 +83,7 @@ class JavaScriptStateTracker(statetracker.StateTracker):
         Returns:
           Whether we are at the top level in the class.
         """
-        return self._scope_depth == self.ParenthesesDepth()
+        return self._scope_depth == self.parentheses_depth()
 
     def InFunction(self):
         """Returns true if the current token is within a function.
@@ -93,7 +93,7 @@ class JavaScriptStateTracker(statetracker.StateTracker):
         Returns:
           True if the current token is within a function.
         """
-        return self._scope_depth != self.FunctionDepth()
+        return self._scope_depth != self.function_depth()
 
     def InNonScopeBlock(self):
         """Compute whether we are nested within a non-goog.scope block.
@@ -102,9 +102,9 @@ class JavaScriptStateTracker(statetracker.StateTracker):
           True if the token is not enclosed in a block that does not originate from
           a goog.scope statement. False otherwise.
         """
-        return self._scope_depth != self.BlockDepth()
+        return self._scope_depth != self.block_depth()
 
-    def GetBlockType(self, token):
+    def get_block_type(self, token):
         """Determine the block type given a START_BLOCK token.
 
         Code blocks come after parameters, keywords  like else, and closing parens.

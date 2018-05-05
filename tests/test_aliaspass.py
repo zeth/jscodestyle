@@ -80,7 +80,7 @@ class AliasPassTest(unittest.TestCase):
         """Tests that aliases are correctly expanded within type annotations."""
         start_token = testutil.TokenizeSourceAndRunEcmaPass(_TEST_ALIAS_SCRIPT)
         tracker = javascriptstatetracker.JavaScriptStateTracker()
-        tracker.DocFlagPass(start_token, error_handler=None)
+        tracker.doc_flag_pass(start_token, error_handler=None)
 
         alias_pass = aliaspass.AliasPass(set(['goog', 'myproject']))
         alias_pass.process(start_token)

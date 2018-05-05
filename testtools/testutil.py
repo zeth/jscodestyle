@@ -70,7 +70,7 @@ def ParseFunctionsAndComments(source, error_handler=None):
 
     tracker = javascriptstatetracker.JavaScriptStateTracker()
     if error_handler is not None:
-        tracker.DocFlagPass(start_token, error_handler)
+        tracker.doc_flag_pass(start_token, error_handler)
 
     functions = []
     comments = []

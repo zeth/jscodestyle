@@ -93,7 +93,7 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
           is_html: Whether this token stream is HTML.
           stop_token: If given, checks should stop at this token.
         """
-        self._state_tracker.DocFlagPass(start_token, self._error_handler)
+        self._state_tracker.doc_flag_pass(start_token, self._error_handler)
 
         if self._alias_pass:
             self._alias_pass.process(start_token)
