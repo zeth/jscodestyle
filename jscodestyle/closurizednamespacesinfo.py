@@ -224,7 +224,7 @@ class ClosurizedNamespacesInfo(object):
         """
         missing_provides = dict()
         for namespace, identifier, line_number in self._created_namespaces:
-            if (not self._IsPrivateIdentifier(identifier)
+            if (not self._is_private_identifier(identifier)
                     and namespace not in self._provided_namespaces
                     and identifier not in self._provided_namespaces
                     and namespace not in self._required_namespaces
@@ -241,7 +241,7 @@ class ClosurizedNamespacesInfo(object):
                                  missing_requires):
         """Checks if a namespace would normally be required."""
         return (
-            not self._IsPrivateIdentifier(identifier) and
+            not self._is_private_identifier(identifier) and
             namespace not in external_dependencies and
             namespace not in self._provided_namespaces and
             identifier not in external_dependencies and
@@ -335,7 +335,7 @@ class ClosurizedNamespacesInfo(object):
                     return namespace
         return None
 
-    def _IsPrivateIdentifier(self, identifier):
+    def _is_private_identifier(self, identifier):
         """Returns whether the given identifier is private."""
         pieces = identifier.split('.')
         for piece in pieces:
