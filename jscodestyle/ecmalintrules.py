@@ -121,7 +121,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         """Handle errors associated with a parameter missing a @param tag."""
         raise NotImplementedError
 
-    def _CheckLineLength(self, last_token, state):
+    def _check_line_length(self, last_token, state):
         """Checks whether the line is too long.
 
         Args:
@@ -183,7 +183,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                     errors.LINE_TOO_LONG,
                     'Line too long (%d characters).' % len(line), last_token)
 
-    def _CheckJsDocType(self, token, js_type):
+    def _check_jsdoc_type(self, token, js_type):
         """Checks the given type for style errors.
 
         Args:
@@ -206,9 +206,9 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         # e.g. {?number|string|null} etc.
 
         for sub_type in js_type.IterTypes():
-            self._CheckJsDocType(token, sub_type)
+            self._check_jsdoc_type(token, sub_type)
 
-    def _CheckForMissingSpaceBeforeToken(self, token):
+    def _check_for_missing_space_before_token(self, token):
         """Checks for a missing space at the beginning of a token.
 
         Reports a MISSING_SPACE error if the token does not begin with a space or
@@ -333,7 +333,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 self._handle_error(*indentation_error)
 
         if last_in_line:
-            self._CheckLineLength(token, state)
+            self._check_line_length(token, state)
 
         if token_type == Type.PARAMETERS:
             # Find missing spaces in parameter lists.
@@ -352,7 +352,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
         elif (token_type == Type.START_BLOCK and
               token.metadata.context.type == Context.BLOCK):
-            self._CheckForMissingSpaceBeforeToken(token)
+            self._check_for_missing_space_before_token(token)
 
         elif token_type == Type.END_BLOCK:
             last_code = token.metadata.last_code
@@ -602,15 +602,15 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                             errors.MISSING_JSDOC_TAG_DESCRIPTION,
                             'Missing description in %s tag' % flag_name, token)
                 else:
-                    self._CheckForMissingSpaceBeforeToken(flag.description_start_token)
+                    self._check_for_missing_space_before_token(flag.description_start_token)
 
             if flag.HasType():
                 if flag.type_start_token is not None:
-                    self._CheckForMissingSpaceBeforeToken(
+                    self._check_for_missing_space_before_token(
                         token.attached_object.type_start_token)
 
                 if flag.jstype and not flag.jstype.IsEmpty():
-                    self._CheckJsDocType(token, flag.jstype)
+                    self._check_jsdoc_type(token, flag.jstype)
 
                     if self.should_check(Rule.BRACES_AROUND_TYPE) and (
                             flag.type_start_token.type != Type.DOC_START_BRACE or
