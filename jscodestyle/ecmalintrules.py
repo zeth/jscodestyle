@@ -739,7 +739,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
             elif (state.InTopLevel() and jsdoc and not jsdoc.HasFlag('see')
                   and not jsdoc.InheritsDocumentation()
                   and not state.InObjectLiteralDescendant() and not
-                  jsdoc.IsInvalidated()):
+                  jsdoc.is_invalidated()):
                 distance, edit = jsdoc.CompareParameters(state.GetParams())
                 if distance:
                     params_iter = iter(state.GetParams())

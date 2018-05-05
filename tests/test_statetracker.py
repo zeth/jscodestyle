@@ -68,16 +68,16 @@ class DocCommentTest(unittest.TestCase):
             [a, b, c],
             comment.GetDocFlags())
 
-    def testInvalidate(self):
+    def test_invalidate(self):
         comment = statetracker.DocComment(None)
 
         self.assertFalse(comment.invalidated)
-        self.assertFalse(comment.IsInvalidated())
+        self.assertFalse(comment.is_invalidated())
 
-        comment.Invalidate()
+        comment.invalidate()
 
         self.assertTrue(comment.invalidated)
-        self.assertTrue(comment.IsInvalidated())
+        self.assertTrue(comment.is_invalidated())
 
     def testSuppressionOnly(self):
         comment = statetracker.DocComment(None)

@@ -336,7 +336,7 @@ class DocComment(object):
                 params.append(flag.name)
         return params
 
-    def Invalidate(self):
+    def invalidate(self):
         """Indicate that the JSDoc is well-formed but we had problems parsing it.
 
         This is a short-circuiting mechanism so that we don't emit false
@@ -345,8 +345,8 @@ class DocComment(object):
         """
         self.invalidated = True
 
-    def IsInvalidated(self):
-        """Test whether Invalidate() has been called."""
+    def is_invalidated(self):
+        """Test whether invalidate() has been called."""
         return self.invalidated
 
     def AddSuppression(self, token):
