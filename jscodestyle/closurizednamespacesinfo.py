@@ -233,6 +233,21 @@ class ClosurizedNamespacesInfo(object):
 
         return missing_provides
 
+    def should_require_namespace(self,
+                                 namespace,
+                                 identifier,
+                                 external_dependencies,
+                                 created_identifiers,
+                                 missing_requires):
+        """Checks if a namespace would normally be required."""
+        return (
+            not self._IsPrivateIdentifier(identifier) and
+            namespace not in external_dependencies and
+            namespace not in self._provided_namespaces and
+            identifier not in external_dependencies and
+            identifier not in created_identifiers and
+            namespace not in missing_requires)
+
     def get_missing_requires(self):
         """Returns the dict of missing required namespaces for the current file.
 
@@ -267,23 +282,17 @@ class ClosurizedNamespacesInfo(object):
         missing_requires = dict()
         illegal_alias_statements = dict()
 
-        def ShouldRequireNamespace(namespace, identifier):
-            """Checks if a namespace would normally be required."""
-            return (
-                not self._IsPrivateIdentifier(identifier) and
-                namespace not in external_dependencies and
-                namespace not in self._provided_namespaces and
-                identifier not in external_dependencies and
-                identifier not in created_identifiers and
-                namespace not in missing_requires)
-
         # First check all the used identifiers where we know that their namespace
         # needs to be provided (unless they are optional).
         for used_ns in self._used_namespaces:
             namespace = used_ns.namespace
             identifier = used_ns.identifier
-            if (not used_ns.alias_definition and ShouldRequireNamespace(
-                    namespace, identifier)):
+            if (not used_ns.alias_definition and self.should_require_namespace(
+                    namespace,
+                    identifier,
+                    external_dependencies,
+                    created_identifiers,
+                    missing_requires)):
                 missing_requires[namespace] = used_ns.get_line()
 
         # Now that all required namespaces are known, we can check if the alias
@@ -291,8 +300,12 @@ class ClosurizedNamespacesInfo(object):
         # need explicit goog.require statements) are already covered. If not
         # the user shouldn't use the alias.
         for used_ns in self._used_namespaces:
-            if (not used_ns.alias_definition or not ShouldRequireNamespace(
-                    used_ns.namespace, used_ns.identifier)):
+            if (not used_ns.alias_definition or not self.should_require_namespace(
+                    used_ns.namespace,
+                    used_ns.identifier,
+                    external_dependencies,
+                    created_identifiers,
+                    missing_requires)):
                 continue
             if self._FindNamespace(used_ns.identifier, self._provided_namespaces,
                                    created_identifiers, external_dependencies,
