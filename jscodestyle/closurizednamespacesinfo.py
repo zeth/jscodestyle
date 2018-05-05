@@ -176,7 +176,7 @@ class ClosurizedNamespacesInfo(object):
 
         return True
 
-    def IsExtraRequire(self, token):
+    def is_extra_require(self, token):
         """Returns whether the given goog.require token is unnecessary.
 
         Args:

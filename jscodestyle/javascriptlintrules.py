@@ -460,7 +460,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                             True)
 
                 # Report extra goog.require statement.
-                if not namespace or namespaces_info.IsExtraRequire(token):
+                if not namespace or namespaces_info.is_extra_require(token):
                     if not namespace:
                         msg = 'Empty namespace in goog.require'
                     else:
