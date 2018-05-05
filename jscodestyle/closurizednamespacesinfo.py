@@ -396,7 +396,7 @@ class ClosurizedNamespacesInfo(object):
 
                 # If there is a suppression for the require, add a usage for it so it
                 # gets treated as a regular goog.require (i.e. still gets sorted).
-                if self._HasSuppression(state_tracker, 'extraRequire'):
+                if self._has_suppression(state_tracker, 'extraRequire'):
                     self._suppressed_requires.append(namespace)
                     self._add_used_namespace(state_tracker, namespace, token)
 
@@ -410,7 +410,7 @@ class ClosurizedNamespacesInfo(object):
 
                 # If there is a suppression for the provide, add a creation for it so it
                 # gets treated as a regular goog.provide (i.e. still gets sorted).
-                if self._HasSuppression(state_tracker, 'extraProvide'):
+                if self._has_suppression(state_tracker, 'extraProvide'):
                     self._add_created_namespace(state_tracker, namespace, token.line_number)
 
             elif token.string == 'goog.scope':
@@ -437,7 +437,7 @@ class ClosurizedNamespacesInfo(object):
                 if token.metadata and token.metadata.aliased_symbol:
                     whole_identifier_string = token.metadata.aliased_symbol
                 elif (token.string == 'goog.module.get' and
-                      not self._HasSuppression(state_tracker, 'extraRequire')):
+                      not self._has_suppression(state_tracker, 'extraRequire')):
                     # Cannot use _add_used_namespace as this is not an identifier, but
                     # already the entire namespace that's required.
                     namespace = tokenutil.GetStringAfterToken(token)
@@ -510,7 +510,7 @@ class ClosurizedNamespacesInfo(object):
         if not namespace:
             namespace = identifier
 
-        if self._HasSuppression(state_tracker, 'missingProvide'):
+        if self._has_suppression(state_tracker, 'missingProvide'):
             return
 
         self._created_namespaces.append([namespace, identifier, line_number])
@@ -530,10 +530,10 @@ class ClosurizedNamespacesInfo(object):
               Aliased symbols need their parent namespace to be available, if it is
               not yet required through another symbol, an error will be thrown.
         """
-        if self._HasSuppression(state_tracker, 'missingRequire'):
+        if self._has_suppression(state_tracker, 'missingRequire'):
             return
 
-        identifier = self._GetUsedIdentifier(identifier)
+        identifier = self._get_used_identifier(identifier)
         namespace = self.GetClosurizedNamespace(identifier)
         # b/5362203 If its a variable in scope then its not a required namespace.
         if namespace and not state_tracker.IsVariableInScope(namespace):
@@ -541,11 +541,11 @@ class ClosurizedNamespacesInfo(object):
                                        is_alias_definition)
             self._used_namespaces.append(unamespace)
 
-    def _HasSuppression(self, state_tracker, suppression):
+    def _has_suppression(self, state_tracker, suppression):
         jsdoc = state_tracker.GetDocComment()
         return jsdoc and suppression in jsdoc.suppressions
 
-    def _GetUsedIdentifier(self, identifier):
+    def _get_used_identifier(self, identifier):
         """Strips apply/call/inherit calls from the identifier."""
         for suffix in ('.apply', '.call', '.inherit'):
             if identifier.endswith(suffix):
