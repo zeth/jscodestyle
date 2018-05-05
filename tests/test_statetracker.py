@@ -20,7 +20,7 @@ import unittest
 
 from jscodestyle import javascripttokens
 from jscodestyle import statetracker
-from jscodestyle import testutil
+from testtools import testutil
 
 
 class _FakeDocFlag(object):

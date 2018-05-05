@@ -18,7 +18,7 @@
 
 import unittest
 from jscodestyle import error_fixer
-from jscodestyle import testutil
+from testtools import testutil
 from jscodestyle import tokenutil
 
 

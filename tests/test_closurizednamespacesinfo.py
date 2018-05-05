@@ -25,7 +25,7 @@ from jscodestyle import closurizednamespacesinfo
 from jscodestyle import ecmametadatapass
 from jscodestyle import javascriptstatetracker
 from jscodestyle import javascripttokens
-from jscodestyle import testutil
+from testtools import testutil
 from jscodestyle import tokenutil
 
 # pylint: disable=g-bad-name

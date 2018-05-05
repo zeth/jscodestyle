@@ -21,7 +21,7 @@ import unittest
 from jscodestyle import aliaspass
 from jscodestyle import errors
 from jscodestyle import javascriptstatetracker
-from jscodestyle import testutil
+from testtools import testutil
 from jscodestyle.common import erroraccumulator
 
 

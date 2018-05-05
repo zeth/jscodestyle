@@ -6,7 +6,7 @@
 
 import unittest
 
-from jscodestyle import testutil
+from testtools import testutil
 from jscodestyle.common import erroraccumulator
 
 CRAZY_TYPE = ('Array.<!function(new:X,{a:null},...(c|d)):'

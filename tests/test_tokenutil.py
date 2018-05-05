@@ -20,7 +20,7 @@ import unittest
 
 from jscodestyle import ecmametadatapass
 from jscodestyle import javascripttokens
-from jscodestyle import testutil
+from testtools import testutil
 from jscodestyle import tokenutil
 
 

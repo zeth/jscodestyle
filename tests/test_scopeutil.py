@@ -20,7 +20,7 @@ import unittest
 
 from jscodestyle import ecmametadatapass
 from jscodestyle import scopeutil
-from jscodestyle import testutil
+from testtools import testutil
 
 
 def _FindContexts(start_token):

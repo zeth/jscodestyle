@@ -22,7 +22,7 @@
 import unittest
 from jscodestyle import javascripttokens
 from jscodestyle import requireprovidesorter
-from jscodestyle import testutil
+from testtools import testutil
 
 # pylint: disable=g-bad-name
 TokenType = javascripttokens.JavaScriptTokenType
