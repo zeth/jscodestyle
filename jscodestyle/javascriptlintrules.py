@@ -114,7 +114,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         # Look for static members defined on a provided namespace.
                         if namespaces_info:
                             namespace = namespaces_info.GetClosurizedNamespace(identifier)
-                            provided_namespaces = namespaces_info.GetProvidedNamespaces()
+                            provided_namespaces = namespaces_info.get_provided_namespaces()
                         else:
                             namespace = None
                             provided_namespaces = set()
@@ -432,7 +432,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                     # If there are no require statements, missing requires should be
                     # reported after the last provide.
-                    if not namespaces_info.GetRequiredNamespaces():
+                    if not namespaces_info.get_required_namespaces():
                         missing_requires, illegal_alias_statements = (
                             namespaces_info.GetMissingRequires())
                         if missing_requires:
@@ -451,7 +451,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # If there are no provide statements, missing provides should be
                 # reported before the first require.
                 if (namespaces_info.IsFirstRequire(token) and
-                    not namespaces_info.GetProvidedNamespaces()):
+                    not namespaces_info.get_provided_namespaces()):
                     missing_provides = namespaces_info.GetMissingProvides()
                     if missing_provides:
                         self._ReportMissingProvides(
@@ -715,8 +715,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         if namespaces_info is not None:
             # If there are no provide or require statements, missing provides and
             # requires should be reported on line 1.
-            if (not namespaces_info.GetProvidedNamespaces() and
-                not namespaces_info.GetRequiredNamespaces()):
+            if (not namespaces_info.get_provided_namespaces() and
+                not namespaces_info.get_required_namespaces()):
                 missing_provides = namespaces_info.GetMissingProvides()
                 if missing_provides:
                     self._ReportMissingProvides(

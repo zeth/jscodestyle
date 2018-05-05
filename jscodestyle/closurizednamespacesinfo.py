@@ -133,7 +133,7 @@ class ClosurizedNamespacesInfo(object):
         # TODO(user): Handle the case where there are 2 different requires
         # that can satisfy the same dependency, but only one is necessary.
 
-    def GetProvidedNamespaces(self):
+    def get_provided_namespaces(self):
         """Returns the namespaces which are already provided by this file.
 
         Returns:
@@ -142,7 +142,7 @@ class ClosurizedNamespacesInfo(object):
         """
         return set(self._provided_namespaces)
 
-    def GetRequiredNamespaces(self):
+    def get_required_namespaces(self):
         """Returns the namespaces which are already required by this file.
 
         Returns:
