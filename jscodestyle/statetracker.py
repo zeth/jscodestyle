@@ -842,7 +842,7 @@ class StateTracker(object):
         """
         return len(self._function_stack) == 1 and self.InTopLevel()
 
-    def InAssignedFunction(self):
+    def in_assigned_function(self):
         """Returns true if the current token is within a function variable.
 
         Returns:
@@ -850,7 +850,7 @@ class StateTracker(object):
         """
         return self.in_function() and self._function_stack[-1].is_assigned
 
-    def IsFunctionOpen(self):
+    def is_function_open(self):
         """Returns true if the current token is a function block open.
 
         Returns:
@@ -859,7 +859,7 @@ class StateTracker(object):
         return (self._function_stack and
                 self._function_stack[-1].block_depth == self._block_depth - 1)
 
-    def IsFunctionClose(self):
+    def is_function_close(self):
         """Returns true if the current token is a function block close.
 
         Returns:
@@ -1293,7 +1293,7 @@ class StateTracker(object):
             self._doc_comment = None
             self._last_comment = None
 
-            if self.in_function() and self.IsFunctionClose():
+            if self.in_function() and self.is_function_close():
                 # TODO(robbyw): Detect the function's name for better errors.
                 function = self._function_stack.pop()
                 function.end_token = token

@@ -289,7 +289,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         fix_data=expected_blank_lines - blank_lines)
 
         elif token.type == Type.END_BLOCK:
-            if state.in_function() and state.IsFunctionClose():
+            if state.in_function() and state.is_function_close():
                 is_immediately_called = (token.next and
                                          token.next.type == Type.START_PAREN)
 
@@ -564,11 +564,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     # variable.
                     self._MarkLocalVariableUsed(token.string)
         elif token.type == Type.START_BLOCK:
-            if in_function and state.IsFunctionOpen():
+            if in_function and state.is_function_open():
                 # Push a new map onto the stack
                 self._unused_local_variables_by_scope.append({})
         elif token.type == Type.END_BLOCK:
-            if state.IsFunctionClose():
+            if state.is_function_close():
                 # Pop the stack and report any remaining locals as unused.
                 unused_local_variables = self._unused_local_variables_by_scope.pop()
                 for unused_token in unused_local_variables.values():

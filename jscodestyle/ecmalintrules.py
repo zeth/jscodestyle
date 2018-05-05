@@ -364,11 +364,11 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         'Illegal comma at end of object literal', last_code,
                         position=Position.All(last_code.string))
 
-            if state.in_function() and state.IsFunctionClose():
+            if state.in_function() and state.is_function_close():
                 if state.in_top_level_function():
                     # A semicolons should not be included at the end of a function
                     # declaration.
-                    if not state.InAssignedFunction():
+                    if not state.in_assigned_function():
                         if not last_in_line and token.next.type == Type.SEMICOLON:
                             self._handle_error(
                                 errors.ILLEGAL_SEMICOLON_AFTER_FUNCTION,
@@ -377,7 +377,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
                 # A semicolon should be included at the end of a function expression
                 # that is not immediately called or used by a dot operator.
-                if (state.InAssignedFunction()
+                if (state.in_assigned_function()
                         and token.next
                         and token.next.type != Type.SEMICOLON):
                     next_token = tokenutil.GetNextCodeToken(token)
