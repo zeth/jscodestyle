@@ -298,7 +298,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     if (function.has_return and function.doc and
                         not is_immediately_called and
                         not function.doc.has_flag('return') and
-                        not function.doc.InheritsDocumentation() and
+                        not function.doc.inherits_documentation() and
                         not function.doc.has_flag('constructor')):
                         # Check for proper documentation of return value.
                         self._handle_error(

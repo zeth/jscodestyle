@@ -266,7 +266,7 @@ class CommentTest(unittest.TestCase):
 
     def assertCommentTarget(self, target, script):
         comment = self._ParseComment(script)
-        self.assertEquals(target, comment.GetTargetIdentifier())
+        self.assertEquals(target, comment.get_target_identifier())
 
 
 if __name__ == '__main__':

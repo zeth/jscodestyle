@@ -737,7 +737,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         'Interface constructor cannot have parameters',
                         token.previous)
             elif (state.InTopLevel() and jsdoc and not jsdoc.has_flag('see')
-                  and not jsdoc.InheritsDocumentation()
+                  and not jsdoc.inherits_documentation()
                   and not state.InObjectLiteralDescendant() and not
                   jsdoc.is_invalidated()):
                 distance, edit = jsdoc.CompareParameters(state.get_params())

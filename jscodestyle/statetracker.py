@@ -379,7 +379,7 @@ class DocComment(object):
         """
         self.__flags.append(flag)
 
-    def InheritsDocumentation(self):
+    def inherits_documentation(self):
         """Test if the jsdoc implies documentation inheritance.
 
         Returns:
@@ -436,21 +436,21 @@ class DocComment(object):
         return tokenutil.TokensToString(
             self._yield_description_tokens())
 
-    def GetTargetIdentifier(self):
+    def get_target_identifier(self):
         """Returns the identifier (as a string) that this is a comment for.
 
         Note that this uses method uses GetIdentifierForToken to get the full
         identifier, even if broken up by whitespace, newlines, or comments,
-        and thus could be longer than GetTargetToken().string.
+        and thus could be longer than get_target_token().string.
 
         Returns:
           The identifier for the token this comment is for.
         """
-        token = self.GetTargetToken()
+        token = self.get_target_token()
         if token:
             return tokenutil.GetIdentifierForToken(token)
 
-    def GetTargetToken(self):
+    def get_target_token(self):
         """Get this comment's target token.
 
         Returns:
