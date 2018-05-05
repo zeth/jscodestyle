@@ -233,7 +233,7 @@ class ClosurizedNamespacesInfo(object):
 
         return missing_provides
 
-    def GetMissingRequires(self):
+    def get_missing_requires(self):
         """Returns the dict of missing required namespaces for the current file.
 
         For each non-private identifier used in the file, find either a

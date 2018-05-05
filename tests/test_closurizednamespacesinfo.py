@@ -348,7 +348,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
         self.assertEquals(0, len(namespaces_info.get_missing_provides()))
 
-    def test_GetMissingRequires_required(self):
+    def test_get_missing_requires_required(self):
         """Tests that required namespaces don't cause a missing require."""
         input_lines = [
             'goog.require(\'package.Foo\');',
@@ -356,10 +356,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(0, len(missing_requires))
 
-    def test_GetMissingRequires_requiredIdentifier(self):
+    def test_get_missing_requires_requiredIdentifier(self):
         """Tests that required namespaces satisfy identifiers on that namespace."""
         input_lines = [
             'goog.require(\'package.Foo\');',
@@ -367,10 +367,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(0, len(missing_requires))
 
-    def test_GetMissingRequires_requiredNamespace(self):
+    def test_get_missing_requires_requiredNamespace(self):
         """Tests that required namespaces satisfy the namespace."""
         input_lines = [
             'goog.require(\'package.soy.fooTemplate\');',
@@ -378,10 +378,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(0, len(missing_requires))
 
-    def test_GetMissingRequires_requiredParentClass(self):
+    def test_get_missing_requires_requiredParentClass(self):
         """Tests that requiring a parent class of an object is sufficient to prevent
         a missing require on that object."""
         input_lines = [
@@ -391,22 +391,22 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(0, len(missing_requires))
 
-    def test_GetMissingRequires_unrequired(self):
+    def test_get_missing_requires_unrequired(self):
         """Tests that unrequired namespaces cause a missing require."""
         input_lines = ['package.Foo();']
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
 
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(1, len(missing_requires))
         missing_req = missing_requires.popitem()
         self.assertEquals('package.Foo', missing_req[0])
         self.assertEquals(1, missing_req[1])
 
-    def test_GetMissingRequires_provided(self):
+    def test_get_missing_requires_provided(self):
         """Tests that provided namespaces satisfy identifiers on that namespace."""
         input_lines = [
             'goog.provide(\'package.Foo\');',
@@ -414,10 +414,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(0, len(missing_requires))
 
-    def test_GetMissingRequires_created(self):
+    def test_get_missing_requires_created(self):
         """Tests that created namespaces do not satisfy usage of an identifier."""
         input_lines = [
             'package.Foo = function();',
@@ -428,14 +428,14 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
 
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(1, len(missing_requires))
         missing_require = missing_requires.popitem()
         self.assertEquals('package.Foo', missing_require[0])
         # Make sure line number of first occurrence is reported
         self.assertEquals(2, missing_require[1])
 
-    def test_GetMissingRequires_createdIdentifier(self):
+    def test_get_missing_requires_createdIdentifier(self):
         """Tests that created identifiers satisfy usage of the identifier."""
         input_lines = [
             'package.Foo.methodName = function();',
@@ -443,10 +443,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(0, len(missing_requires))
 
-    def test_GetMissingRequires_implements(self):
+    def test_get_missing_requires_implements(self):
         """Tests that a parametrized type requires the correct identifier."""
         input_lines = [
             '/** @constructor @implements {package.Bar<T>} */',
@@ -454,10 +454,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertItemsEqual({'package.Bar': 1}, missing_requires)
 
-    def test_GetMissingRequires_objectOnClass(self):
+    def test_get_missing_requires_objectOnClass(self):
         """Tests that we should require a class, not the object on the class."""
         input_lines = [
             'goog.require(\'package.Foo.Enum\');',
@@ -465,11 +465,11 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['package'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(1, len(missing_requires),
                           'The whole class, not the object, should be required.')
 
-    def test_GetMissingRequires_variableWithSameName(self):
+    def test_get_missing_requires_variableWithSameName(self):
         """Tests that we should not goog.require variables and parameters.
 
         b/5362203 Variables in scope are not missing namespaces.
@@ -502,7 +502,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
                                                                          'docs',
                                                                          'lvalue',
                                                                          'dummy'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals(2, len(missing_requires))
         self.assertItemsEqual(
             {'dummy.xyz': 14,
@@ -554,7 +554,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({'goog.events': 2}, _ToLineDict(illegal_alias_stmts))
 
@@ -569,7 +569,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({}, illegal_alias_stmts)
 
@@ -584,7 +584,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, illegal_alias_stmts)
         self.assertEquals({'goog.dom.classes': 4, 'goog.events.Event': 4},
                           missing_requires)
@@ -633,7 +633,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        self.assertEquals({}, namespaces_info.GetMissingRequires()[0])
+        self.assertEquals({}, namespaces_info.get_missing_requires()[0])
 
     def test_Module_requireForGet(self):
         """Tests that goog.module.get needs a goog.require call."""
@@ -647,7 +647,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
         self.assertEquals({'goog.someModule': 3},
-                          namespaces_info.GetMissingRequires()[0])
+                          namespaces_info.get_missing_requires()[0])
 
     def test_Scope_usedTypeAlias(self):
         """Tests aliased symbols in type annotations."""
@@ -659,7 +659,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({'goog.events': 2}, _ToLineDict(illegal_alias_stmts))
 
@@ -677,7 +677,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({'goog.events': 2}, _ToLineDict(illegal_alias_stmts))
 
@@ -696,7 +696,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({'goog.events.bar.EventType': 4}, missing_requires)
         self.assertEquals({}, illegal_alias_stmts)
 
@@ -712,7 +712,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({}, illegal_alias_stmts)
 
@@ -729,7 +729,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({}, illegal_alias_stmts)
         event_token = self._GetRequireTokens('goog.events.bar.Event')
@@ -748,7 +748,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, _ = namespaces_info.GetMissingRequires()
+        missing_requires, _ = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
 
     def test_Scope_aliasNamespace(self):
@@ -767,7 +767,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({}, illegal_alias_stmts)
 
@@ -781,7 +781,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ]
 
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
-        missing_requires, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        missing_requires, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, missing_requires)
         self.assertEquals({'goog.events': 2}, _ToLineDict(illegal_alias_stmts))
 
@@ -798,7 +798,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         namespaces_info = self._GetNamespacesInfoForScript(input_lines, ['goog'])
         missing_provides = namespaces_info.get_missing_provides()
         self.assertEquals({'goog.bar.Foo': 4}, missing_provides)
-        _, illegal_alias_stmts = namespaces_info.GetMissingRequires()
+        _, illegal_alias_stmts = namespaces_info.get_missing_requires()
         self.assertEquals({}, illegal_alias_stmts)
 
     def test_SetTestOnlyNamespaces(self):

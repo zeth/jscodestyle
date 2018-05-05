@@ -434,7 +434,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     # reported after the last provide.
                     if not namespaces_info.get_required_namespaces():
                         missing_requires, illegal_alias_statements = (
-                            namespaces_info.GetMissingRequires())
+                            namespaces_info.get_missing_requires())
                         if missing_requires:
                             self._ReportMissingRequires(
                                 missing_requires,
@@ -474,7 +474,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # Report missing goog.require statements.
                 if namespaces_info.IsLastRequire(token):
                     missing_requires, illegal_alias_statements = (
-                        namespaces_info.GetMissingRequires())
+                        namespaces_info.get_missing_requires())
                     if missing_requires:
                         self._ReportMissingRequires(
                             missing_requires,
@@ -722,7 +722,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     self._ReportMissingProvides(
                         missing_provides, state.GetFirstToken(), None)
 
-                missing_requires, illegal_alias = namespaces_info.GetMissingRequires()
+                missing_requires, illegal_alias = namespaces_info.get_missing_requires()
                 if missing_requires:
                     self._ReportMissingRequires(
                         missing_requires, state.GetFirstToken(), None)
