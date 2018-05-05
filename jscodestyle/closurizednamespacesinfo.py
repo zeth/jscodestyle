@@ -542,11 +542,13 @@ class ClosurizedNamespacesInfo(object):
                                        is_alias_definition)
             self._used_namespaces.append(unamespace)
 
-    def _has_suppression(self, state_tracker, suppression):
+    @staticmethod
+    def _has_suppression(state_tracker, suppression):
         jsdoc = state_tracker.GetDocComment()
         return jsdoc and suppression in jsdoc.suppressions
 
-    def _get_used_identifier(self, identifier):
+    @staticmethod
+    def _get_used_identifier(identifier):
         """Strips apply/call/inherit calls from the identifier."""
         for suffix in ('.apply', '.call', '.inherit'):
             if identifier.endswith(suffix):
