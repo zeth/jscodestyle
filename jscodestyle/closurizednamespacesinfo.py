@@ -419,9 +419,9 @@ class ClosurizedNamespacesInfo(object):
             elif token.string == 'goog.setTestOnly':
 
                 # Since the message is optional, we don't want to scan to later lines.
-                for t in tokenutil.GetAllTokensInSameLine(token):
-                    if t.type == JavaScriptTokenType.STRING_TEXT:
-                        message = t.string
+                for ltoken in tokenutil.GetAllTokensInSameLine(token):
+                    if ltoken.type == JavaScriptTokenType.STRING_TEXT:
+                        message = ltoken.string
 
                         if re.match(r'^\w+(\.\w+)+$', message):
                             # This looks like a namespace. If it's a Closurized namespace,
