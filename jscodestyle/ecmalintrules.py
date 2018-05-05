@@ -466,7 +466,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         token.previous, position=Position.All(token.previous.string))
 
         elif token_type == Type.START_BRACKET:
-            self._HandleStartBracket(token, last_non_space_token)
+            self._handle_start_bracket(token, last_non_space_token)
         elif token_type in (Type.END_PAREN, Type.END_BRACKET):
             # Ensure there is no space before closing parentheses, except when
             # it's in a for statement with an omitted section, or when it's at the
@@ -699,12 +699,12 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                     # These flags are only legal on localizable message definitions;
                     # such variables always begin with the prefix MSG_.
                     if not identifier.startswith('MSG_') and '.MSG_' not in identifier:
-                        for f in ('desc', 'hidden', 'meaning'):
-                            if jsdoc.HasFlag(f):
+                        for tflag in ('desc', 'hidden', 'meaning'):
+                            if jsdoc.HasFlag(tflag):
                                 self._handle_error(
                                     errors.INVALID_USE_OF_DESC_TAG,
                                     'Member "%s" does not start with MSG_ and thus '
-                                    'should not have @%s JsDoc' % (identifier, f),
+                                    'should not have @%s JsDoc' % (identifier, tflag),
                                     token)
 
             # Check for illegaly assigning live objects as prototype property values.
@@ -745,8 +745,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                     params_iter = iter(state.GetParams())
                     docs_iter = iter(jsdoc.ordered_params)
 
-                    for op in edit:
-                        if op == 'I':
+                    for operation in edit:
+                        if operation == 'I':
                             # Insertion.
                             # Parsing doc comments is the same for all languages
                             # but some languages care about parameters that don't have
@@ -757,12 +757,12 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                             if not self._limited_doc_checks:
                                 self.HandleMissingParameterDoc(token, params_iter.next())
 
-                        elif op == 'D':
+                        elif operation == 'D':
                             # Deletion
                             self._handle_error(errors.EXTRA_PARAMETER_DOCUMENTATION,
                                                'Found docs for non-existing parameter: "%s"' %
                                                docs_iter.next(), token)
-                        elif op == 'S':
+                        elif operation == 'S':
                             # Substitution
                             if not self._limited_doc_checks:
                                 self._handle_error(
@@ -803,7 +803,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
             self._handle_error(errors.MISSING_SEMICOLON,
                                'Missing semicolon at end of line', token)
 
-    def _HandleStartBracket(self, token, last_non_space_token):
+    def _handle_start_bracket(self, token, last_non_space_token):
         """Handles a token that is an open bracket.
 
         Args:
@@ -859,10 +859,10 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
         try:
             self._indentation.finish()
-        except Exception, e:
+        except Exception, err:
             self._handle_error(
                 errors.FILE_DOES_NOT_PARSE,
-                str(e),
+                str(err),
                 last_non_space_token)
 
     @staticmethod
