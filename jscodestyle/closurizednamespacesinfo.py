@@ -207,9 +207,9 @@ class ClosurizedNamespacesInfo(object):
             return True
 
         # TODO(user): There's probably a faster way to compute this.
-        for ns in self._used_namespaces:
-            if (not ns.alias_definition and (
-                    namespace == ns.namespace or namespace == ns.identifier)):
+        for used_ns in self._used_namespaces:
+            if (not used_ns.alias_definition and (
+                    namespace == used_ns.namespace or namespace == used_ns.identifier)):
                 return False
 
         return True
