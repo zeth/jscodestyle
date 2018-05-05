@@ -293,7 +293,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 is_immediately_called = (token.next and
                                          token.next.type == Type.START_PAREN)
 
-                function = state.GetFunction()
+                function = state.get_function()
                 if not self._limited_doc_checks:
                     if (function.has_return and function.doc and
                         not is_immediately_called and
@@ -380,14 +380,14 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
         elif token.type == Type.IDENTIFIER:
             if token.string == 'goog.inherits' and not state.InFunction():
-                if state.GetLastNonSpaceToken().line_number == token.line_number:
+                if state.get_last_non_space_token().line_number == token.line_number:
                     self._handle_error(
                         errors.MISSING_LINE,
                         'Missing newline between constructor and goog.inherits',
                         token,
                         position=Position.AtBeginning())
 
-                extra_space = state.GetLastNonSpaceToken().next
+                extra_space = state.get_last_non_space_token().next
                 while extra_space != token:
                     if extra_space.type == Type.BLANK_LINE:
                         self._handle_error(
@@ -720,16 +720,16 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 missing_provides = namespaces_info.get_missing_provides()
                 if missing_provides:
                     self._ReportMissingProvides(
-                        missing_provides, state.GetFirstToken(), None)
+                        missing_provides, state.get_first_token(), None)
 
                 missing_requires, illegal_alias = namespaces_info.get_missing_requires()
                 if missing_requires:
                     self._ReportMissingRequires(
-                        missing_requires, state.GetFirstToken(), None)
+                        missing_requires, state.get_first_token(), None)
                 if illegal_alias:
                     self._ReportIllegalAliasStatement(illegal_alias)
 
-        self._CheckSortedRequiresProvides(state.GetFirstToken())
+        self._CheckSortedRequiresProvides(state.get_first_token())
 
     def _CheckSortedRequiresProvides(self, token):
         """Checks that all goog.require and goog.provide statements are sorted.

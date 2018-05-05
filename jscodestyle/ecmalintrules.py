@@ -321,7 +321,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         # Store some convenience variables
         first_in_line = token.IsFirstInLine()
         last_in_line = token.IsLastInLine()
-        last_non_space_token = state.GetLastNonSpaceToken()
+        last_non_space_token = state.get_last_non_space_token()
 
         token_type = token.type
 
@@ -730,7 +730,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                                    token.previous)
 
             jsdoc = state.GetDocComment()
-            if state.GetFunction().is_interface:
+            if state.get_function().is_interface:
                 if token.previous and token.previous.type == Type.PARAMETERS:
                     self._handle_error(
                         errors.INTERFACE_CONSTRUCTOR_CANNOT_HAVE_PARAMS,
@@ -847,14 +847,14 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         Raises:
           TypeError: If not overridden.
         """
-        last_non_space_token = state.GetLastNonSpaceToken()
+        last_non_space_token = state.get_last_non_space_token()
         # Check last line for ending with newline.
-        if state.GetLastLine() and not (
-                state.GetLastLine().isspace()
-                or state.GetLastLine().rstrip('\n\r\f') != state.GetLastLine()):
+        if state.get_last_line() and not (
+                state.get_last_line().isspace()
+                or state.get_last_line().rstrip('\n\r\f') != state.get_last_line()):
             self._handle_error(
                 errors.FILE_MISSING_NEWLINE,
-                'File does not end with new line.  (%s)' % state.GetLastLine(),
+                'File does not end with new line.  (%s)' % state.get_last_line(),
                 last_non_space_token)
 
         try:

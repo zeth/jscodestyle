@@ -1041,7 +1041,7 @@ class StateTracker(object):
                             first_token.attached_object.type_end_token) < 0)
         return False
 
-    def GetFunction(self):
+    def get_function(self):
         """Return the function the current code block is a part of.
 
         Returns:
@@ -1050,7 +1050,7 @@ class StateTracker(object):
         if self._function_stack:
             return self._function_stack[-1]
 
-    def GetBlockDepth(self):
+    def get_block_depth(self):
         """Return the block depth.
 
         Returns:
@@ -1058,15 +1058,15 @@ class StateTracker(object):
         """
         return self._block_depth
 
-    def GetLastNonSpaceToken(self):
+    def get_last_non_space_token(self):
         """Return the last non whitespace token."""
         return self._last_non_space_token
 
-    def GetLastLine(self):
+    def get_last_line(self):
         """Return the last line."""
         return self._last_line
 
-    def GetFirstToken(self):
+    def get_first_token(self):
         """Return the very first token in the file."""
         return self._first_token
 
@@ -1214,17 +1214,17 @@ class StateTracker(object):
         elif type == JSTTokenType.KEYWORD and token.string == 'return':
             next_token = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES)
             if not next_token.IsType(JSTTokenType.SEMICOLON):
-                function = self.GetFunction()
+                function = self.get_function()
                 if function:
                     function.has_return = True
 
         elif type == JSTTokenType.KEYWORD and token.string == 'throw':
-            function = self.GetFunction()
+            function = self.get_function()
             if function:
                 function.has_throw = True
 
         elif type == JSTTokenType.KEYWORD and token.string == 'var':
-            function = self.GetFunction()
+            function = self.get_function()
             next_token = tokenutil.Search(token, [JSTTokenType.IDENTIFIER,
                                                   JSTTokenType.SIMPLE_LVALUE])
 
@@ -1264,7 +1264,7 @@ class StateTracker(object):
           is_assignment: Whether the identifer is being written to.
         """
         if identifier == 'this' or identifier.startswith('this.'):
-            function = self.GetFunction()
+            function = self.get_function()
             if function:
                 function.has_this = True
 
