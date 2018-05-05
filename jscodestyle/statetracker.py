@@ -1106,8 +1106,7 @@ class StateTracker(object):
             self._first_token = token
 
         # Track block depth.
-        type = token.type
-        if type == JSTTokenType.START_BLOCK:
+        if token.type == JSTTokenType.START_BLOCK:
             self._block_depth += 1
 
             # Subclasses need to handle block start very differently because
@@ -1122,30 +1121,30 @@ class StateTracker(object):
                     function.parameters = self.get_params()
 
         # Track block depth.
-        elif type == JSTTokenType.END_BLOCK:
+        elif token.type == JSTTokenType.END_BLOCK:
             self._is_block_close = not self.in_object_literal()
             self._block_depth -= 1
             self._block_types.pop()
 
         # Track parentheses depth.
-        elif type == JSTTokenType.START_PAREN:
+        elif token.type == JSTTokenType.START_PAREN:
             self._paren_depth += 1
 
         # Track parentheses depth.
-        elif type == JSTTokenType.END_PAREN:
+        elif token.type == JSTTokenType.END_PAREN:
             self._paren_depth -= 1
 
-        elif type == JSTTokenType.COMMENT:
+        elif token.type == JSTTokenType.COMMENT:
             self._last_comment = token.string
 
-        elif type == JSTTokenType.START_DOC_COMMENT:
+        elif token.type == JSTTokenType.START_DOC_COMMENT:
             self._last_comment = None
             self._doc_comment = DocComment(token)
 
-        elif type == JSTTokenType.END_DOC_COMMENT:
+        elif token.type == JSTTokenType.END_DOC_COMMENT:
             self._doc_comment.end_token = token
 
-        elif type in (JSTTokenType.DOC_FLAG, JSTTokenType.DOC_INLINE_FLAG):
+        elif token.type in (JSTTokenType.DOC_FLAG, JSTTokenType.DOC_INLINE_FLAG):
             # Don't overwrite flags if they were already parsed in a previous pass.
             if token.attached_object is None:
                 flag = self._doc_flag(token)
@@ -1157,7 +1156,7 @@ class StateTracker(object):
             if flag.flag_type == 'suppress':
                 self._doc_comment.add_suppression(token)
 
-        elif type == JSTTokenType.FUNCTION_DECLARATION:
+        elif token.type == JSTTokenType.FUNCTION_DECLARATION:
             last_code = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES, None,
                                                True)
             doc = None
@@ -1204,26 +1203,26 @@ class StateTracker(object):
             # function declaration ends.
             self._variables_in_scope.append('')
 
-        elif type == JSTTokenType.START_PARAMETERS:
+        elif token.type == JSTTokenType.START_PARAMETERS:
             self._cumulative_params = ''
 
-        elif type == JSTTokenType.PARAMETERS:
+        elif token.type == JSTTokenType.PARAMETERS:
             self._cumulative_params += token.string
             self._variables_in_scope.extend(self.get_params())
 
-        elif type == JSTTokenType.KEYWORD and token.string == 'return':
+        elif token.type == JSTTokenType.KEYWORD and token.string == 'return':
             next_token = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES)
             if not next_token.IsType(JSTTokenType.SEMICOLON):
                 function = self.get_function()
                 if function:
                     function.has_return = True
 
-        elif type == JSTTokenType.KEYWORD and token.string == 'throw':
+        elif token.type == JSTTokenType.KEYWORD and token.string == 'throw':
             function = self.get_function()
             if function:
                 function.has_throw = True
 
-        elif type == JSTTokenType.KEYWORD and token.string == 'var':
+        elif token.type == JSTTokenType.KEYWORD and token.string == 'var':
             function = self.get_function()
             next_token = tokenutil.Search(token, [JSTTokenType.IDENTIFIER,
                                                   JSTTokenType.SIMPLE_LVALUE])
@@ -1234,7 +1233,7 @@ class StateTracker(object):
                 else:
                     self._variables_in_scope.append(next_token.string)
 
-        elif type == JSTTokenType.SIMPLE_LVALUE:
+        elif token.type == JSTTokenType.SIMPLE_LVALUE:
             identifier = token.values['identifier']
             jsdoc = self.get_doc_comment()
             if jsdoc:
@@ -1242,7 +1241,7 @@ class StateTracker(object):
 
             self._handle_identifier(identifier, True)
 
-        elif type == JSTTokenType.IDENTIFIER:
+        elif token.type == JSTTokenType.IDENTIFIER:
             self._handle_identifier(token.string, False)
 
             # Detect documented non-assignments.
@@ -1277,9 +1276,8 @@ class StateTracker(object):
         Args:
           token: The token to handle.
         """
-        type = token.type
-        if type == JSTTokenType.SEMICOLON or type == JSTTokenType.END_PAREN or (
-                type == JSTTokenType.END_BRACKET and
+        if token.type == JSTTokenType.SEMICOLON or token.type == JSTTokenType.END_PAREN or (
+                token.type == JSTTokenType.END_BRACKET and
                 self._last_non_space_token.type not in (
                     JSTTokenType.SINGLE_QUOTE_STRING_END,
                     JSTTokenType.DOUBLE_QUOTE_STRING_END,
@@ -1289,7 +1287,7 @@ class StateTracker(object):
             self._doc_comment = None
             self._last_comment = None
 
-        elif type == JSTTokenType.END_BLOCK:
+        elif token.type == JSTTokenType.END_BLOCK:
             self._doc_comment = None
             self._last_comment = None
 
@@ -1307,7 +1305,7 @@ class StateTracker(object):
                 if self._variables_in_scope:
                     self._variables_in_scope.pop()
 
-        elif type == JSTTokenType.END_PARAMETERS and self._doc_comment:
+        elif token.type == JSTTokenType.END_PARAMETERS and self._doc_comment:
             self._doc_comment = None
             self._last_comment = None
 
