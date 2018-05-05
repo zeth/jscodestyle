@@ -85,6 +85,6 @@ def ParseFunctionsAndComments(source, error_handler=None):
         if comment and comment not in comments:
             comments.append(comment)
 
-        tracker.HandleAfterToken(token)
+        tracker.handle_after_token(token)
 
     return functions, comments

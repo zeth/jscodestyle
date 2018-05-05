@@ -216,6 +216,6 @@ class CheckerBase(object):
                 self._state_tracker.HandleToken(
                     token, self._state_tracker.GetLastNonSpaceToken())
                 pass_function(token)
-                self._state_tracker.HandleAfterToken(token)
+                self._state_tracker.handle_after_token(token)
 
             token = token.next

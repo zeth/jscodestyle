@@ -1264,7 +1264,7 @@ class StateTracker(object):
             if function:
                 function.has_this = True
 
-    def HandleAfterToken(self, token):
+    def handle_after_token(self, token):
         """Handle updating state after a token has been checked.
 
         This function should be used for destructive state changes such as
