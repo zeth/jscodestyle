@@ -418,7 +418,7 @@ class DocComment(object):
         """Return the doc flags for this comment."""
         return list(self.__flags)
 
-    def _YieldDescriptionTokens(self):
+    def _yield_description_tokens(self):
         for token in self.start_token:
 
             if (token is self.end_token
@@ -434,7 +434,7 @@ class DocComment(object):
     @property
     def description(self):
         return tokenutil.TokensToString(
-            self._YieldDescriptionTokens())
+            self._yield_description_tokens())
 
     def GetTargetIdentifier(self):
         """Returns the identifier (as a string) that this is a comment for.
@@ -1236,10 +1236,10 @@ class StateTracker(object):
             if jsdoc:
                 self._documented_identifiers.add(identifier)
 
-            self._HandleIdentifier(identifier, True)
+            self._handle_identifier(identifier, True)
 
         elif type == JSTTokenType.IDENTIFIER:
-            self._HandleIdentifier(token.string, False)
+            self._handle_identifier(token.string, False)
 
             # Detect documented non-assignments.
             next_token = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES)
@@ -1249,7 +1249,7 @@ class StateTracker(object):
                             JSTTokenType.END_DOC_COMMENT)):
                     self._documented_identifiers.add(token.string)
 
-    def _HandleIdentifier(self, identifier, is_assignment):
+    def _handle_identifier(self, identifier, is_assignment):
         """Process the given identifier.
 
         Currently checks if it references 'this' and annotates the function
