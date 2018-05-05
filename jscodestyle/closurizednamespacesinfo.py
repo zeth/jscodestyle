@@ -485,7 +485,7 @@ class ClosurizedNamespacesInfo(object):
         elif token.type == JavaScriptTokenType.DOC_FLAG:
             flag = token.attached_object
             flag_type = flag.flag_type
-            if flag and flag.HasType() and flag.jstype:
+            if flag and flag.has_type() and flag.jstype:
                 is_interface = state_tracker.GetDocComment().HasFlag('interface')
                 if flag_type == 'implements' or (flag_type == 'extends'
                                                  and is_interface):

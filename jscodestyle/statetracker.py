@@ -298,7 +298,7 @@ class DocFlag(object):
                 self.description_end_token, self.description = (
                     _GetEndTokenAndContents(interesting_token))
 
-    def HasType(self):
+    def has_type(self):
         """Returns whether this flag should have a type annotation."""
         return self.flag_type in self.HAS_TYPE
 

@@ -252,7 +252,7 @@ class AliasPass(object):
 
             elif token.type == JavaScriptTokenType.DOC_FLAG:
                 flag = token.attached_object
-                if flag and flag.HasType() and flag.jstype:
+                if flag and flag.has_type() and flag.jstype:
                     _set_type_alias(flag.jstype, alias_map)
 
             token = token.next  # Get next token
