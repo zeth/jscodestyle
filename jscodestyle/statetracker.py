@@ -433,6 +433,7 @@ class DocComment(object):
 
     @property
     def description(self):
+        """Returns description as tokens."""
         return tokenutil.TokensToString(
             self._yield_description_tokens())
 
@@ -762,6 +763,14 @@ class StateTracker(object):
               documentation flags.
         """
         self._doc_flag = doc_flag
+        self._last_comment = None
+        self._last_non_space_token = None
+        self._first_token = None
+        self._last_line = None
+        self._doc_comment = None
+        self._is_block_close = False
+        self._cumulative_params = None
+
         self.reset()
 
     def reset(self):
@@ -1021,6 +1030,7 @@ class StateTracker(object):
         return self._doc_flag
 
     def is_type_token(self, token):
+        """Is it a real token?"""
         if self.in_doc_comment() and token.type not in (
                 JSTTokenType.START_DOC_COMMENT,
                 JSTTokenType.DOC_FLAG,
