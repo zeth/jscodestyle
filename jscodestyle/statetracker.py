@@ -798,7 +798,7 @@ class StateTracker(object):
             if token.type in doc_flag_types:
                 token.attached_object = self._doc_flag(token, error_handler)
 
-    def InFunction(self):
+    def in_function(self):
         """Returns true if the current token is within a function.
 
         Returns:
@@ -806,21 +806,21 @@ class StateTracker(object):
         """
         return bool(self._function_stack)
 
-    def InConstructor(self):
+    def in_constructor(self):
         """Returns true if the current token is within a constructor.
 
         Returns:
           True if the current token is within a constructor.
         """
-        return self.InFunction() and self._function_stack[-1].is_constructor
+        return self.in_function() and self._function_stack[-1].is_constructor
 
-    def InInterfaceMethod(self):
+    def in_interface_method(self):
         """Returns true if the current token is within an interface method.
 
         Returns:
           True if the current token is within an interface method.
         """
-        if self.InFunction():
+        if self.in_function():
             if self._function_stack[-1].is_interface:
                 return True
             else:
@@ -834,7 +834,7 @@ class StateTracker(object):
 
         return False
 
-    def InTopLevelFunction(self):
+    def in_top_level_function(self):
         """Returns true if the current token is within a top level function.
 
         Returns:
@@ -848,7 +848,7 @@ class StateTracker(object):
         Returns:
           True if if the current token is within a function variable
         """
-        return self.InFunction() and self._function_stack[-1].is_assigned
+        return self.in_function() and self._function_stack[-1].is_assigned
 
     def IsFunctionOpen(self):
         """Returns true if the current token is a function block open.
@@ -1116,7 +1116,7 @@ class StateTracker(object):
             self._block_types.append(self.get_block_type(token))
 
             # When entering a function body, record its parameters.
-            if self.InFunction():
+            if self.in_function():
                 function = self._function_stack[-1]
                 if self._block_depth == function.block_depth + 1:
                     function.parameters = self.get_params()
@@ -1293,7 +1293,7 @@ class StateTracker(object):
             self._doc_comment = None
             self._last_comment = None
 
-            if self.InFunction() and self.IsFunctionClose():
+            if self.in_function() and self.IsFunctionClose():
                 # TODO(robbyw): Detect the function's name for better errors.
                 function = self._function_stack.pop()
                 function.end_token = token

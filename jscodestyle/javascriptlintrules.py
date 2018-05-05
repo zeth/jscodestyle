@@ -289,7 +289,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         fix_data=expected_blank_lines - blank_lines)
 
         elif token.type == Type.END_BLOCK:
-            if state.InFunction() and state.IsFunctionClose():
+            if state.in_function() and state.IsFunctionClose():
                 is_immediately_called = (token.next and
                                          token.next.type == Type.START_PAREN)
 
@@ -309,7 +309,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                           not function.has_throw and
                           function.doc and
                           function.doc.has_flag('return') and
-                          not state.InInterfaceMethod()):
+                          not state.in_interface_method()):
                         flag = function.doc.get_flag('return')
                         valid_no_return_names = ['undefined', 'void', '*']
                         invalid_return = flag.jstype is None or not any(
@@ -379,7 +379,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         function.doc.end_token, position=Position.AtBeginning())
 
         elif token.type == Type.IDENTIFIER:
-            if token.string == 'goog.inherits' and not state.InFunction():
+            if token.string == 'goog.inherits' and not state.in_function():
                 if state.get_last_non_space_token().line_number == token.line_number:
                     self._handle_error(
                         errors.MISSING_LINE,
@@ -400,7 +400,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # TODO(robbyw): Test correct @extends and @implements documentation.
 
             elif (token.string == 'goog.provide' and
-                  not state.InFunction() and
+                  not state.in_function() and
                   namespaces_info is not None):
                 namespace = tokenutil.GetStringAfterToken(token)
 
@@ -444,7 +444,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                             self._ReportIllegalAliasStatement(illegal_alias_statements)
 
             elif (token.string == 'goog.require' and
-                  not state.InFunction() and
+                  not state.in_function() and
                   namespaces_info is not None):
                 namespace = tokenutil.GetStringAfterToken(token)
 
@@ -542,7 +542,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
           token: The token to check.
           state: The state tracker.
         """
-        # We don't use state.InFunction because that disregards scope functions.
+        # We don't use state.in_function because that disregards scope functions.
         in_function = state.function_depth() > 0
         if token.type == Type.SIMPLE_LVALUE or token.type == Type.IDENTIFIER:
             if in_function:

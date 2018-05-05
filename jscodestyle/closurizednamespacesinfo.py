@@ -387,7 +387,7 @@ class ClosurizedNamespacesInfo(object):
 
             # In the odd case that a goog.require is encountered inside a function,
             # just ignore it (e.g. dynamic loading in test runners).
-            if token.string == 'goog.require' and not state_tracker.InFunction():
+            if token.string == 'goog.require' and not state_tracker.in_function():
                 self._require_tokens.append(token)
                 namespace = tokenutil.GetStringAfterToken(token)
                 if namespace in self._required_namespaces:
@@ -474,7 +474,7 @@ class ClosurizedNamespacesInfo(object):
 
             if identifier:
                 cnamespace = self.get_closurized_namespace(identifier)
-                if state_tracker.InFunction():
+                if state_tracker.in_function():
                     self._add_used_namespace(state_tracker, identifier, token)
                 elif cnamespace and cnamespace != 'goog':
                     self._add_created_namespace(state_tracker,

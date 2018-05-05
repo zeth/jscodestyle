@@ -364,8 +364,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         'Illegal comma at end of object literal', last_code,
                         position=Position.All(last_code.string))
 
-            if state.InFunction() and state.IsFunctionClose():
-                if state.InTopLevelFunction():
+            if state.in_function() and state.IsFunctionClose():
+                if state.in_top_level_function():
                     # A semicolons should not be included at the end of a function
                     # declaration.
                     if not state.InAssignedFunction():
@@ -390,7 +390,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                             'Missing semicolon after function assigned to a variable',
                             token, position=Position.AtEnd(token.string))
 
-                if state.InInterfaceMethod() and last_code.type != Type.START_BLOCK:
+                if state.in_interface_method() and last_code.type != Type.START_BLOCK:
                     self._handle_error(errors.INTERFACE_METHOD_CANNOT_HAVE_CODE,
                                        'Interface methods cannot contain code', last_code)
 
@@ -636,14 +636,14 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         elif token_type == Type.SIMPLE_LVALUE:
             identifier = token.values['identifier']
 
-            if ((not state.InFunction() or state.InConstructor())
+            if ((not state.in_function() or state.in_constructor())
                     and state.InTopLevel() and not state.InObjectLiteralDescendant()):
                 jsdoc = state.get_doc_comment()
                 if not state.has_doc_comment(identifier):
                     # Only test for documentation on identifiers with .s in them to
                     # avoid checking things like simple variables. We don't require
                     # documenting assignments to .prototype itself (bug 1880803).
-                    if (not state.InConstructor()
+                    if (not state.in_constructor()
                             and identifier.find('.') != -1
                             and not identifier.endswith('.prototype')
                             and not self._limited_doc_checks):
@@ -653,7 +653,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                                 errors.MISSING_MEMBER_DOCUMENTATION,
                                 "No docs found for member '%s'" % identifier,
                                 token)
-                elif jsdoc and (not state.InConstructor() or
+                elif jsdoc and (not state.in_constructor() or
                                 identifier.startswith('this.')):
                     # We are at the top level and the function/member is documented.
                     if identifier.endswith('_') and not identifier.endswith('__'):

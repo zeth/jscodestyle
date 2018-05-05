@@ -85,7 +85,7 @@ class JavaScriptStateTracker(statetracker.StateTracker):
         """
         return self._scope_depth == self.parentheses_depth()
 
-    def InFunction(self):
+    def in_function(self):
         """Returns true if the current token is within a function.
 
         This js-specific override ignores goog.scope functions.
