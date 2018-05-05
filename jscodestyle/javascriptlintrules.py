@@ -421,7 +421,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         msg,
                         token, position=Position.AtBeginning())
 
-                if namespaces_info.IsLastProvide(token):
+                if namespaces_info.is_last_provide(token):
                     # Report missing provide statements after the last existing provide.
                     missing_provides = namespaces_info.get_missing_provides()
                     if missing_provides:
@@ -472,7 +472,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         token, position=Position.AtBeginning())
 
                 # Report missing goog.require statements.
-                if namespaces_info.IsLastRequire(token):
+                if namespaces_info.is_last_require(token):
                     missing_requires, illegal_alias_statements = (
                         namespaces_info.get_missing_requires())
                     if missing_requires:

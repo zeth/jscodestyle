@@ -351,11 +351,11 @@ class ClosurizedNamespacesInfo(object):
         """Returns whether token is the first require token."""
         return self._require_tokens and token == self._require_tokens[0]
 
-    def IsLastProvide(self, token):
+    def is_last_provide(self, token):
         """Returns whether token is the last provide token."""
         return self._provide_tokens and token == self._provide_tokens[-1]
 
-    def IsLastRequire(self, token):
+    def is_last_require(self, token):
         """Returns whether token is the last require token."""
         return self._require_tokens and token == self._require_tokens[-1]
 
