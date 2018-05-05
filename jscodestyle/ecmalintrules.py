@@ -23,7 +23,6 @@ import re
 from jscodestyle import checkerbase
 from jscodestyle import ecmametadatapass
 from jscodestyle.error_check import Rule
-from jscodestyle.error_fixer import ErrorFixer
 from jscodestyle import errors
 from jscodestyle import indentation
 from jscodestyle import javascripttokenizer
@@ -82,7 +81,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         ['*', '//', '@see'] +
         ['@%s' % tag for tag in statetracker.DocFlag.HAS_TYPE])
 
-    JSDOC_FLAGS_DESCRIPTION_NOT_REQUIRED = frozenset([
+    # JS Doc flags for which description is not required
+    JSDOC_DESCRIPTION_NOT_REQUIRED = frozenset([
         '@fileoverview', '@param', '@return', '@returns'])
 
     def __init__(self,
@@ -190,7 +190,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
           token: The DOC_FLAG token for the flag whose type to check.
           js_type: The flag's typeannotation.TypeAnnotation instance.
         """
-        if not js_type: return
+        if not js_type:
+            return
 
         if js_type.type_group and len(js_type.sub_types) == 2:
             identifiers = [t.identifier for t in js_type.sub_types]
@@ -595,7 +596,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                     if 'name' in token.values:
                         flag_name = '@' + token.values['name']
 
-                    if flag_name not in self.JSDOC_FLAGS_DESCRIPTION_NOT_REQUIRED:
+                    if flag_name not in self.JSDOC_DESCRIPTION_NOT_REQUIRED:
                         self._handle_error(
                             errors.MISSING_JSDOC_TAG_DESCRIPTION,
                             'Missing description in %s tag' % flag_name, token)
