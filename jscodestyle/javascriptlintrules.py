@@ -208,7 +208,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
             # When @externs appears in a @fileoverview comment, it should trigger
             # the same limited doc checks as a special filename like externs.js.
-            if doc_comment.HasFlag('fileoverview') and doc_comment.HasFlag('externs'):
+            if doc_comment.has_flag('fileoverview') and doc_comment.has_flag('externs'):
                 self._set_limited_doc_checks(True)
 
             if (self.should_check(Rule.BLANK_LINES_AT_TOP_LEVEL) and
@@ -218,12 +218,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                 # Check if we're in a fileoverview or constructor JsDoc.
                 is_constructor = (
-                    doc_comment.HasFlag('constructor') or
-                    doc_comment.HasFlag('interface'))
+                    doc_comment.has_flag('constructor') or
+                    doc_comment.has_flag('interface'))
                 # @fileoverview is an optional tag so if the dosctring is the first
                 # token in the file treat it as a file level docstring.
                 is_file_level_comment = (
-                    doc_comment.HasFlag('fileoverview') or
+                    doc_comment.has_flag('fileoverview') or
                     not doc_comment.start_token.previous)
 
                 # If the comment is not a file overview, and it does not immediately
@@ -297,9 +297,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 if not self._limited_doc_checks:
                     if (function.has_return and function.doc and
                         not is_immediately_called and
-                        not function.doc.HasFlag('return') and
+                        not function.doc.has_flag('return') and
                         not function.doc.InheritsDocumentation() and
-                        not function.doc.HasFlag('constructor')):
+                        not function.doc.has_flag('constructor')):
                         # Check for proper documentation of return value.
                         self._handle_error(
                             errors.MISSING_RETURN_DOCUMENTATION,
@@ -308,9 +308,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     elif (not function.has_return and
                           not function.has_throw and
                           function.doc and
-                          function.doc.HasFlag('return') and
+                          function.doc.has_flag('return') and
                           not state.InInterfaceMethod()):
-                        flag = function.doc.GetFlag('return')
+                        flag = function.doc.get_flag('return')
                         valid_no_return_names = ['undefined', 'void', '*']
                         invalid_return = flag.jstype is None or not any(
                             sub_type.identifier in valid_no_return_names
@@ -365,7 +365,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                                                 '.prototype'))
 
                 if (function.has_this and function.doc and
-                    not function.doc.HasFlag('this') and
+                    not function.doc.has_flag('this') and
                     not function.is_constructor and
                     not function.is_interface and
                     '.prototype.' not in function.name and

@@ -445,7 +445,7 @@ class ClosurizedNamespacesInfo(object):
                     namespace = UsedNamespace(namespace, namespace, token,
                                               alias_definition=False)
                     self._used_namespaces.append(namespace)
-                if jsdoc and jsdoc.HasFlag('typedef'):
+                if jsdoc and jsdoc.has_flag('typedef'):
                     self._add_created_namespace(state_tracker, whole_identifier_string,
                                                 token.line_number,
                                                 namespace=self.get_closurized_namespace(
@@ -486,7 +486,7 @@ class ClosurizedNamespacesInfo(object):
             flag = token.attached_object
             flag_type = flag.flag_type
             if flag and flag.has_type() and flag.jstype:
-                is_interface = state_tracker.GetDocComment().HasFlag('interface')
+                is_interface = state_tracker.GetDocComment().has_flag('interface')
                 if flag_type == 'implements' or (flag_type == 'extends'
                                                  and is_interface):
                     identifier = flag.jstype.alias or flag.jstype.identifier

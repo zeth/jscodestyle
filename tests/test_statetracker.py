@@ -52,13 +52,13 @@ class DocCommentTest(unittest.TestCase):
         comment = statetracker.DocComment(None)
 
         a = self._MakeDocFlagFake('param', 'foo')
-        comment.AddFlag(a)
+        comment.add_flag(a)
 
         b = self._MakeDocFlagFake('param', '')
-        comment.AddFlag(b)
+        comment.add_flag(b)
 
         c = self._MakeDocFlagFake('param', 'bar')
-        comment.AddFlag(c)
+        comment.add_flag(c)
 
         self.assertEquals(
             ['foo', 'bar'],
@@ -83,15 +83,15 @@ class DocCommentTest(unittest.TestCase):
         comment = statetracker.DocComment(None)
 
         self.assertFalse(comment.suppression_only())
-        comment.AddFlag(self._MakeDocFlagFake('suppress'))
+        comment.add_flag(self._MakeDocFlagFake('suppress'))
         self.assertTrue(comment.suppression_only())
-        comment.AddFlag(self._MakeDocFlagFake('foo'))
+        comment.add_flag(self._MakeDocFlagFake('foo'))
         self.assertFalse(comment.suppression_only())
 
     def testRepr(self):
         comment = statetracker.DocComment(None)
-        comment.AddFlag(self._MakeDocFlagFake('param', 'foo'))
-        comment.AddFlag(self._MakeDocFlagFake('param', 'bar'))
+        comment.add_flag(self._MakeDocFlagFake('param', 'foo'))
+        comment.add_flag(self._MakeDocFlagFake('param', 'bar'))
 
         self.assertEquals(
             '<DocComment: [\'foo\', \'bar\'], [@param foo, @param bar]>',
@@ -102,7 +102,7 @@ class DocCommentTest(unittest.TestCase):
         /**
          * @param {string} [name] Name of customer.
          */""")
-        flag = comment.GetFlag('param')
+        flag = comment.get_flag('param')
         self.assertEquals('string', flag.type)
         self.assertEquals('string', flag.jstype.ToString())
         self.assertEquals('[name]', flag.name)

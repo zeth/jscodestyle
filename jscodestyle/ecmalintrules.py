@@ -661,33 +661,33 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         # public superclass.
                         #
                         # @inheritDoc is deprecated in favor of using @override, and they
-                        if (jsdoc.HasFlag('override') and not jsdoc.HasFlag('constructor')
+                        if (jsdoc.has_flag('override') and not jsdoc.has_flag('constructor')
                                 and ('accessControls' not in jsdoc.suppressions)):
                             self._handle_error(
                                 errors.INVALID_OVERRIDE_PRIVATE,
                                 '%s should not override a private member.' % identifier,
-                                jsdoc.GetFlag('override').flag_token)
-                        if (jsdoc.HasFlag('inheritDoc') and not jsdoc.HasFlag('constructor')
+                                jsdoc.get_flag('override').flag_token)
+                        if (jsdoc.has_flag('inheritDoc') and not jsdoc.has_flag('constructor')
                                 and ('accessControls' not in jsdoc.suppressions)):
                             self._handle_error(
                                 errors.INVALID_INHERIT_DOC_PRIVATE,
                                 '%s should not inherit from a private member.' % identifier,
-                                jsdoc.GetFlag('inheritDoc').flag_token)
-                        if (not jsdoc.HasFlag('private')
+                                jsdoc.get_flag('inheritDoc').flag_token)
+                        if (not jsdoc.has_flag('private')
                                 and ('underscore' not in jsdoc.suppressions)
-                                and not ((jsdoc.HasFlag('inheritDoc')
-                                          or jsdoc.HasFlag('override'))
+                                and not ((jsdoc.has_flag('inheritDoc')
+                                          or jsdoc.has_flag('override'))
                                          and ('accessControls' in jsdoc.suppressions))):
                             self._handle_error(
                                 errors.MISSING_PRIVATE,
                                 'Member "%s" must have @private JsDoc.' %
                                 identifier, token)
-                        if jsdoc.HasFlag('private') and 'underscore' in jsdoc.suppressions:
+                        if jsdoc.has_flag('private') and 'underscore' in jsdoc.suppressions:
                             self._handle_error(
                                 errors.UNNECESSARY_SUPPRESS,
                                 '@suppress {underscore} is not necessary with @private',
                                 jsdoc.suppressions['underscore'])
-                    elif (jsdoc.HasFlag('private') and
+                    elif (jsdoc.has_flag('private') and
                           not self.in_explicitly_typed_language()):
                         # It is convention to hide public fields in some ECMA
                         # implementations from documentation using the @private tag.
@@ -700,7 +700,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                     # such variables always begin with the prefix MSG_.
                     if not identifier.startswith('MSG_') and '.MSG_' not in identifier:
                         for tflag in ('desc', 'hidden', 'meaning'):
-                            if jsdoc.HasFlag(tflag):
+                            if jsdoc.has_flag(tflag):
                                 self._handle_error(
                                     errors.INVALID_USE_OF_DESC_TAG,
                                     'Member "%s" does not start with MSG_ and thus '
@@ -736,7 +736,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         errors.INTERFACE_CONSTRUCTOR_CANNOT_HAVE_PARAMS,
                         'Interface constructor cannot have parameters',
                         token.previous)
-            elif (state.InTopLevel() and jsdoc and not jsdoc.HasFlag('see')
+            elif (state.InTopLevel() and jsdoc and not jsdoc.has_flag('see')
                   and not jsdoc.InheritsDocumentation()
                   and not state.InObjectLiteralDescendant() and not
                   jsdoc.is_invalidated()):

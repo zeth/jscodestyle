@@ -371,7 +371,7 @@ class DocComment(object):
 
         return True
 
-    def AddFlag(self, flag):
+    def add_flag(self, flag):
         """Add a new document flag.
 
         Args:
@@ -385,9 +385,9 @@ class DocComment(object):
         Returns:
             True if documentation may be pulled off the superclass.
         """
-        return self.HasFlag('inheritDoc') or self.HasFlag('override')
+        return self.has_flag('inheritDoc') or self.has_flag('override')
 
-    def HasFlag(self, flag_type):
+    def has_flag(self, flag_type):
         """Test if the given flag has been set.
 
         Args:
@@ -401,7 +401,7 @@ class DocComment(object):
                 return True
         return False
 
-    def GetFlag(self, flag_type):
+    def get_flag(self, flag_type):
         """Gets the last flag of the given type.
 
         Args:
@@ -458,7 +458,7 @@ class DocComment(object):
         """
 
         # File overviews describe the file, not a token.
-        if self.HasFlag('fileoverview'):
+        if self.has_flag('fileoverview'):
             return
 
         skip_types = frozenset([
@@ -733,8 +733,8 @@ class Function(object):
     def __init__(self, block_depth, is_assigned, doc, name):
         self.block_depth = block_depth
         self.is_assigned = is_assigned
-        self.is_constructor = doc and doc.HasFlag('constructor')
-        self.is_interface = doc and doc.HasFlag('interface')
+        self.is_constructor = doc and doc.has_flag('constructor')
+        self.is_interface = doc and doc.has_flag('interface')
         self.has_return = False
         self.has_throw = False
         self.has_this = False
@@ -1152,7 +1152,7 @@ class StateTracker(object):
                 token.attached_object = flag
             else:
                 flag = token.attached_object
-            self._doc_comment.AddFlag(flag)
+            self._doc_comment.add_flag(flag)
 
             if flag.flag_type == 'suppress':
                 self._doc_comment.add_suppression(token)
