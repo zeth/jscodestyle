@@ -163,7 +163,7 @@ class ClosurizedNamespacesInfo(object):
         """
         namespace = tokenutil.GetStringAfterToken(token)
 
-        if self.GetClosurizedNamespace(namespace) is None:
+        if self.get_closurized_namespace(namespace) is None:
             return False
 
         if token in self._duplicate_provide_tokens:
@@ -188,7 +188,7 @@ class ClosurizedNamespacesInfo(object):
         """
         namespace = tokenutil.GetStringAfterToken(token)
 
-        if self.GetClosurizedNamespace(namespace) is None:
+        if self.get_closurized_namespace(namespace) is None:
             return False
 
         if namespace in self._ignored_extra_namespaces:
@@ -447,7 +447,7 @@ class ClosurizedNamespacesInfo(object):
                 if jsdoc and jsdoc.HasFlag('typedef'):
                     self._add_created_namespace(state_tracker, whole_identifier_string,
                                                 token.line_number,
-                                                namespace=self.GetClosurizedNamespace(
+                                                namespace=self.get_closurized_namespace(
                                                     whole_identifier_string))
                 else:
                     is_alias_definition = (token.metadata and
@@ -472,7 +472,7 @@ class ClosurizedNamespacesInfo(object):
                 identifier = start_token.metadata.aliased_symbol
 
             if identifier:
-                cnamespace = self.GetClosurizedNamespace(identifier)
+                cnamespace = self.get_closurized_namespace(identifier)
                 if state_tracker.InFunction():
                     self._add_used_namespace(state_tracker, identifier, token)
                 elif cnamespace and cnamespace != 'goog':
@@ -534,7 +534,7 @@ class ClosurizedNamespacesInfo(object):
             return
 
         identifier = self._get_used_identifier(identifier)
-        namespace = self.GetClosurizedNamespace(identifier)
+        namespace = self.get_closurized_namespace(identifier)
         # b/5362203 If its a variable in scope then its not a required namespace.
         if namespace and not state_tracker.IsVariableInScope(namespace):
             unamespace = UsedNamespace(namespace, identifier, token,
@@ -552,7 +552,7 @@ class ClosurizedNamespacesInfo(object):
                 return identifier[:-len(suffix)]
         return identifier
 
-    def GetClosurizedNamespace(self, identifier):
+    def get_closurized_namespace(self, identifier):
         """Given an identifier, returns the namespace that identifier is from.
 
         Args:

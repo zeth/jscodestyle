@@ -64,12 +64,12 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         'package.className.prototype.something.somethingElse': 'package.className'
     }
 
-    def test_GetClosurizedNamespace(self):
+    def test_get_closurized_namespace(self):
         """Tests that the correct namespace is returned for various identifiers."""
         namespaces_info = closurizednamespacesinfo.ClosurizedNamespacesInfo(
             closurized_namespaces=['package'], ignored_extra_namespaces=[])
         for identifier, expected_namespace in self._test_cases.items():
-            actual_namespace = namespaces_info.GetClosurizedNamespace(identifier)
+            actual_namespace = namespaces_info.get_closurized_namespace(identifier)
             self.assertEqual(
                 expected_namespace,
                 actual_namespace,

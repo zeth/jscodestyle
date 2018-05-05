@@ -113,7 +113,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     if not suppressed:
                         # Look for static members defined on a provided namespace.
                         if namespaces_info:
-                            namespace = namespaces_info.GetClosurizedNamespace(identifier)
+                            namespace = namespaces_info.get_closurized_namespace(identifier)
                             provided_namespaces = namespaces_info.get_provided_namespaces()
                         else:
                             namespace = None
