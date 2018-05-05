@@ -234,7 +234,7 @@ class DocFlag(object):
                 [JSTTokenType.DOC_START_BRACE],
                 JSTTokenType.FLAG_ENDING_TYPES)
             if brace:
-                end_token, contents = _GetMatchingEndBraceAndContents(brace)
+                end_token, contents = _get_matching_end_brace(brace)
                 self.type = contents
                 self.jstype = typeannotation.Parse(brace, end_token,
                                                    error_handler)
@@ -247,7 +247,7 @@ class DocFlag(object):
                 # search for type in same line only. If no token after flag in same
                 # line then conclude that no type is specified.
                 self.type_start_token = flag_token.next
-                self.type_end_token, self.type = _GetEndTokenAndContents(
+                self.type_end_token, self.type = _get_end_token(
                     self.type_start_token)
                 if self.type is not None:
                     self.type = self.type.strip()
@@ -259,7 +259,7 @@ class DocFlag(object):
         self.name = None
         if self.flag_type in self.HAS_NAME:
             # Handle bad case, name could be immediately after flag token.
-            self.name_token = _GetNextPartialIdentifierToken(flag_token)
+            self.name_token = _get_next_partial_id_token(flag_token)
 
             # Handle good case, if found token is after type start, look for
             # a identifier (substring to cover cases like [cnt] b/4197272) after
@@ -269,7 +269,7 @@ class DocFlag(object):
                     and tokenutil.Compare(
                         self.name_token,
                         self.type_start_token) > 0):
-                self.name_token = _GetNextPartialIdentifierToken(self.type_end_token)
+                self.name_token = _get_next_partial_id_token(self.type_end_token)
 
             if self.name_token:
                 self.name = self.name_token.string
@@ -296,7 +296,7 @@ class DocFlag(object):
             if interesting_token.type in JSTTokenType.FLAG_DESCRIPTION_TYPES:
                 self.description_start_token = interesting_token
                 self.description_end_token, self.description = (
-                    _GetEndTokenAndContents(interesting_token))
+                    _get_end_token(interesting_token))
 
     def has_type(self):
         """Returns whether this flag should have a type annotation."""
@@ -583,7 +583,7 @@ class DocComment(object):
 #
 
 
-def _GetMatchingEndBraceAndContents(start_brace):
+def _get_matching_end_brace(start_brace):
     """Returns the matching end brace and contents between the two braces.
 
     If any FLAG_ENDING_TYPE token is encountered before a matching end brace, then
@@ -624,7 +624,7 @@ def _GetMatchingEndBraceAndContents(start_brace):
     return token, ''.join(contents)
 
 
-def _GetNextPartialIdentifierToken(start_token):
+def _get_next_partial_id_token(start_token):
     """Returns the first token having identifier as substring after a token.
 
     Searches each token after the start to see if it contains an identifier.
@@ -650,7 +650,7 @@ def _GetNextPartialIdentifierToken(start_token):
     return None
 
 
-def _GetEndTokenAndContents(start_token):
+def _get_end_token(start_token):
     """Returns last content token and all contents before FLAG_ENDING_TYPE token.
 
     Comment prefixes are split into DOC_PREFIX tokens and stripped from the
