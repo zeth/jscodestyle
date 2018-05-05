@@ -537,7 +537,7 @@ class ClosurizedNamespacesInfo(object):
         identifier = self._get_used_identifier(identifier)
         namespace = self.get_closurized_namespace(identifier)
         # b/5362203 If its a variable in scope then its not a required namespace.
-        if namespace and not state_tracker.IsVariableInScope(namespace):
+        if namespace and not state_tracker.is_variable_in_scope(namespace):
             unamespace = UsedNamespace(namespace, identifier, token,
                                        is_alias_definition)
             self._used_namespaces.append(unamespace)

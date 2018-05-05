@@ -349,7 +349,7 @@ class DocComment(object):
         """Test whether invalidate() has been called."""
         return self.invalidated
 
-    def AddSuppression(self, token):
+    def add_suppression(self, token):
         """Add a new error suppression flag.
 
         Args:
@@ -360,7 +360,7 @@ class DocComment(object):
             for suppression in flag.jstype.IterIdentifiers():
                 self.suppressions[suppression] = token
 
-    def SuppressionOnly(self):
+    def suppression_only(self):
         """Returns whether this comment contains only suppression flags."""
         if not self.__flags:
             return False
@@ -1070,7 +1070,7 @@ class StateTracker(object):
         """Return the very first token in the file."""
         return self._first_token
 
-    def IsVariableInScope(self, token_string):
+    def is_variable_in_scope(self, token_string):
         """Checks if string is variable in current scope.
 
         For given string it checks whether the string is a defined variable
@@ -1155,7 +1155,7 @@ class StateTracker(object):
             self._doc_comment.AddFlag(flag)
 
             if flag.flag_type == 'suppress':
-                self._doc_comment.AddSuppression(token)
+                self._doc_comment.add_suppression(token)
 
         elif type == JSTTokenType.FUNCTION_DECLARATION:
             last_code = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES, None,

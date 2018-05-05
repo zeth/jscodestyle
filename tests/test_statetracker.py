@@ -79,14 +79,14 @@ class DocCommentTest(unittest.TestCase):
         self.assertTrue(comment.invalidated)
         self.assertTrue(comment.is_invalidated())
 
-    def testSuppressionOnly(self):
+    def testsuppression_only(self):
         comment = statetracker.DocComment(None)
 
-        self.assertFalse(comment.SuppressionOnly())
+        self.assertFalse(comment.suppression_only())
         comment.AddFlag(self._MakeDocFlagFake('suppress'))
-        self.assertTrue(comment.SuppressionOnly())
+        self.assertTrue(comment.suppression_only())
         comment.AddFlag(self._MakeDocFlagFake('foo'))
-        self.assertFalse(comment.SuppressionOnly())
+        self.assertFalse(comment.suppression_only())
 
     def testRepr(self):
         comment = statetracker.DocComment(None)

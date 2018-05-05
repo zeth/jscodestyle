@@ -238,7 +238,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                 # Don't require extra blank lines around suppression of extra
                 # goog.require errors.
-                if (doc_comment.SuppressionOnly() and
+                if (doc_comment.suppression_only() and
                     next_token.type == Type.IDENTIFIER and
                     next_token.string in ['goog.provide', 'goog.require']):
                     return
