@@ -394,7 +394,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                     self._handle_error(errors.INTERFACE_METHOD_CANNOT_HAVE_CODE,
                                        'Interface methods cannot contain code', last_code)
 
-            elif (state.IsBlockClose() and
+            elif (state.is_block_close() and
                   token.next and token.next.type == Type.SEMICOLON):
                 if (last_code.metadata.context.parent.type != Context.OBJECT_LITERAL
                         and last_code.metadata.context.type != Context.OBJECT_LITERAL):
@@ -637,7 +637,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
             identifier = token.values['identifier']
 
             if ((not state.in_function() or state.in_constructor())
-                    and state.InTopLevel() and not state.InObjectLiteralDescendant()):
+                    and state.in_top_level() and not state.in_object_literal_descendant()):
                 jsdoc = state.get_doc_comment()
                 if not state.has_doc_comment(identifier):
                     # Only test for documentation on identifiers with .s in them to
@@ -736,11 +736,11 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         errors.INTERFACE_CONSTRUCTOR_CANNOT_HAVE_PARAMS,
                         'Interface constructor cannot have parameters',
                         token.previous)
-            elif (state.InTopLevel() and jsdoc and not jsdoc.has_flag('see')
+            elif (state.in_top_level() and jsdoc and not jsdoc.has_flag('see')
                   and not jsdoc.inherits_documentation()
-                  and not state.InObjectLiteralDescendant() and not
+                  and not state.in_object_literal_descendant() and not
                   jsdoc.is_invalidated()):
-                distance, edit = jsdoc.CompareParameters(state.get_params())
+                distance, edit = jsdoc.compare_parameters(state.get_params())
                 if distance:
                     params_iter = iter(state.get_params())
                     docs_iter = iter(jsdoc.ordered_params)

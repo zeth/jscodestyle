@@ -72,7 +72,7 @@ class JavaScriptStateTracker(statetracker.StateTracker):
         self._block_stack = []
         super(JavaScriptStateTracker, self).reset()
 
-    def InTopLevel(self):
+    def in_top_level(self):
         """Compute whether we are at the top level in the class.
 
         This function call is language specific.  In some languages like

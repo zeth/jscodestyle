@@ -506,7 +506,7 @@ class DocComment(object):
 
             token = token.next
 
-    def CompareParameters(self, params):
+    def compare_parameters(self, params):
         """Computes the edit distance and list from the function params to the docs.
 
         Uses the Levenshtein edit distance algorithm, with code modified from
@@ -840,7 +840,7 @@ class StateTracker(object):
         Returns:
           True if the current token is within a top level function.
         """
-        return len(self._function_stack) == 1 and self.InTopLevel()
+        return len(self._function_stack) == 1 and self.in_top_level()
 
     def in_assigned_function(self):
         """Returns true if the current token is within a function variable.
@@ -868,7 +868,7 @@ class StateTracker(object):
         return (self._function_stack and
                 self._function_stack[-1].block_depth == self._block_depth)
 
-    def InBlock(self):
+    def in_block(self):
         """Returns true if the current token is within a block.
 
         Returns:
@@ -876,7 +876,7 @@ class StateTracker(object):
         """
         return bool(self._block_depth)
 
-    def IsBlockClose(self):
+    def is_block_close(self):
         """Returns true if the current token is a block close.
 
         Returns:
@@ -884,7 +884,7 @@ class StateTracker(object):
         """
         return self._is_block_close
 
-    def InObjectLiteral(self):
+    def in_object_literal(self):
         """Returns true if the current token is within an object literal.
 
         Returns:
@@ -892,7 +892,7 @@ class StateTracker(object):
         """
         return self._block_depth and self._block_types[-1] == self.OBJECT_LITERAL
 
-    def InObjectLiteralDescendant(self):
+    def in_object_literal_descendant(self):
         """Returns true if the current token has an object literal ancestor.
 
         Returns:
@@ -900,7 +900,7 @@ class StateTracker(object):
         """
         return self.OBJECT_LITERAL in self._block_types
 
-    def InParentheses(self):
+    def in_parentheses(self):
         """Returns true if the current token is within parentheses.
 
         Returns:
@@ -932,7 +932,7 @@ class StateTracker(object):
         """
         return len(self._function_stack)
 
-    def InTopLevel(self):
+    def in_top_level(self):
         """Whether we are at the top level in the class.
 
         This function call is language specific.  In some languages like
@@ -1123,7 +1123,7 @@ class StateTracker(object):
 
         # Track block depth.
         elif type == JSTTokenType.END_BLOCK:
-            self._is_block_close = not self.InObjectLiteral()
+            self._is_block_close = not self.in_object_literal()
             self._block_depth -= 1
             self._block_types.pop()
 
@@ -1162,7 +1162,7 @@ class StateTracker(object):
                                                True)
             doc = None
             # Only top-level functions are eligible for documentation.
-            if self.InTopLevel():
+            if self.in_top_level():
                 doc = self._doc_comment
 
             name = ''
@@ -1171,7 +1171,7 @@ class StateTracker(object):
                 or last_code.IsOperator('||')
                 or last_code.IsOperator('&&')
                 or (last_code.IsOperator(':')
-                    and not self.InObjectLiteral()))
+                    and not self.in_object_literal()))
             if is_assigned:
                 # TODO(robbyw): This breaks for x[2] = ...
                 # Must use loop to find full function name in the case of line-wrapped
