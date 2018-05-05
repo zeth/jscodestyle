@@ -347,7 +347,7 @@ class ClosurizedNamespacesInfo(object):
         """Returns whether token is the first provide token."""
         return self._provide_tokens and token == self._provide_tokens[0]
 
-    def IsFirstRequire(self, token):
+    def is_first_require(self, token):
         """Returns whether token is the first require token."""
         return self._require_tokens and token == self._require_tokens[0]
 

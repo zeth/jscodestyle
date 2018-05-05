@@ -450,7 +450,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                 # If there are no provide statements, missing provides should be
                 # reported before the first require.
-                if (namespaces_info.IsFirstRequire(token) and
+                if (namespaces_info.is_first_require(token) and
                     not namespaces_info.get_provided_namespaces()):
                     missing_provides = namespaces_info.get_missing_provides()
                     if missing_provides:
