@@ -472,12 +472,12 @@ class ClosurizedNamespacesInfo(object):
                 identifier = start_token.metadata.aliased_symbol
 
             if identifier:
-                namespace = self.GetClosurizedNamespace(identifier)
+                cnamespace = self.GetClosurizedNamespace(identifier)
                 if state_tracker.InFunction():
                     self._AddUsedNamespace(state_tracker, identifier, token)
-                elif namespace and namespace != 'goog':
+                elif cnamespace and cnamespace != 'goog':
                     self._AddCreatedNamespace(state_tracker, identifier,
-                                              token.line_number, namespace=namespace)
+                                              token.line_number, namespace=cnamespace)
 
         elif token.type == JavaScriptTokenType.DOC_FLAG:
             flag = token.attached_object
