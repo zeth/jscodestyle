@@ -173,11 +173,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                                                flag.name,
                                                token)
 
-            if flag.flag_type in state.GetDocFlag().HAS_TYPE:
+            if flag.flag_type in state.get_doc_flag().HAS_TYPE:
                 # Check for both missing type token and empty type braces '{}'
                 # Missing suppress types are reported separately and we allow enums,
                 # const, private, public and protected without types.
-                if (flag.flag_type not in state.GetDocFlag().CAN_OMIT_TYPE
+                if (flag.flag_type not in state.get_doc_flag().CAN_OMIT_TYPE
                     and (not flag.jstype or flag.jstype.IsEmpty())):
                     self._handle_error(errors.MISSING_JSDOC_TAG_TYPE,
                                        'Missing type in %s tag' % token.string, token)
@@ -580,7 +580,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             # Flags that use aliased symbols should be counted.
             flag = token.attached_object
             js_type = flag and flag.jstype
-            if flag and flag.flag_type in state.GetDocFlag().HAS_TYPE and js_type:
+            if flag and flag.flag_type in state.get_doc_flag().HAS_TYPE and js_type:
                 self._MarkAliasUsed(js_type)
 
     def _MarkAliasUsed(self, js_type):

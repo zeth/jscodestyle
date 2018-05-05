@@ -414,7 +414,7 @@ class DocComment(object):
             if flag.flag_type == flag_type:
                 return flag
 
-    def GetDocFlags(self):
+    def get_doc_flags(self):
         """Return the doc flags for this comment."""
         return list(self.__flags)
 
@@ -1004,7 +1004,7 @@ class StateTracker(object):
         """
         return identifier in self._documented_identifiers
 
-    def InDocComment(self):
+    def in_doc_comment(self):
         """Returns whether the current token is in a doc comment.
 
         Returns:
@@ -1012,7 +1012,7 @@ class StateTracker(object):
         """
         return self._doc_comment and self._doc_comment.end_token is None
 
-    def GetDocFlag(self):
+    def get_doc_flag(self):
         """Returns the current documentation flags.
 
         Returns:
@@ -1021,7 +1021,7 @@ class StateTracker(object):
         return self._doc_flag
 
     def is_type_token(self, token):
-        if self.InDocComment() and token.type not in (
+        if self.in_doc_comment() and token.type not in (
                 JSTTokenType.START_DOC_COMMENT,
                 JSTTokenType.DOC_FLAG,
                 JSTTokenType.DOC_INLINE_FLAG,

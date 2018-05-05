@@ -66,7 +66,7 @@ class DocCommentTest(unittest.TestCase):
 
         self.assertEquals(
             [a, b, c],
-            comment.GetDocFlags())
+            comment.get_doc_flags())
 
     def test_invalidate(self):
         comment = statetracker.DocComment(None)

@@ -49,7 +49,7 @@ class ErrorFixerTest(unittest.TestCase):
     def DoTestFixJsDocPipeNull(self, expected, original):
         _, comments = testutil.ParseFunctionsAndComments(
             '/** @param {%s} */' % original)
-        jstype = comments[0].GetDocFlags()[0].jstype
+        jstype = comments[0].get_doc_flags()[0].jstype
         self.error_fixer.HandleFile('unittest', None)
         self.error_fixer._FixJsDocPipeNull(jstype)
         self.assertEquals(expected, repr(jstype))

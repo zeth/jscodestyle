@@ -36,7 +36,7 @@ class TypeParserTest(unittest.TestCase):
     def _ParseType(self, type_str):
         """Creates a comment to parse and returns the parsed type."""
         comment = self._ParseComment('/** @type {%s} **/' % type_str)
-        return comment.GetDocFlags()[0].jstype
+        return comment.get_doc_flags()[0].jstype
 
     def assertProperReconstruction(self, type_str, matching_str=None):
         """Parses the type and asserts the its repr matches the type.

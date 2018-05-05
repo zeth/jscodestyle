@@ -546,7 +546,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         'Spaces matter.', token)
                 else:
                     for suppress_type in flag.jstype.IterIdentifiers():
-                        if suppress_type not in state.GetDocFlag().SUPPRESS_TYPES:
+                        if suppress_type not in state.get_doc_flag().SUPPRESS_TYPES:
                             self._handle_error(
                                 errors.INVALID_SUPPRESS_TYPE,
                                 'Invalid suppression type: %s' % suppress_type, token)
@@ -585,7 +585,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                                            'Extra space before email address',
                                            token.next, position=Position(1, num_spaces - 1))
 
-            elif (flag.flag_type in state.GetDocFlag().HAS_DESCRIPTION and
+            elif (flag.flag_type in state.get_doc_flag().HAS_DESCRIPTION and
                   not self._limited_doc_checks):
                 if flag.flag_type == 'param':
                     if flag.name is None:
@@ -620,7 +620,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                             'Type must always be surrounded by curly braces.', token)
 
         if token_type in (Type.DOC_FLAG, Type.DOC_INLINE_FLAG):
-            if (token.values['name'] not in state.GetDocFlag().LEGAL_DOC
+            if (token.values['name'] not in state.get_doc_flag().LEGAL_DOC
                     and token.values['name'] not in self.custom_jsdoc_tags):
                 self._handle_error(
                     errors.INVALID_JSDOC_TAG,
