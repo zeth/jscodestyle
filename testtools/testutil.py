@@ -81,7 +81,7 @@ def ParseFunctionsAndComments(source, error_handler=None):
         if function and function not in functions:
             functions.append(function)
 
-        comment = tracker.GetDocComment()
+        comment = tracker.get_doc_comment()
         if comment and comment not in comments:
             comments.append(comment)
 

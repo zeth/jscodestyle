@@ -106,7 +106,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             if token.type == Type.SIMPLE_LVALUE:
                 identifier = token.string
                 if identifier.endswith('_') and not identifier.endswith('__'):
-                    doc_comment = state.GetDocComment()
+                    doc_comment = state.get_doc_comment()
                     suppressed = doc_comment and (
                         'underscore' in doc_comment.suppressions or
                         'unusedPrivateMembers' in doc_comment.suppressions)
@@ -204,7 +204,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     position=Position.All(token.string))
 
         elif token.type == Type.END_DOC_COMMENT:
-            doc_comment = state.GetDocComment()
+            doc_comment = state.get_doc_comment()
 
             # When @externs appears in a @fileoverview comment, it should trigger
             # the same limited doc checks as a special filename like externs.js.

@@ -638,8 +638,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
             if ((not state.InFunction() or state.InConstructor())
                     and state.InTopLevel() and not state.InObjectLiteralDescendant()):
-                jsdoc = state.GetDocComment()
-                if not state.HasDocComment(identifier):
+                jsdoc = state.get_doc_comment()
+                if not state.has_doc_comment(identifier):
                     # Only test for documentation on identifiers with .s in them to
                     # avoid checking things like simple variables. We don't require
                     # documenting assignments to .prototype itself (bug 1880803).
@@ -647,7 +647,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                             and identifier.find('.') != -1
                             and not identifier.endswith('.prototype')
                             and not self._limited_doc_checks):
-                        comment = state.GetLastComment()
+                        comment = state.get_last_comment()
                         if not (comment and comment.lower().count('jsdoc inherited')):
                             self._handle_error(
                                 errors.MISSING_MEMBER_DOCUMENTATION,
@@ -729,7 +729,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 self._handle_error(errors.EXTRA_SPACE, 'Extra space before ")"',
                                    token.previous)
 
-            jsdoc = state.GetDocComment()
+            jsdoc = state.get_doc_comment()
             if state.get_function().is_interface:
                 if token.previous and token.previous.type == Type.PARAMETERS:
                     self._handle_error(

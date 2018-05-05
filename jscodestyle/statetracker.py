@@ -977,7 +977,7 @@ class StateTracker(object):
 
         return params
 
-    def GetLastComment(self):
+    def get_last_comment(self):
         """Return the last plain comment that could be used as documentation.
 
         Returns:
@@ -985,7 +985,7 @@ class StateTracker(object):
         """
         return self._last_comment
 
-    def GetDocComment(self):
+    def get_doc_comment(self):
         """Return the most recent applicable documentation comment.
 
         Returns:
@@ -993,7 +993,7 @@ class StateTracker(object):
         """
         return self._doc_comment
 
-    def HasDocComment(self, identifier):
+    def has_doc_comment(self, identifier):
         """Returns whether the identifier has been documented yet.
 
         Args:
@@ -1236,7 +1236,7 @@ class StateTracker(object):
 
         elif type == JSTTokenType.SIMPLE_LVALUE:
             identifier = token.values['identifier']
-            jsdoc = self.GetDocComment()
+            jsdoc = self.get_doc_comment()
             if jsdoc:
                 self._documented_identifiers.add(identifier)
 

@@ -434,7 +434,7 @@ class ClosurizedNamespacesInfo(object):
 
                         break
             else:
-                jsdoc = state_tracker.GetDocComment()
+                jsdoc = state_tracker.get_doc_comment()
                 if token.metadata and token.metadata.aliased_symbol:
                     whole_identifier_string = token.metadata.aliased_symbol
                 elif (token.string == 'goog.module.get' and
@@ -486,7 +486,7 @@ class ClosurizedNamespacesInfo(object):
             flag = token.attached_object
             flag_type = flag.flag_type
             if flag and flag.has_type() and flag.jstype:
-                is_interface = state_tracker.GetDocComment().has_flag('interface')
+                is_interface = state_tracker.get_doc_comment().has_flag('interface')
                 if flag_type == 'implements' or (flag_type == 'extends'
                                                  and is_interface):
                     identifier = flag.jstype.alias or flag.jstype.identifier
@@ -544,7 +544,7 @@ class ClosurizedNamespacesInfo(object):
 
     @staticmethod
     def _has_suppression(state_tracker, suppression):
-        jsdoc = state_tracker.GetDocComment()
+        jsdoc = state_tracker.get_doc_comment()
         return jsdoc and suppression in jsdoc.suppressions
 
     @staticmethod
