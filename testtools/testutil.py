@@ -75,7 +75,7 @@ def ParseFunctionsAndComments(source, error_handler=None):
     functions = []
     comments = []
     for token in start_token:
-        tracker.HandleToken(token, tracker.GetLastNonSpaceToken())
+        tracker.handle_token(token, tracker.GetLastNonSpaceToken())
 
         function = tracker.GetFunction()
         if function and function not in functions:

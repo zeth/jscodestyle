@@ -853,7 +853,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         alias_pass.process(token)
 
         while token:
-            state_tracker.HandleToken(token, state_tracker.GetLastNonSpaceToken())
+            state_tracker.handle_token(token, state_tracker.GetLastNonSpaceToken())
             namespaces_info.process_token(token, state_tracker)
             state_tracker.handle_after_token(token)
             token = token.next

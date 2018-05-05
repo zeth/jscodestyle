@@ -132,7 +132,7 @@ class JavaScriptStateTracker(statetracker.StateTracker):
         else:
             return None
 
-    def HandleToken(self, token, last_non_space_token):
+    def handle_token(self, token, last_non_space_token):
         """Handles the given token and updates state.
 
         Args:
@@ -147,5 +147,5 @@ class JavaScriptStateTracker(statetracker.StateTracker):
             start_token = self._block_stack.pop()
             if tokenutil.GoogScopeOrNoneFromStartBlock(start_token):
                 self._scope_depth -= 1
-        super(JavaScriptStateTracker, self).HandleToken(token,
-                                                        last_non_space_token)
+        super(JavaScriptStateTracker, self).handle_token(token,
+                                                         last_non_space_token)

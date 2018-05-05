@@ -36,7 +36,7 @@ class IdentifierTest(unittest.TestCase):
             'abc', javascripttokens.JavaScriptTokenType.IDENTIFIER, 'abc', 1)
 
         st = statetracker.StateTracker()
-        st.HandleToken(a, None)
+        st.handle_token(a, None)
 
 
 class DocCommentTest(unittest.TestCase):

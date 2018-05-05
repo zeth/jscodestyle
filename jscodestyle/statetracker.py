@@ -1089,7 +1089,7 @@ class StateTracker(object):
 
         return False
 
-    def HandleToken(self, token, last_non_space_token):
+    def handle_token(self, token, last_non_space_token):
         """Handles the given token and updates state.
 
         Args:

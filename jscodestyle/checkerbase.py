@@ -203,7 +203,7 @@ class CheckerBase(object):
         self._state_tracker.reset()
         while token:
             # When we are looking at a token and decided to delete the whole line, we
-            # will delete all of them in the "HandleToken()" below.  So the current
+            # will delete all of them in the "handle_token()" below.  So the current
             # token and subsequent ones may already be deleted here.  The way we
             # delete a token does not wipe out the previous and next pointers of the
             # deleted token.  So we need to check the token itself to make sure it is
@@ -213,7 +213,7 @@ class CheckerBase(object):
                 if stop_token and token is stop_token:
                     return
 
-                self._state_tracker.HandleToken(
+                self._state_tracker.handle_token(
                     token, self._state_tracker.GetLastNonSpaceToken())
                 pass_function(token)
                 self._state_tracker.handle_after_token(token)
