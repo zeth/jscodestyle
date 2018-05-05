@@ -93,7 +93,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         self.assertTrue(namespaces_info.IsExtraRequire(token),
                         'Should be invalid since it is not in ignored namespaces.')
 
-    def test_IsExtraProvide_created(self):
+    def test_is_extra_provide_created(self):
         """Tests that provides for created namespaces are not extra."""
         input_lines = [
             'goog.provide(\'package.Foo\');',
@@ -103,10 +103,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         token, namespaces_info = self._GetStartTokenAndNamespacesInfoForScript(
             input_lines, ['package'])
 
-        self.assertFalse(namespaces_info.IsExtraProvide(token),
+        self.assertFalse(namespaces_info.is_extra_provide(token),
                          'Should not be extra since it is created.')
 
-    def test_IsExtraProvide_createdIdentifier(self):
+    def test_is_extra_provide_createdIdentifier(self):
         """Tests that provides for created identifiers are not extra."""
         input_lines = [
             'goog.provide(\'package.Foo.methodName\');',
@@ -116,30 +116,30 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         token, namespaces_info = self._GetStartTokenAndNamespacesInfoForScript(
             input_lines, ['package'])
 
-        self.assertFalse(namespaces_info.IsExtraProvide(token),
+        self.assertFalse(namespaces_info.is_extra_provide(token),
                          'Should not be extra since it is created.')
 
-    def test_IsExtraProvide_notCreated(self):
+    def test_is_extra_provide_notCreated(self):
         """Tests that provides for non-created namespaces are extra."""
         input_lines = ['goog.provide(\'package.Foo\');']
 
         token, namespaces_info = self._GetStartTokenAndNamespacesInfoForScript(
             input_lines, ['package'])
 
-        self.assertTrue(namespaces_info.IsExtraProvide(token),
+        self.assertTrue(namespaces_info.is_extra_provide(token),
                         'Should be extra since it is not created.')
 
-    def test_IsExtraProvide_notCreatedMultipartClosurizedNamespace(self):
+    def test_is_extra_provide_notCreatedMultipartClosurizedNamespace(self):
         """Tests that provides for non-created namespaces are extra."""
         input_lines = ['goog.provide(\'multi.part.namespace.Foo\');']
 
         token, namespaces_info = self._GetStartTokenAndNamespacesInfoForScript(
             input_lines, ['multi.part'])
 
-        self.assertTrue(namespaces_info.IsExtraProvide(token),
+        self.assertTrue(namespaces_info.is_extra_provide(token),
                         'Should be extra since it is not created.')
 
-    def test_IsExtraProvide_duplicate(self):
+    def test_is_extra_provide_duplicate(self):
         """Tests that providing a namespace twice makes the second one extra."""
         input_lines = [
             'goog.provide(\'package.Foo\');',
@@ -153,17 +153,17 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         # Advance to the second goog.provide token.
         token = tokenutil.Search(token.next, TokenType.IDENTIFIER)
 
-        self.assertTrue(namespaces_info.IsExtraProvide(token),
+        self.assertTrue(namespaces_info.is_extra_provide(token),
                         'Should be extra since it is already provided.')
 
-    def test_IsExtraProvide_notClosurized(self):
+    def test_is_extra_provide_notClosurized(self):
         """Tests that provides of non-closurized namespaces are not extra."""
         input_lines = ['goog.provide(\'notclosurized.Foo\');']
 
         token, namespaces_info = self._GetStartTokenAndNamespacesInfoForScript(
             input_lines, ['package'])
 
-        self.assertFalse(namespaces_info.IsExtraProvide(token),
+        self.assertFalse(namespaces_info.is_extra_provide(token),
                          'Should not be extra since it is not closurized.')
 
     def test_IsExtraRequire_used(self):
@@ -808,10 +808,10 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             ], ['goog'])
 
         token = self._GetProvideTokens('goog.foo.barTest')
-        self.assertFalse(namespaces_info.IsExtraProvide(token))
+        self.assertFalse(namespaces_info.is_extra_provide(token))
 
         token = self._GetProvideTokens('goog.foo.bazTest')
-        self.assertTrue(namespaces_info.IsExtraProvide(token))
+        self.assertTrue(namespaces_info.is_extra_provide(token))
 
     def test_SetTestOnlyComment(self):
         """Ensure a comment in setTestOnly does not cause a created namespace."""

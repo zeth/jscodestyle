@@ -151,7 +151,7 @@ class ClosurizedNamespacesInfo(object):
         """
         return set(self._required_namespaces)
 
-    def IsExtraProvide(self, token):
+    def is_extra_provide(self, token):
         """Returns whether the given goog.provide token is unnecessary.
 
         Args:

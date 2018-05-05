@@ -405,7 +405,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 namespace = tokenutil.GetStringAfterToken(token)
 
                 # Report extra goog.provide statement.
-                if not namespace or namespaces_info.IsExtraProvide(token):
+                if not namespace or namespaces_info.is_extra_provide(token):
                     if not namespace:
                         msg = 'Empty namespace in goog.provide'
                     else:
