@@ -411,7 +411,7 @@ class ClosurizedNamespacesInfo(object):
                 # If there is a suppression for the provide, add a creation for it so it
                 # gets treated as a regular goog.provide (i.e. still gets sorted).
                 if self._HasSuppression(state_tracker, 'extraProvide'):
-                    self._AddCreatedNamespace(state_tracker, namespace, token.line_number)
+                    self._add_created_namespace(state_tracker, namespace, token.line_number)
 
             elif token.string == 'goog.scope':
                 self._scopified_file = True
@@ -428,8 +428,8 @@ class ClosurizedNamespacesInfo(object):
                             # consider it created.
                             base_namespace = message.split('.', 1)[0]
                             if base_namespace in self._closurized_namespaces:
-                                self._AddCreatedNamespace(state_tracker, message,
-                                                          token.line_number)
+                                self._add_created_namespace(state_tracker, message,
+                                                            token.line_number)
 
                         break
             else:
@@ -445,10 +445,10 @@ class ClosurizedNamespacesInfo(object):
                                               alias_definition=False)
                     self._used_namespaces.append(namespace)
                 if jsdoc and jsdoc.HasFlag('typedef'):
-                    self._AddCreatedNamespace(state_tracker, whole_identifier_string,
-                                              token.line_number,
-                                              namespace=self.GetClosurizedNamespace(
-                                                  whole_identifier_string))
+                    self._add_created_namespace(state_tracker, whole_identifier_string,
+                                                token.line_number,
+                                                namespace=self.GetClosurizedNamespace(
+                                                    whole_identifier_string))
                 else:
                     is_alias_definition = (token.metadata and
                                            token.metadata.is_alias_definition)
@@ -476,8 +476,10 @@ class ClosurizedNamespacesInfo(object):
                 if state_tracker.InFunction():
                     self._AddUsedNamespace(state_tracker, identifier, token)
                 elif cnamespace and cnamespace != 'goog':
-                    self._AddCreatedNamespace(state_tracker, identifier,
-                                              token.line_number, namespace=cnamespace)
+                    self._add_created_namespace(state_tracker,
+                                                identifier,
+                                                token.line_number,
+                                                namespace=cnamespace)
 
         elif token.type == JavaScriptTokenType.DOC_FLAG:
             flag = token.attached_object
@@ -491,8 +493,8 @@ class ClosurizedNamespacesInfo(object):
                     # Since we process doctypes only for implements and extends, the
                     # type is a simple one and we don't need any iteration for subtypes.
 
-    def _AddCreatedNamespace(self, state_tracker, identifier, line_number,
-                             namespace=None):
+    def _add_created_namespace(self, state_tracker, identifier, line_number,
+                               namespace=None):
         """Adds the namespace of an identifier to the list of created namespaces.
 
         If the identifier is annotated with a 'missingProvide' suppression, it is
