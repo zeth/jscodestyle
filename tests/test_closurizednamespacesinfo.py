@@ -508,7 +508,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
             {'dummy.xyz': 14,
              'lvalue.abc': 20}, missing_requires)
 
-    def test_IsFirstProvide(self):
+    def test_is_first_provide(self):
         """Tests operation of the isFirstProvide method."""
         input_lines = [
             'goog.provide(\'package.Foo\');',
@@ -517,7 +517,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
 
         token, namespaces_info = self._GetStartTokenAndNamespacesInfoForScript(
             input_lines, ['package'])
-        self.assertTrue(namespaces_info.IsFirstProvide(token))
+        self.assertTrue(namespaces_info.is_first_provide(token))
 
     def test_GetWholeIdentifierString(self):
         """Tests that created identifiers satisfy usage of the identifier."""
