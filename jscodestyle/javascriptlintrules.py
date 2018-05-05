@@ -78,7 +78,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         # a token as its value.
         self._unused_local_variables_by_scope = []
 
-    def HandleMissingParameterDoc(self, token, param_name):
+    def handle_missing_parameter_doc(self, token, param_name):
         """Handle errors associated with a parameter missing a param tag."""
         self._handle_error(errors.MISSING_PARAMETER_DOCUMENTATION,
                            'Missing docs for parameter: "%s"' % param_name, token)

@@ -117,7 +117,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         self.jslint_error = jslint_error or []
         self.strict = strict
 
-    def HandleMissingParameterDoc(self, token, param_name):
+    def handle_missing_parameter_doc(self, token, param_name):
         """Handle errors associated with a parameter missing a @param tag."""
         raise NotImplementedError
 
@@ -755,7 +755,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                             # JavaScript care but languages such as ActionScript or Java
                             # that allow variables to be typed don't care.
                             if not self._limited_doc_checks:
-                                self.HandleMissingParameterDoc(token, params_iter.next())
+                                self.handle_missing_parameter_doc(token, params_iter.next())
 
                         elif operation == 'D':
                             # Deletion
