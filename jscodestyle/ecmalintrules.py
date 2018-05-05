@@ -137,7 +137,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         # line-break locations.
         line_parts = []
         while token and token.line_number == line_number:
-            if state.IsTypeToken(token):
+            if state.is_type_token(token):
                 line_parts.insert(0, 'x' * len(token.string))
             elif token.type in (Type.IDENTIFIER, Type.OPERATOR):
                 # Dots are acceptable places to wrap (may be tokenized as identifiers).

@@ -1020,21 +1020,25 @@ class StateTracker(object):
         """
         return self._doc_flag
 
-    def IsTypeToken(self, t):
-        if self.InDocComment() and t.type not in (
+    def is_type_token(self, token):
+        if self.InDocComment() and token.type not in (
                 JSTTokenType.START_DOC_COMMENT,
                 JSTTokenType.DOC_FLAG,
                 JSTTokenType.DOC_INLINE_FLAG,
                 JSTTokenType.DOC_PREFIX):
-            f = tokenutil.SearchUntil(t,
-                                      [JSTTokenType.DOC_FLAG],
-                                      [JSTTokenType.START_DOC_COMMENT],
-                                      None,
-                                      True)
-            if (f and f.attached_object.type_start_token is not None
-                    and f.attached_object.type_end_token is not None):
-                return (tokenutil.Compare(t, f.attached_object.type_start_token) > 0
-                        and tokenutil.Compare(t, f.attached_object.type_end_token) < 0)
+            first_token = tokenutil.SearchUntil(
+                token,
+                [JSTTokenType.DOC_FLAG],
+                [JSTTokenType.START_DOC_COMMENT],
+                None,
+                True)
+            if (first_token and first_token.attached_object.type_start_token is not None
+                    and first_token.attached_object.type_end_token is not None):
+                return (tokenutil.Compare(
+                    token, first_token.attached_object.type_start_token) > 0
+                        and tokenutil.Compare(
+                            token,
+                            first_token.attached_object.type_end_token) < 0)
         return False
 
     def GetFunction(self):
