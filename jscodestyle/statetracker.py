@@ -21,12 +21,9 @@
 import re
 
 from jscodestyle import javascripttokenizer
-from jscodestyle import javascripttokens
+from jscodestyle.javascripttokens import JavaScriptTokenType as JSTTokenType
 from jscodestyle import tokenutil
 from jscodestyle import typeannotation
-
-# Shorthand
-Type = javascripttokens.JavaScriptTokenType
 
 
 class DocFlag(object):
@@ -232,8 +229,10 @@ class DocFlag(object):
         self.type_start_token = None
         self.type_end_token = None
         if self.flag_type in self.HAS_TYPE:
-            brace = tokenutil.SearchUntil(flag_token, [Type.DOC_START_BRACE],
-                                          Type.FLAG_ENDING_TYPES)
+            brace = tokenutil.SearchUntil(
+                flag_token,
+                [JSTTokenType.DOC_START_BRACE],
+                JSTTokenType.FLAG_ENDING_TYPES)
             if brace:
                 end_token, contents = _GetMatchingEndBraceAndContents(brace)
                 self.type = contents
@@ -242,8 +241,8 @@ class DocFlag(object):
                 self.type_start_token = brace
                 self.type_end_token = end_token
             elif (self.flag_type in self.TYPE_ONLY and
-                  flag_token.next.type not in Type.FLAG_ENDING_TYPES and
-                  flag_token.line_number == flag_token.next.line_number):
+                  flag_token.next.type not in JSTTokenType.FLAG_ENDING_TYPES
+                  and flag_token.line_number == flag_token.next.line_number):
                 # b/10407058. If the flag is expected to be followed by a type then
                 # search for type in same line only. If no token after flag in same
                 # line then conclude that no type is specified.
@@ -265,8 +264,11 @@ class DocFlag(object):
             # Handle good case, if found token is after type start, look for
             # a identifier (substring to cover cases like [cnt] b/4197272) after
             # type end, since types contain identifiers.
-            if (self.type and self.name_token and
-                tokenutil.Compare(self.name_token, self.type_start_token) > 0):
+            if (self.type
+                    and self.name_token
+                    and tokenutil.Compare(
+                        self.name_token,
+                        self.type_start_token) > 0):
                 self.name_token = _GetNextPartialIdentifierToken(self.type_end_token)
 
             if self.name_token:
@@ -288,9 +290,10 @@ class DocFlag(object):
             elif self.type:
                 search_start_token = self.type_end_token
 
-            interesting_token = tokenutil.Search(search_start_token,
-                Type.FLAG_DESCRIPTION_TYPES | Type.FLAG_ENDING_TYPES)
-            if interesting_token.type in Type.FLAG_DESCRIPTION_TYPES:
+            interesting_token = tokenutil.Search(
+                search_start_token,
+                JSTTokenType.FLAG_DESCRIPTION_TYPES | JSTTokenType.FLAG_ENDING_TYPES)
+            if interesting_token.type in JSTTokenType.FLAG_DESCRIPTION_TYPES:
                 self.description_start_token = interesting_token
                 self.description_end_token, self.description = (
                     _GetEndTokenAndContents(interesting_token))
@@ -418,15 +421,15 @@ class DocComment(object):
     def _YieldDescriptionTokens(self):
         for token in self.start_token:
 
-            if (token is self.end_token or
-                token.type is javascripttokens.JavaScriptTokenType.DOC_FLAG or
-                token.type not in javascripttokens.JavaScriptTokenType.COMMENT_TYPES):
+            if (token is self.end_token
+                    or token.type is JSTTokenType.DOC_FLAG
+                    or token.type not in JSTTokenType.COMMENT_TYPES):
                 return
 
             if token.type not in [
-                javascripttokens.JavaScriptTokenType.START_DOC_COMMENT,
-                javascripttokens.JavaScriptTokenType.END_DOC_COMMENT,
-                javascripttokens.JavaScriptTokenType.DOC_PREFIX]:
+                JSTTokenType.START_DOC_COMMENT,
+                JSTTokenType.END_DOC_COMMENT,
+                JSTTokenType.DOC_PREFIX]:
                 yield token
 
     @property
@@ -460,14 +463,14 @@ class DocComment(object):
             return
 
         skip_types = frozenset([
-            Type.WHITESPACE,
-            Type.BLANK_LINE,
-            Type.START_PAREN])
+            JSTTokenType.WHITESPACE,
+            JSTTokenType.BLANK_LINE,
+            JSTTokenType.START_PAREN])
 
         target_types = frozenset([
-            Type.FUNCTION_NAME,
-            Type.IDENTIFIER,
-            Type.SIMPLE_LVALUE])
+            JSTTokenType.FUNCTION_NAME,
+            JSTTokenType.IDENTIFIER,
+            JSTTokenType.SIMPLE_LVALUE])
 
         token = self.end_token.next
         while token:
@@ -478,21 +481,21 @@ class DocComment(object):
             if token.IsKeyword('var'):
                 next_code_token = tokenutil.CustomSearch(
                     token,
-                    lambda t: t.type not in Type.NON_CODE_TYPES)
+                    lambda t: t.type not in JSTTokenType.NON_CODE_TYPES)
 
                 if (next_code_token and
-                    next_code_token.IsType(Type.SIMPLE_LVALUE)):
+                    next_code_token.IsType(JSTTokenType.SIMPLE_LVALUE)):
                     return next_code_token
 
                 return
 
             # Handles the case of a comment on "function foo () {}"
-            if token.type is Type.FUNCTION_DECLARATION:
+            if token.type is JSTTokenType.FUNCTION_DECLARATION:
                 next_code_token = tokenutil.CustomSearch(
                     token,
-                    lambda t: t.type not in Type.NON_CODE_TYPES)
+                    lambda t: t.type not in JSTTokenType.NON_CODE_TYPES)
 
-                if next_code_token.IsType(Type.FUNCTION_NAME):
+                if next_code_token.IsType(JSTTokenType.FUNCTION_NAME):
                     return next_code_token
 
                 return
@@ -602,15 +605,15 @@ def _GetMatchingEndBraceAndContents(start_brace):
     # We don't consider the start brace part of the type string.
     token = start_brace.next
     while open_count != close_count:
-        if token.type == Type.DOC_START_BRACE:
+        if token.type == JSTTokenType.DOC_START_BRACE:
             open_count += 1
-        elif token.type == Type.DOC_END_BRACE:
+        elif token.type == JSTTokenType.DOC_END_BRACE:
             close_count += 1
 
-        if token.type != Type.DOC_PREFIX:
+        if token.type != JSTTokenType.DOC_PREFIX:
             contents.append(token.string)
 
-        if token.type in Type.FLAG_ENDING_TYPES:
+        if token.type in JSTTokenType.FLAG_ENDING_TYPES:
             break
         token = token.next
 
@@ -636,10 +639,10 @@ def _GetNextPartialIdentifierToken(start_token):
     """
     token = start_token.next
 
-    while token and token.type not in Type.FLAG_ENDING_TYPES:
+    while token and token.type not in JSTTokenType.FLAG_ENDING_TYPES:
         match = javascripttokenizer.JavaScriptTokenizer.IDENTIFIER.search(
             token.string)
-        if match is not None and token.type == Type.COMMENT:
+        if match is not None and token.type == JSTTokenType.COMMENT:
             return token
 
         token = token.next
@@ -665,7 +668,7 @@ def _GetEndTokenAndContents(start_token):
     last_token = None
     contents = ''
     doc_depth = 0
-    while not iterator.type in Type.FLAG_ENDING_TYPES or doc_depth > 0:
+    while not iterator.type in JSTTokenType.FLAG_ENDING_TYPES or doc_depth > 0:
         if (iterator.IsFirstInLine() and
             DocFlag.EMPTY_COMMENT_LINE.match(iterator.line)):
             # If we have a blank comment line, consider that an implicit
@@ -684,14 +687,14 @@ def _GetEndTokenAndContents(start_token):
         # don't prematurely match against a @flag if inside a doc flag
         # need to think about what is the correct behavior for unterminated
         # inline doc flags
-        if (iterator.type == Type.DOC_START_BRACE and
-            iterator.next.type == Type.DOC_INLINE_FLAG):
+        if (iterator.type == JSTTokenType.DOC_START_BRACE and
+            iterator.next.type == JSTTokenType.DOC_INLINE_FLAG):
             doc_depth += 1
-        elif (iterator.type == Type.DOC_END_BRACE and
+        elif (iterator.type == JSTTokenType.DOC_END_BRACE and
             doc_depth > 0):
             doc_depth -= 1
 
-        if iterator.type in Type.FLAG_DESCRIPTION_TYPES:
+        if iterator.type in JSTTokenType.FLAG_DESCRIPTION_TYPES:
             contents += iterator.string
             last_token = iterator
 
@@ -790,7 +793,7 @@ class StateTracker(object):
         """
         if not start_token:
             return
-        doc_flag_types = (Type.DOC_FLAG, Type.DOC_INLINE_FLAG)
+        doc_flag_types = (JSTTokenType.DOC_FLAG, JSTTokenType.DOC_INLINE_FLAG)
         for token in start_token:
             if token.type in doc_flag_types:
                 token.attached_object = self._doc_flag(token, error_handler)
@@ -969,7 +972,7 @@ class StateTracker(object):
         params = []
         if self._cumulative_params:
             params = re.compile(r'\s+').sub('', self._cumulative_params).split(',')
-            # Strip out the type from parameters of the form name:Type.
+            # Strip out the type from parameters of the form name:JSTTokenType.
             params = map(lambda param: param.split(':')[0], params)
 
         return params
@@ -1018,9 +1021,9 @@ class StateTracker(object):
         return self._doc_flag
 
     def IsTypeToken(self, t):
-        if self.InDocComment() and t.type not in (Type.START_DOC_COMMENT,
-            Type.DOC_FLAG, Type.DOC_INLINE_FLAG, Type.DOC_PREFIX):
-            f = tokenutil.SearchUntil(t, [Type.DOC_FLAG], [Type.START_DOC_COMMENT],
+        if self.InDocComment() and t.type not in (JSTTokenType.START_DOC_COMMENT,
+            JSTTokenType.DOC_FLAG, JSTTokenType.DOC_INLINE_FLAG, JSTTokenType.DOC_PREFIX):
+            f = tokenutil.SearchUntil(t, [JSTTokenType.DOC_FLAG], [JSTTokenType.START_DOC_COMMENT],
                                       None, True)
             if (f and f.attached_object.type_start_token is not None and
                 f.attached_object.type_end_token is not None):
@@ -1094,7 +1097,7 @@ class StateTracker(object):
 
         # Track block depth.
         type = token.type
-        if type == Type.START_BLOCK:
+        if type == JSTTokenType.START_BLOCK:
             self._block_depth += 1
 
             # Subclasses need to handle block start very differently because
@@ -1109,30 +1112,30 @@ class StateTracker(object):
                     function.parameters = self.GetParams()
 
         # Track block depth.
-        elif type == Type.END_BLOCK:
+        elif type == JSTTokenType.END_BLOCK:
             self._is_block_close = not self.InObjectLiteral()
             self._block_depth -= 1
             self._block_types.pop()
 
         # Track parentheses depth.
-        elif type == Type.START_PAREN:
+        elif type == JSTTokenType.START_PAREN:
             self._paren_depth += 1
 
         # Track parentheses depth.
-        elif type == Type.END_PAREN:
+        elif type == JSTTokenType.END_PAREN:
             self._paren_depth -= 1
 
-        elif type == Type.COMMENT:
+        elif type == JSTTokenType.COMMENT:
             self._last_comment = token.string
 
-        elif type == Type.START_DOC_COMMENT:
+        elif type == JSTTokenType.START_DOC_COMMENT:
             self._last_comment = None
             self._doc_comment = DocComment(token)
 
-        elif type == Type.END_DOC_COMMENT:
+        elif type == JSTTokenType.END_DOC_COMMENT:
             self._doc_comment.end_token = token
 
-        elif type in (Type.DOC_FLAG, Type.DOC_INLINE_FLAG):
+        elif type in (JSTTokenType.DOC_FLAG, JSTTokenType.DOC_INLINE_FLAG):
             # Don't overwrite flags if they were already parsed in a previous pass.
             if token.attached_object is None:
                 flag = self._doc_flag(token)
@@ -1144,8 +1147,8 @@ class StateTracker(object):
             if flag.flag_type == 'suppress':
                 self._doc_comment.AddSuppression(token)
 
-        elif type == Type.FUNCTION_DECLARATION:
-            last_code = tokenutil.SearchExcept(token, Type.NON_CODE_TYPES, None,
+        elif type == JSTTokenType.FUNCTION_DECLARATION:
+            last_code = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES, None,
                                                True)
             doc = None
             # Only top-level functions are eligible for documentation.
@@ -1162,20 +1165,20 @@ class StateTracker(object):
                 # declarations (bug 1220601) like:
                 # my.function.foo.
                 #   bar = function() ...
-                identifier = tokenutil.Search(last_code, Type.SIMPLE_LVALUE, None, True)
+                identifier = tokenutil.Search(last_code, JSTTokenType.SIMPLE_LVALUE, None, True)
                 while identifier and tokenutil.IsIdentifierOrDot(identifier):
                     name = identifier.string + name
                     # Traverse behind us, skipping whitespace and comments.
                     while True:
                         identifier = identifier.previous
-                        if not identifier or not identifier.type in Type.NON_CODE_TYPES:
+                        if not identifier or not identifier.type in JSTTokenType.NON_CODE_TYPES:
                             break
 
             else:
-                next_token = tokenutil.SearchExcept(token, Type.NON_CODE_TYPES)
-                while next_token and next_token.IsType(Type.FUNCTION_NAME):
+                next_token = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES)
+                while next_token and next_token.IsType(JSTTokenType.FUNCTION_NAME):
                     name += next_token.string
-                    next_token = tokenutil.Search(next_token, Type.FUNCTION_NAME, 2)
+                    next_token = tokenutil.Search(next_token, JSTTokenType.FUNCTION_NAME, 2)
 
             function = Function(self._block_depth, is_assigned, doc, name)
             function.start_token = token
@@ -1188,37 +1191,37 @@ class StateTracker(object):
             # function declaration ends.
             self._variables_in_scope.append('')
 
-        elif type == Type.START_PARAMETERS:
+        elif type == JSTTokenType.START_PARAMETERS:
             self._cumulative_params = ''
 
-        elif type == Type.PARAMETERS:
+        elif type == JSTTokenType.PARAMETERS:
             self._cumulative_params += token.string
             self._variables_in_scope.extend(self.GetParams())
 
-        elif type == Type.KEYWORD and token.string == 'return':
-            next_token = tokenutil.SearchExcept(token, Type.NON_CODE_TYPES)
-            if not next_token.IsType(Type.SEMICOLON):
+        elif type == JSTTokenType.KEYWORD and token.string == 'return':
+            next_token = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES)
+            if not next_token.IsType(JSTTokenType.SEMICOLON):
                 function = self.GetFunction()
                 if function:
                     function.has_return = True
 
-        elif type == Type.KEYWORD and token.string == 'throw':
+        elif type == JSTTokenType.KEYWORD and token.string == 'throw':
             function = self.GetFunction()
             if function:
                 function.has_throw = True
 
-        elif type == Type.KEYWORD and token.string == 'var':
+        elif type == JSTTokenType.KEYWORD and token.string == 'var':
             function = self.GetFunction()
-            next_token = tokenutil.Search(token, [Type.IDENTIFIER,
-                                                  Type.SIMPLE_LVALUE])
+            next_token = tokenutil.Search(token, [JSTTokenType.IDENTIFIER,
+                                                  JSTTokenType.SIMPLE_LVALUE])
 
             if next_token:
-                if next_token.type == Type.SIMPLE_LVALUE:
+                if next_token.type == JSTTokenType.SIMPLE_LVALUE:
                     self._variables_in_scope.append(next_token.values['identifier'])
                 else:
                     self._variables_in_scope.append(next_token.string)
 
-        elif type == Type.SIMPLE_LVALUE:
+        elif type == JSTTokenType.SIMPLE_LVALUE:
             identifier = token.values['identifier']
             jsdoc = self.GetDocComment()
             if jsdoc:
@@ -1226,14 +1229,14 @@ class StateTracker(object):
 
             self._HandleIdentifier(identifier, True)
 
-        elif type == Type.IDENTIFIER:
+        elif type == JSTTokenType.IDENTIFIER:
             self._HandleIdentifier(token.string, False)
 
             # Detect documented non-assignments.
-            next_token = tokenutil.SearchExcept(token, Type.NON_CODE_TYPES)
-            if next_token and next_token.IsType(Type.SEMICOLON):
+            next_token = tokenutil.SearchExcept(token, JSTTokenType.NON_CODE_TYPES)
+            if next_token and next_token.IsType(JSTTokenType.SEMICOLON):
                 if (self._last_non_space_token and
-                    self._last_non_space_token.IsType(Type.END_DOC_COMMENT)):
+                    self._last_non_space_token.IsType(JSTTokenType.END_DOC_COMMENT)):
                     self._documented_identifiers.add(token.string)
 
     def _HandleIdentifier(self, identifier, is_assignment):
@@ -1261,17 +1264,17 @@ class StateTracker(object):
           token: The token to handle.
         """
         type = token.type
-        if type == Type.SEMICOLON or type == Type.END_PAREN or (
-            type == Type.END_BRACKET and
+        if type == JSTTokenType.SEMICOLON or type == JSTTokenType.END_PAREN or (
+            type == JSTTokenType.END_BRACKET and
             self._last_non_space_token.type not in (
-                Type.SINGLE_QUOTE_STRING_END, Type.DOUBLE_QUOTE_STRING_END,
-                Type.TEMPLATE_STRING_END)):
+                JSTTokenType.SINGLE_QUOTE_STRING_END, JSTTokenType.DOUBLE_QUOTE_STRING_END,
+                JSTTokenType.TEMPLATE_STRING_END)):
             # We end on any numeric array index, but keep going for string based
             # array indices so that we pick up manually exported identifiers.
             self._doc_comment = None
             self._last_comment = None
 
-        elif type == Type.END_BLOCK:
+        elif type == JSTTokenType.END_BLOCK:
             self._doc_comment = None
             self._last_comment = None
 
@@ -1289,11 +1292,11 @@ class StateTracker(object):
                 if self._variables_in_scope:
                     self._variables_in_scope.pop()
 
-        elif type == Type.END_PARAMETERS and self._doc_comment:
+        elif type == JSTTokenType.END_PARAMETERS and self._doc_comment:
             self._doc_comment = None
             self._last_comment = None
 
-        if not token.IsAnyType(Type.WHITESPACE, Type.BLANK_LINE):
+        if not token.IsAnyType(JSTTokenType.WHITESPACE, JSTTokenType.BLANK_LINE):
             self._last_non_space_token = token
 
         self._last_line = token.line
