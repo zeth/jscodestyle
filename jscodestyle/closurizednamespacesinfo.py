@@ -307,16 +307,16 @@ class ClosurizedNamespacesInfo(object):
                     created_identifiers,
                     missing_requires)):
                 continue
-            if self._FindNamespace(used_ns.identifier, self._provided_namespaces,
-                                   created_identifiers, external_dependencies,
-                                   missing_requires):
+            if self._find_namespace(used_ns.identifier, self._provided_namespaces,
+                                    created_identifiers, external_dependencies,
+                                    missing_requires):
                 continue
             namespace = used_ns.identifier.rsplit('.', 1)[0]
             illegal_alias_statements[namespace] = used_ns.token
 
         return missing_requires, illegal_alias_statements
 
-    def _FindNamespace(self, identifier, *namespaces_list):
+    def _find_namespace(self, identifier, *namespaces_list):
         """Finds the namespace of an identifier given a list of other namespaces.
 
         Args:
