@@ -279,27 +279,27 @@ class ClosurizedNamespacesInfo(object):
 
         # First check all the used identifiers where we know that their namespace
         # needs to be provided (unless they are optional).
-        for ns in self._used_namespaces:
-            namespace = ns.namespace
-            identifier = ns.identifier
-            if (not ns.alias_definition and ShouldRequireNamespace(
+        for used_ns in self._used_namespaces:
+            namespace = used_ns.namespace
+            identifier = used_ns.identifier
+            if (not used_ns.alias_definition and ShouldRequireNamespace(
                     namespace, identifier)):
-                missing_requires[namespace] = ns.get_line()
+                missing_requires[namespace] = used_ns.get_line()
 
         # Now that all required namespaces are known, we can check if the alias
         # definitions (that are likely being used for typeannotations that don't
         # need explicit goog.require statements) are already covered. If not
         # the user shouldn't use the alias.
-        for ns in self._used_namespaces:
-            if (not ns.alias_definition or not ShouldRequireNamespace(
-                    ns.namespace, ns.identifier)):
+        for used_ns in self._used_namespaces:
+            if (not used_ns.alias_definition or not ShouldRequireNamespace(
+                    used_ns.namespace, used_ns.identifier)):
                 continue
-            if self._FindNamespace(ns.identifier, self._provided_namespaces,
+            if self._FindNamespace(used_ns.identifier, self._provided_namespaces,
                                    created_identifiers, external_dependencies,
                                    missing_requires):
                 continue
-            namespace = ns.identifier.rsplit('.', 1)[0]
-            illegal_alias_statements[namespace] = ns.token
+            namespace = used_ns.identifier.rsplit('.', 1)[0]
+            illegal_alias_statements[namespace] = used_ns.token
 
         return missing_requires, illegal_alias_statements
 
