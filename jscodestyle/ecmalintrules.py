@@ -135,18 +135,18 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
         # Build a representation of the string where spaces indicate potential
         # line-break locations.
-        line = []
+        line_parts = []
         while token and token.line_number == line_number:
             if state.IsTypeToken(token):
-                line.insert(0, 'x' * len(token.string))
+                line_parts.insert(0, 'x' * len(token.string))
             elif token.type in (Type.IDENTIFIER, Type.OPERATOR):
                 # Dots are acceptable places to wrap (may be tokenized as identifiers).
-                line.insert(0, token.string.replace('.', ' '))
+                line_parts.insert(0, token.string.replace('.', ' '))
             else:
-                line.insert(0, token.string)
+                line_parts.insert(0, token.string)
             token = token.previous
 
-        line = ''.join(line)
+        line = ''.join(line_parts)
         line = line.rstrip('\n\r\f')
         try:
             length = len(unicode(line, 'utf-8'))
@@ -161,7 +161,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         if length > EcmaScriptLintRules.max_line_length:
 
             # If the line matches one of the exceptions, then it's ok.
-            for long_line_regexp in self.GetLongLineExceptions():
+            for long_line_regexp in self.get_long_line_exceptions():
                 if long_line_regexp.match(last_token.line):
                     return
 
@@ -274,7 +274,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 'Binary operator must go on previous line "%s"' % token.string,
                 token)
 
-    def _IsLabel(self, token):
+    @staticmethod
+    def _is_label(token):
         # A ':' token is considered part of a label if it occurs in a case
         # statement, a plain label, or an object literal, i.e. is not part of a
         # ternary.
@@ -302,7 +303,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         # Colons should appear in labels, object literals, the case of a switch
         # statement, and ternary operator. Only want a space in the case of the
         # ternary operator.
-        if self._IsLabel(token):
+        if self._is_label(token):
             return False
 
         if token.metadata.IsUnaryOperator() and token.IsFirstInLine():
@@ -687,7 +688,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                                 '@suppress {underscore} is not necessary with @private',
                                 jsdoc.suppressions['underscore'])
                     elif (jsdoc.HasFlag('private') and
-                          not self.InExplicitlyTypedLanguage()):
+                          not self.in_explicitly_typed_language()):
                         # It is convention to hide public fields in some ECMA
                         # implementations from documentation using the @private tag.
                         self._handle_error(
@@ -864,7 +865,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 str(e),
                 last_non_space_token)
 
-    def GetLongLineExceptions(self):
+    @staticmethod
+    def get_long_line_exceptions():
         """Gets a list of regexps for lines which can be longer than the limit.
 
         Returns:
@@ -872,7 +874,8 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         """
         return []
 
-    def InExplicitlyTypedLanguage(self):
+    @staticmethod
+    def in_explicitly_typed_language():
         """Returns whether this ecma implementation is explicitly typed."""
         return False
 

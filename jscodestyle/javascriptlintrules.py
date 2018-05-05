@@ -763,7 +763,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 position=Position.AtBeginning(),
                 fix_data=first_require_token)
 
-    def GetLongLineExceptions(self):
+    @staticmethod
+    def get_long_line_exceptions():
         """Gets a list of regexps for lines which can be longer than the limit.
 
         Returns:
