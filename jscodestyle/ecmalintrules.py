@@ -208,7 +208,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         for sub_type in js_type.IterTypes():
             self._check_jsdoc_type(token, sub_type)
 
-    def _check_for_missing_space_before_token(self, token):
+    def _missing_space_before_token(self, token):
         """Checks for a missing space at the beginning of a token.
 
         Reports a MISSING_SPACE error if the token does not begin with a space or
@@ -229,7 +229,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 token,
                 position=Position.AtBeginning())
 
-    def _CheckOperator(self, token):
+    def _check_operator(self, token):
         """Checks an operator for spacing and line style.
 
         Args:
@@ -237,7 +237,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         """
         last_code = token.metadata.last_code
 
-        if not self._ExpectSpaceBeforeOperator(token):
+        if not self._expect_space_before_operator(token):
             if (token.previous
                     and token.previous.type == Type.WHITESPACE
                     and last_code
@@ -285,7 +285,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                                                 Context.CASE_BLOCK,
                                                 Context.STATEMENT))
 
-    def _ExpectSpaceBeforeOperator(self, token):
+    def _expect_space_before_operator(self, token):
         """Returns whether a space should appear before the given operator token.
 
         Args:
@@ -352,7 +352,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
 
         elif (token_type == Type.START_BLOCK and
               token.metadata.context.type == Context.BLOCK):
-            self._check_for_missing_space_before_token(token)
+            self._missing_space_before_token(token)
 
         elif token_type == Type.END_BLOCK:
             last_code = token.metadata.last_code
@@ -523,7 +523,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                         position=Position(1, len(token.string) - 1))
 
         elif token_type == Type.OPERATOR:
-            self._CheckOperator(token)
+            self._check_operator(token)
         elif token_type == Type.DOC_FLAG:
             flag = token.attached_object
 
@@ -602,11 +602,11 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                             errors.MISSING_JSDOC_TAG_DESCRIPTION,
                             'Missing description in %s tag' % flag_name, token)
                 else:
-                    self._check_for_missing_space_before_token(flag.description_start_token)
+                    self._missing_space_before_token(flag.description_start_token)
 
             if flag.HasType():
                 if flag.type_start_token is not None:
-                    self._check_for_missing_space_before_token(
+                    self._missing_space_before_token(
                         token.attached_object.type_start_token)
 
                 if flag.jstype and not flag.jstype.IsEmpty():

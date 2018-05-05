@@ -141,7 +141,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             flag = token.attached_object
 
             if flag.flag_type == 'param' and flag.name_token is not None:
-                self._check_for_missing_space_before_token(
+                self._missing_space_before_token(
                     token.attached_object.name_token)
 
                 if flag.type is not None and flag.name is not None:
