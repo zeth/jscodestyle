@@ -359,7 +359,7 @@ class ClosurizedNamespacesInfo(object):
         """Returns whether token is the last require token."""
         return self._require_tokens and token == self._require_tokens[-1]
 
-    def ProcessToken(self, token, state_tracker):
+    def process_token(self, token, state_tracker):
         """Processes the given token for dependency information.
 
         Args:

@@ -462,7 +462,7 @@ class EcmaMetaDataPass(object):
         """Processes the token stream starting with the given token."""
         self._token = first_token
         while self._token:
-            self._ProcessToken()
+            self._process_token()
 
             if self._token.IsCode():
                 self._last_code = self._token
@@ -475,7 +475,7 @@ class EcmaMetaDataPass(object):
             # Ignore the "popped to root" error.
             pass
 
-    def _ProcessToken(self):
+    def _process_token(self):
         """Process the given token."""
         token = self._token
         token.metadata = self._CreateMetaData()

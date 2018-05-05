@@ -854,7 +854,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
 
         while token:
             state_tracker.HandleToken(token, state_tracker.GetLastNonSpaceToken())
-            namespaces_info.ProcessToken(token, state_tracker)
+            namespaces_info.process_token(token, state_tracker)
             state_tracker.HandleAfterToken(token)
             token = token.next
 

@@ -120,4 +120,4 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         Args:
           token: The token to process.
         """
-        self.namespaces_info.ProcessToken(token, self._state_tracker)
+        self.namespaces_info.process_token(token, self._state_tracker)
