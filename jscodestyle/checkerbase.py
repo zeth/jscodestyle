@@ -200,7 +200,7 @@ class CheckerBase(object):
           Exception: If any error occurred while calling the given function.
         """
 
-        self._state_tracker.Reset()
+        self._state_tracker.reset()
         while token:
             # When we are looking at a token and decided to delete the whole line, we
             # will delete all of them in the "HandleToken()" below.  So the current

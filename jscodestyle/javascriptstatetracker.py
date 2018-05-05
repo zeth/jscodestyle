@@ -67,10 +67,10 @@ class JavaScriptStateTracker(statetracker.StateTracker):
         """Initializes a JavaScript token stream state tracker."""
         statetracker.StateTracker.__init__(self, JsDocFlag)
 
-    def Reset(self):
+    def reset(self):
         self._scope_depth = 0
         self._block_stack = []
-        super(JavaScriptStateTracker, self).Reset()
+        super(JavaScriptStateTracker, self).reset()
 
     def InTopLevel(self):
         """Compute whether we are at the top level in the class.

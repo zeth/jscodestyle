@@ -101,7 +101,7 @@ class JavaScriptStyleChecker(checkerbase.CheckerBase):
         # To maximize the amount of errors that get reported before a parse error
         # is displayed, don't run the dependency pass if a parse error exists.
         if self.namespaces_info:
-            self.namespaces_info.Reset()
+            self.namespaces_info.reset()
             self._execute_pass(start_token, self._dependency_pass, stop_token)
 
         self._execute_pass(start_token, self._lint_pass, stop_token)

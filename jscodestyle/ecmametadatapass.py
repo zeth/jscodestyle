@@ -233,9 +233,9 @@ class EcmaMetaDataPass(object):
 
     def __init__(self):
         """Initialize the meta data pass object."""
-        self.Reset()
+        self.reset()
 
-    def Reset(self):
+    def reset(self):
         """Resets the metadata pass to prepare for the next file."""
         self._token = None
         self._context = None

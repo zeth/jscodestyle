@@ -27,11 +27,9 @@ processed to determine if they constitute the creation or usage of a dependency.
 
 import re
 
-from jscodestyle import javascripttokens
+from jscodestyle.javascripttokens import JavaScriptTokenType
 from jscodestyle import tokenutil
 
-# pylint: disable=g-bad-name
-TokenType = javascripttokens.JavaScriptTokenType
 
 DEFAULT_EXTRA_NAMESPACES = [
     'goog.testing.asserts',
@@ -57,7 +55,8 @@ class UsedNamespace(object):
         self.token = token
         self.alias_definition = alias_definition
 
-    def GetLine(self):
+    def get_line(self):
+        """Get the line number of the token."""
         return self.token.line_number
 
     def __repr__(self):
@@ -86,9 +85,9 @@ class ClosurizedNamespacesInfo(object):
         self._closurized_namespaces = closurized_namespaces
         self._ignored_extra_namespaces = (ignored_extra_namespaces +
                                           DEFAULT_EXTRA_NAMESPACES)
-        self.Reset()
+        self.reset()
 
-    def Reset(self):
+    def reset(self):
         """Resets the internal state to prepare for processing a new file."""
 
         # A list of goog.provide tokens in the order they appeared in the file.
@@ -210,7 +209,7 @@ class ClosurizedNamespacesInfo(object):
         # TODO(user): There's probably a faster way to compute this.
         for ns in self._used_namespaces:
             if (not ns.alias_definition and (
-                namespace == ns.namespace or namespace == ns.identifier)):
+                    namespace == ns.namespace or namespace == ns.identifier)):
                 return False
 
         return True
@@ -225,11 +224,11 @@ class ClosurizedNamespacesInfo(object):
         """
         missing_provides = dict()
         for namespace, identifier, line_number in self._created_namespaces:
-            if (not self._IsPrivateIdentifier(identifier) and
-                namespace not in self._provided_namespaces and
-                identifier not in self._provided_namespaces and
-                namespace not in self._required_namespaces and
-                namespace not in missing_provides):
+            if (not self._IsPrivateIdentifier(identifier)
+                    and namespace not in self._provided_namespaces
+                    and identifier not in self._provided_namespaces
+                    and namespace not in self._required_namespaces
+                    and namespace not in missing_provides):
                 missing_provides[namespace] = line_number
 
         return missing_provides
@@ -262,7 +261,7 @@ class ClosurizedNamespacesInfo(object):
 
         created_identifiers = set()
         for unused_namespace, identifier, unused_line_number in (
-            self._created_namespaces):
+                self._created_namespaces):
             created_identifiers.add(identifier)
 
         missing_requires = dict()
@@ -283,17 +282,17 @@ class ClosurizedNamespacesInfo(object):
         for ns in self._used_namespaces:
             namespace = ns.namespace
             identifier = ns.identifier
-            if (not ns.alias_definition and
-                ShouldRequireNamespace(namespace, identifier)):
-                missing_requires[namespace] = ns.GetLine()
+            if (not ns.alias_definition and ShouldRequireNamespace(
+                    namespace, identifier)):
+                missing_requires[namespace] = ns.get_line()
 
         # Now that all required namespaces are known, we can check if the alias
         # definitions (that are likely being used for typeannotations that don't
         # need explicit goog.require statements) are already covered. If not
         # the user shouldn't use the alias.
         for ns in self._used_namespaces:
-            if (not ns.alias_definition or
-                not ShouldRequireNamespace(ns.namespace, ns.identifier)):
+            if (not ns.alias_definition or not ShouldRequireNamespace(
+                    ns.namespace, ns.identifier)):
                 continue
             if self._FindNamespace(ns.identifier, self._provided_namespaces,
                                    created_identifiers, external_dependencies,
@@ -363,7 +362,7 @@ class ClosurizedNamespacesInfo(object):
         # - The number of function calls has been minimized (thus the length of this
         #   function.
 
-        if token.type == TokenType.IDENTIFIER:
+        if token.type == JavaScriptTokenType.IDENTIFIER:
             # TODO(user): Consider saving the whole identifier in metadata.
             whole_identifier_string = tokenutil.GetIdentifierForToken(token)
             if whole_identifier_string is None:
@@ -408,7 +407,7 @@ class ClosurizedNamespacesInfo(object):
 
                 # Since the message is optional, we don't want to scan to later lines.
                 for t in tokenutil.GetAllTokensInSameLine(token):
-                    if t.type == TokenType.STRING_TEXT:
+                    if t.type == JavaScriptTokenType.STRING_TEXT:
                         message = t.string
 
                         if re.match(r'^\w+(\.\w+)+$', message):
@@ -443,7 +442,7 @@ class ClosurizedNamespacesInfo(object):
                     self._AddUsedNamespace(state_tracker, whole_identifier_string,
                                            token, is_alias_definition)
 
-        elif token.type == TokenType.SIMPLE_LVALUE:
+        elif token.type == JavaScriptTokenType.SIMPLE_LVALUE:
             identifier = token.values['identifier']
             start_token = tokenutil.GetIdentifierStart(token)
             if start_token and start_token != token:
@@ -451,11 +450,12 @@ class ClosurizedNamespacesInfo(object):
                 identifier = tokenutil.GetIdentifierForToken(start_token)
             else:
                 start_token = token
+
             # If an alias is defined on the start_token, use it instead.
-            if (start_token and
-                start_token.metadata and
-                start_token.metadata.aliased_symbol and
-                not start_token.metadata.is_alias_definition):
+            if (start_token
+                    and start_token.metadata
+                    and start_token.metadata.aliased_symbol
+                    and not start_token.metadata.is_alias_definition):
                 identifier = start_token.metadata.aliased_symbol
 
             if identifier:
@@ -466,7 +466,7 @@ class ClosurizedNamespacesInfo(object):
                     self._AddCreatedNamespace(state_tracker, identifier,
                                               token.line_number, namespace=namespace)
 
-        elif token.type == TokenType.DOC_FLAG:
+        elif token.type == JavaScriptTokenType.DOC_FLAG:
             flag = token.attached_object
             flag_type = flag.flag_type
             if flag and flag.HasType() and flag.jstype:

@@ -759,9 +759,9 @@ class StateTracker(object):
               documentation flags.
         """
         self._doc_flag = doc_flag
-        self.Reset()
+        self.reset()
 
-    def Reset(self):
+    def reset(self):
         """Resets the state tracker to prepare for processing a new page."""
         self._block_depth = 0
         self._is_block_close = False
