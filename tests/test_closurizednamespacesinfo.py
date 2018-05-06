@@ -844,7 +844,7 @@ class ClosurizedNamespacesInfoTest(unittest.TestCase):
         state_tracker = javascriptstatetracker.JavaScriptStateTracker()
 
         ecma_pass = ecmametadatapass.EcmaMetaDataPass()
-        ecma_pass.Process(token)
+        ecma_pass.process(token)
 
         state_tracker.doc_flag_pass(token, error_handler=None)
 

@@ -458,7 +458,7 @@ class EcmaMetaDataPass(object):
         elif token_type == TokenType.SEMICOLON:
             self._end_statement()
 
-    def Process(self, first_token):
+    def process(self, first_token):
         """Processes the token stream starting with the given token."""
         self._token = first_token
         while self._token:

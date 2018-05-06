@@ -185,7 +185,7 @@ def RunMetaDataPass(start_token,
     """
 
     try:
-        metadata_pass.Process(start_token)
+        metadata_pass.process(start_token)
     except ecmametadatapass.ParseError, parse_err:
         if error_trace:
             traceback.print_exc()

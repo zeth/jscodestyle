@@ -52,7 +52,7 @@ def TokenizeSourceAndRunEcmaPass(source):
     """
     start_token = TokenizeSource(source)
     ecma_pass = ecmametadatapass.EcmaMetaDataPass()
-    ecma_pass.Process(start_token)
+    ecma_pass.process(start_token)
     return start_token
 
 
