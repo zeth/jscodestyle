@@ -153,7 +153,7 @@ class JavaScriptToken(tokens.Token):
 
     def IsCode(self):
         """Tests if this token is code, as opposed to a comment or
-whitespace."""
+        whitespace."""
         return self.type not in JavaScriptTokenType.NON_CODE_TYPES
 
     def __repr__(self):
