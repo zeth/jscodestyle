@@ -54,6 +54,17 @@ MISSING_JSDOC_THIS = (
 MISSING_NL_GI = 'Missing newline between constructor and goog.inherits',
 SET_NS_TEST_ONLY = (' *Test namespaces must be mentioned in the '
                     'goog.setTestOnly() call')
+MISSING_PROVIDES_MSG = 'Missing the following goog.provide statements:\n'
+MISSING_REQUIRES_MSG = 'Missing the following goog.require statements:\n'
+ILLEGAL_ALIAS = (
+    'The alias definition would need the namespace \'%s\' which is not '
+    'required through any other symbol.'
+)
+FIRST_LINE = '\nFirst line where required: \n'
+PROVIDES_NOT_ALPHABETIZED = (
+    'goog.provide classes must be alphabetized.  The correct code is:\n')
+REQUIRES_NOT_ALPHABETIZED = (
+    'goog.require classes must be alphabetized.  The correct code is:\n')
 
 
 class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
@@ -302,7 +313,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         # A blank line.
                         blank_lines += 1
                     elif (token.type == Type.WHITESPACE
-                              and not token.line.strip()):
+                          and not token.line.strip()):
                         # A line with only whitespace on it.
                         blank_lines += 1
                     token = token.previous
@@ -625,11 +636,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     # unused locals stack.
                     self._unused_local_vars_by_scope[-1][identifier] = token
                 elif token.type == Type.IDENTIFIER:
-                    # This covers most cases where the variable is used as an identifier.
+                    # This covers most cases where the variable is
+                    # used as an identifier.
                     self._MarkLocalVariableUsed(token.string)
                 elif token.type == Type.SIMPLE_LVALUE and '.' in identifier:
-                    # This covers cases where a value is assigned to a property of the
-                    # variable.
+                    # This covers cases where a value is assigned to a
+                    # property of the variable.
                     self._MarkLocalVariableUsed(token.string)
         elif token.type == Type.START_BLOCK:
             if in_function and state.is_function_open():
@@ -648,7 +660,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             # Flags that use aliased symbols should be counted.
             flag = token.attached_object
             js_type = flag and flag.jstype
-            if flag and flag.flag_type in state.get_doc_flag().HAS_TYPE and js_type:
+            if (flag
+                    and flag.flag_type in state.get_doc_flag().HAS_TYPE
+                    and js_type):
                 self._MarkAliasUsed(js_type)
 
     def _MarkAliasUsed(self, js_type):
@@ -674,12 +688,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         matches the given identifier as used.
 
         Args:
-          identifier: The identifier representing the potential usage of a local
-                      variable.
+          identifier: The identifier representing the potential usage of
+                      a local variable.
         """
         identifier = identifier.split('.', 1)[0]
-        # Find the first instance of the identifier in the stack of function scopes
-        # and mark it used.
+        # Find the first instance of the identifier in the stack of
+        # function scopes and mark it used.
         for unused_local_variables in reversed(
                 self._unused_local_vars_by_scope):
             if identifier in unused_local_variables:
@@ -690,17 +704,19 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         """Reports missing provide statements to the error handler.
 
         Args:
-          missing_provides: A dictionary of string(key) and integer(value) where
-              each string(key) is a namespace that should be provided, but is not
-              and integer(value) is first line number where it's required.
-          token: The token where the error was detected (also where the new provides
-              will be inserted.
-          need_blank_line: Whether a blank line needs to be inserted after the new
-              provides are inserted. May be True, False, or None, where None
-              indicates that the insert location is unknown.
+          missing_provides: A dictionary of string(key) and integer(value)
+                            where each string(key) is a namespace that should
+                            be provided, but is not and integer(value) is
+                            first line number where it's required.
+          token: The token where the error was detected (also where the new
+                 provides will be inserted.
+          need_blank_line: Whether a blank line needs to be inserted after the
+                           new provides are inserted. May be True, False, or
+                           None, where None indicates that the insert location
+                           is unknown.
         """
-
-        missing_provides_msg = 'Missing the following goog.provide statements:\n'
+        missing_provides_msg = ""
+        missing_provides_msg += MISSING_PROVIDES_MSG
         missing_provides_msg += '\n'.join(['goog.provide(\'%s\');' % x for x in
                                            sorted(missing_provides)])
         missing_provides_msg += '\n'
@@ -721,22 +737,24 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         """Reports missing require statements to the error handler.
 
         Args:
-          missing_requires: A dictionary of string(key) and integer(value) where
-              each string(key) is a namespace that should be required, but is not
-              and integer(value) is first line number where it's required.
-          token: The token where the error was detected (also where the new requires
-              will be inserted.
-          need_blank_line: Whether a blank line needs to be inserted before the new
-              requires are inserted. May be True, False, or None, where None
-              indicates that the insert location is unknown.
+          missing_requires: A dictionary of string(key) and integer(value)
+                            where each string(key) is a namespace that should
+                            be required, but is not and integer(value) is first
+                            line number where it's required.
+          token: The token where the error was detected (also where the new
+                 requires will be inserted.
+          need_blank_line: Whether a blank line needs to be inserted before the
+                           new requires are inserted. May be True, False, or
+                           None, where None indicates that the insert location
+                           is unknown.
         """
-
-        missing_requires_msg = 'Missing the following goog.require statements:\n'
+        missing_requires_msg = ""
+        missing_requires_msg += MISSING_REQUIRES_MSG
         missing_requires_msg += '\n'.join(['goog.require(\'%s\');' % x for x in
                                            sorted(missing_requires)])
         missing_requires_msg += '\n'
 
-        missing_requires_msg += '\nFirst line where required: \n'
+        missing_requires_msg += FIRST_LINE
         missing_requires_msg += '\n'.join(
             ['  %s : line %d' % (x, missing_requires[x]) for x in
              sorted(missing_requires)])
@@ -753,17 +771,18 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         for namespace, token in illegal_alias_statements.iteritems():
             self._handle_error(
                 errors.ALIAS_STMT_NEEDS_GOOG_REQUIRE,
-                'The alias definition would need the namespace \'%s\' which is not '
-                'required through any other symbol.' % namespace,
+                ILLEGAL_ALIAS % namespace,
                 token, position=Position.AtBeginning())
 
     def finish(self, state):
-        """Perform all checks that need to occur after all lines are processed."""
+        """Perform all checks that need to occur after all lines are
+        processed."""
         # Call the base class's finish function.
         super(JavaScriptLintRules, self).finish(state)
 
         if self.should_check(Rule.UNUSED_PRIVATE_MEMBERS):
-            # Report an error for any declared private member that was never used.
+            # Report an error for any declared private member that was
+            # never used.
             unused_private_members = (self._declared_private_members -
                                       self._used_private_members)
 
@@ -781,8 +800,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
         ns_info = self._namespaces_info
         if ns_info is not None:
-            # If there are no provide or require statements, missing provides and
-            # requires should be reported on line 1.
+            # If there are no provide or require statements, missing
+            # provides and requires should be reported on line 1.
             if (not ns_info.get_provided_namespaces()
                     and not ns_info.get_required_namespaces()):
                 missing_provides = ns_info.get_missing_provides()
@@ -790,7 +809,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     self._ReportMissingProvides(
                         missing_provides, state.get_first_token(), None)
 
-                missing_requires, illegal_alias = ns_info.get_missing_requires()
+                missing_requires, illegal_alias = \
+                    ns_info.get_missing_requires()
                 if missing_requires:
                     self._ReportMissingRequires(
                         missing_requires, state.get_first_token(), None)
@@ -800,13 +820,15 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         self._CheckSortedRequiresProvides(state.get_first_token())
 
     def _CheckSortedRequiresProvides(self, token):
-        """Checks that all goog.require and goog.provide statements are sorted.
+        """Checks that all goog.require and goog.provide statements are
+        sorted.
 
-        Note that this method needs to be run after missing statements are added to
-        preserve alphabetical order.
+        Note that this method needs to be run after missing statements
+        are added to preserve alphabetical order.
 
         Args:
           token: The first token in the token stream.
+
         """
         sorter = requireprovidesorter.RequireProvideSorter()
         first_provide_token = sorter.CheckProvides(token)
@@ -814,8 +836,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             new_order = sorter.GetFixedProvideString(first_provide_token)
             self._handle_error(
                 errors.GOOG_PROVIDES_NOT_ALPHABETIZED,
-                'goog.provide classes must be alphabetized.  The correct code is:\n' +
-                new_order,
+                PROVIDES_NOT_ALPHABETIZED + new_order,
                 first_provide_token,
                 position=Position.AtBeginning(),
                 fix_data=first_provide_token)
@@ -825,8 +846,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             new_order = sorter.GetFixedRequireString(first_require_token)
             self._handle_error(
                 errors.GOOG_REQUIRES_NOT_ALPHABETIZED,
-                'goog.require classes must be alphabetized.  The correct code is:\n' +
-                new_order,
+                REQUIRES_NOT_ALPHABETIZED + new_order,
                 first_require_token,
                 position=Position.AtBeginning(),
                 fix_data=first_require_token)
@@ -839,8 +859,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
           A list of regexps, used as matches (rather than searches).
         """
         return [
-            re.compile(r'((var|let|const) .+\s*=\s*)?goog\.require\(.+\);?\s*$'),
-            re.compile(r'goog\.(forwardDeclare|module|provide|setTestOnly)'
-                       r'\(.+\);?\s*$'),
-            re.compile(r'[\s/*]*@visibility\s*{.*}[\s*/]*$'),
+            re.compile(
+                r'((var|let|const) .+\s*=\s*)?goog\.require\(.+\);?\s*$'),
+            re.compile(
+                r'goog\.(forwardDeclare|module|provide|setTestOnly)'
+                r'\(.+\);?\s*$'),
+            re.compile(
+                r'[\s/*]*@visibility\s*{.*}[\s*/]*$'),
             ]
