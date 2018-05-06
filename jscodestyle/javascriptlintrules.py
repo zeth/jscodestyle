@@ -160,12 +160,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                     if self.should_check(Rule.OPTIONAL_TYPE_MARKER):
                         # Check for optional marker in type.
-                        if (flag.jstype.opt_arg and
-                            not flag.name.startswith('opt_')):
+                        if (flag.jstype.opt_arg
+                                and not flag.name.startswith('opt_')):
                             self._handle_error(errors.JSDOC_MISSING_OPTIONAL_PREFIX,
-                                              'Optional parameter name %s must be prefixed '
-                                              'with opt_.' % flag.name,
-                                              token)
+                                               'Optional parameter name %s must be prefixed '
+                                               'with opt_.' % flag.name,
+                                               token)
                         elif (not flag.jstype.opt_arg and
                               flag.name.startswith('opt_')):
                             self._handle_error(errors.JSDOC_MISSING_OPTIONAL_TYPE,
@@ -178,12 +178,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # Missing suppress types are reported separately and we allow enums,
                 # const, private, public and protected without types.
                 if (flag.flag_type not in state.get_doc_flag().CAN_OMIT_TYPE
-                    and (not flag.jstype or flag.jstype.IsEmpty())):
+                        and (not flag.jstype or flag.jstype.IsEmpty())):
                     self._handle_error(errors.MISSING_JSDOC_TAG_TYPE,
                                        'Missing type in %s tag' % token.string, token)
 
                 elif flag.name_token and flag.type_end_token and tokenutil.Compare(
-                    flag.type_end_token, flag.name_token) > 0:
+                        flag.type_end_token, flag.name_token) > 0:
                     self._handle_error(
                         errors.OUT_OF_ORDER_JSDOC_TAG_TYPE,
                         'Type should be immediately after %s tag' % token.string,
@@ -193,7 +193,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             next_token = token.next
             while next_token.type == Type.STRING_TEXT:
                 if javascripttokenizer.JavaScriptTokenizer.SINGLE_QUOTE.search(
-                    next_token.string):
+                        next_token.string):
                     break
                 next_token = next_token.next
             else:
@@ -211,10 +211,10 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             if doc_comment.has_flag('fileoverview') and doc_comment.has_flag('externs'):
                 self._set_limited_doc_checks(True)
 
-            if (self.should_check(Rule.BLANK_LINES_AT_TOP_LEVEL) and
-                not self._is_html and
-                state.in_top_level() and
-                not state.InNonScopeBlock()):
+            if (self.should_check(Rule.BLANK_LINES_AT_TOP_LEVEL)
+                    and not self._is_html
+                    and state.in_top_level()
+                    and not state.InNonScopeBlock()):
 
                 # Check if we're in a fileoverview or constructor JsDoc.
                 is_constructor = (
@@ -232,15 +232,15 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # behavior at the top of a file.
                 next_token = token.next
                 if (not next_token or
-                    (not is_file_level_comment and
-                     next_token.type in Type.NON_CODE_TYPES)):
+                        (not is_file_level_comment and
+                         next_token.type in Type.NON_CODE_TYPES)):
                     return
 
                 # Don't require extra blank lines around suppression of extra
                 # goog.require errors.
-                if (doc_comment.suppression_only() and
-                    next_token.type == Type.IDENTIFIER and
-                    next_token.string in ['goog.provide', 'goog.require']):
+                if (doc_comment.suppression_only()
+                        and next_token.type == Type.IDENTIFIER
+                        and next_token.string in ['goog.provide', 'goog.require']):
                     return
 
                 # Find the start of this block (include comments above the block, unless
@@ -295,11 +295,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                 function = state.get_function()
                 if not self._limited_doc_checks:
-                    if (function.has_return and function.doc and
-                        not is_immediately_called and
-                        not function.doc.has_flag('return') and
-                        not function.doc.inherits_documentation() and
-                        not function.doc.has_flag('constructor')):
+                    if (function.has_return and function.doc
+                            and not is_immediately_called
+                            and not function.doc.has_flag('return')
+                            and not function.doc.inherits_documentation()
+                            and not function.doc.has_flag('constructor')):
                         # Check for proper documentation of return value.
                         self._handle_error(
                             errors.MISSING_RETURN_DOCUMENTATION,
@@ -364,12 +364,13 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                                             previous_previous_code.string.endswith(
                                                 '.prototype'))
 
-                if (function.has_this and function.doc and
-                    not function.doc.has_flag('this') and
-                    not function.is_constructor and
-                    not function.is_interface and
-                    '.prototype.' not in function.name and
-                    not prototype_object_literal):
+                if (function.has_this
+                        and function.doc
+                        and not function.doc.has_flag('this')
+                        and not function.is_constructor
+                        and not function.is_interface
+                        and '.prototype.' not in function.name
+                        and not prototype_object_literal):
                     self._handle_error(
                         errors.MISSING_JSDOC_TAG_THIS,
                         'Missing @this JsDoc in function referencing "this". ('
@@ -450,8 +451,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
                 # If there are no provide statements, missing provides should be
                 # reported before the first require.
-                if (namespaces_info.is_first_require(token) and
-                    not namespaces_info.get_provided_namespaces()):
+                if (namespaces_info.is_first_require(token)
+                        and not namespaces_info.get_provided_namespaces()):
                     missing_provides = namespaces_info.get_missing_provides()
                     if missing_provides:
                         self._ReportMissingProvides(
@@ -490,13 +491,16 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             # before a comment, it's ok.
             # Don't report an error before a start bracket - it will be reported
             # by that token's space checks.
-            if (not token.metadata.is_unary_operator() and not last_in_line
-                and not token.next.IsComment()
-                and not token.next.IsOperator(',')
-                and not tokenutil.IsDot(token)
-                and token.next.type not in (Type.WHITESPACE, Type.END_PAREN,
-                                            Type.END_BRACKET, Type.SEMICOLON,
-                                            Type.START_BRACKET)):
+            if (not token.metadata.is_unary_operator()
+                    and not last_in_line
+                    and not token.next.IsComment()
+                    and not token.next.IsOperator(',')
+                    and not tokenutil.IsDot(token)
+                    and token.next.type not in (Type.WHITESPACE,
+                                                Type.END_PAREN,
+                                                Type.END_BRACKET,
+                                                Type.SEMICOLON,
+                                                Type.START_BRACKET)):
                 self._handle_error(
                     errors.MISSING_SPACE,
                     'Missing space after "%s"' % token.string,
@@ -511,7 +515,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # Ensure there is no space after opening parentheses.
                 if (token.previous.type in (Type.START_PAREN, Type.START_BRACKET,
                                             Type.FUNCTION_NAME)
-                    or token.next.type == Type.START_PARAMETERS):
+                        or token.next.type == Type.START_PARAMETERS):
                     self._handle_error(
                         errors.EXTRA_SPACE,
                         'Extra space after "%s"' % token.previous.string,
@@ -613,7 +617,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         # Find the first instance of the identifier in the stack of function scopes
         # and mark it used.
         for unused_local_variables in reversed(
-            self._unused_local_variables_by_scope):
+                self._unused_local_variables_by_scope):
             if identifier in unused_local_variables:
                 del unused_local_variables[identifier]
                 break
@@ -715,8 +719,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         if namespaces_info is not None:
             # If there are no provide or require statements, missing provides and
             # requires should be reported on line 1.
-            if (not namespaces_info.get_provided_namespaces() and
-                not namespaces_info.get_required_namespaces()):
+            if (not namespaces_info.get_provided_namespaces()
+                    and not namespaces_info.get_required_namespaces()):
                 missing_provides = namespaces_info.get_missing_provides()
                 if missing_provides:
                     self._ReportMissingProvides(
