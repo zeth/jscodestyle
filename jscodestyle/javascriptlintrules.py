@@ -130,7 +130,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         ns_info = self._namespaces_info
 
         if self.should_check(Rule.UNUSED_LOCAL_VARIABLES):
-            self._CheckUnusedLocalVariables(token, state)
+            self._check_unused_local_variables(token, state)
 
         if self.should_check(Rule.UNUSED_PRIVATE_MEMBERS):
             # Find all assignments to private members.
@@ -319,7 +319,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     token = token.previous
 
                 # Log errors.
-                error_message = False
+                error_message = None
                 expected_blank_lines = 0
 
                 # Only need blank line before file overview if it is
@@ -491,7 +491,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     # existing provide.
                     missing_provides = ns_info.get_missing_provides()
                     if missing_provides:
-                        self._ReportMissingProvides(
+                        self._report_missing_provides(
                             missing_provides,
                             tokenutil.GetLastTokenInSameLine(token).next,
                             False)
@@ -503,12 +503,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         missing_requires, illegal_alias_statements = (
                             ns_info.get_missing_requires())
                         if missing_requires:
-                            self._ReportMissingRequires(
+                            self._report_missing_requires(
                                 missing_requires,
                                 tokenutil.GetLastTokenInSameLine(token).next,
                                 True)
                         if illegal_alias_statements:
-                            self._ReportIllegalAliasStatement(
+                            self._report_illegal_alias_statement(
                                 illegal_alias_statements)
 
             elif (token.string == 'goog.require' and
@@ -522,7 +522,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         and not ns_info.get_provided_namespaces()):
                     missing_provides = ns_info.get_missing_provides()
                     if missing_provides:
-                        self._ReportMissingProvides(
+                        self._report_missing_provides(
                             missing_provides,
                             tokenutil.GetFirstTokenInSameLine(token),
                             True)
@@ -544,12 +544,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     missing_requires, illegal_alias_statements = (
                         ns_info.get_missing_requires())
                     if missing_requires:
-                        self._ReportMissingRequires(
+                        self._report_missing_requires(
                             missing_requires,
                             tokenutil.GetLastTokenInSameLine(token).next,
                             False)
                     if illegal_alias_statements:
-                        self._ReportIllegalAliasStatement(
+                        self._report_illegal_alias_statement(
                             illegal_alias_statements)
 
         elif token.type == Type.OPERATOR:
@@ -612,7 +612,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     token,
                     position=Position.AtEnd(token.string))
 
-    def _CheckUnusedLocalVariables(self, token, state):
+    def _check_unused_local_variables(self, token, state):
         """Checks for unused local variables in function blocks.
 
         Args:
@@ -638,11 +638,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 elif token.type == Type.IDENTIFIER:
                     # This covers most cases where the variable is
                     # used as an identifier.
-                    self._MarkLocalVariableUsed(token.string)
+                    self._mark_local_variable_used(token.string)
                 elif token.type == Type.SIMPLE_LVALUE and '.' in identifier:
                     # This covers cases where a value is assigned to a
                     # property of the variable.
-                    self._MarkLocalVariableUsed(token.string)
+                    self._mark_local_variable_used(token.string)
         elif token.type == Type.START_BLOCK:
             if in_function and state.is_function_open():
                 # Push a new map onto the stack
@@ -663,9 +663,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             if (flag
                     and flag.flag_type in state.get_doc_flag().HAS_TYPE
                     and js_type):
-                self._MarkAliasUsed(js_type)
+                self._mark_alias_used(js_type)
 
-    def _MarkAliasUsed(self, js_type):
+    def _mark_alias_used(self, js_type):
         """Marks aliases in a type as used.
 
         Recursively iterates over all subtypes in a jsdoc type annotation and
@@ -677,11 +677,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
           js_type: The jsdoc type, a typeannotation.TypeAnnotation object.
         """
         if js_type.alias:
-            self._MarkLocalVariableUsed(js_type.identifier)
+            self._mark_local_variable_used(js_type.identifier)
         for sub_type in js_type.IterTypes():
-            self._MarkAliasUsed(sub_type)
+            self._mark_alias_used(sub_type)
 
-    def _MarkLocalVariableUsed(self, identifier):
+    def _mark_local_variable_used(self, identifier):
         """Marks the local variable as used in the relevant scope.
 
         Marks the local variable in the scope nearest to the current scope that
@@ -700,7 +700,10 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 del unused_local_variables[identifier]
                 break
 
-    def _ReportMissingProvides(self, missing_provides, token, need_blank_line):
+    def _report_missing_provides(self,
+                                 missing_provides,
+                                 token,
+                                 need_blank_line):
         """Reports missing provide statements to the error handler.
 
         Args:
@@ -733,7 +736,10 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             token, position=Position.AtBeginning(),
             fix_data=(missing_provides.keys(), need_blank_line))
 
-    def _ReportMissingRequires(self, missing_requires, token, need_blank_line):
+    def _report_missing_requires(self,
+                                 missing_requires,
+                                 token,
+                                 need_blank_line):
         """Reports missing require statements to the error handler.
 
         Args:
@@ -766,7 +772,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             token, position=Position.AtBeginning(),
             fix_data=(missing_requires.keys(), need_blank_line))
 
-    def _ReportIllegalAliasStatement(self, illegal_alias_statements):
+    def _report_illegal_alias_statement(self, illegal_alias_statements):
         """Reports alias statements that would need a goog.require."""
         for namespace, token in illegal_alias_statements.iteritems():
             self._handle_error(
@@ -806,20 +812,20 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     and not ns_info.get_required_namespaces()):
                 missing_provides = ns_info.get_missing_provides()
                 if missing_provides:
-                    self._ReportMissingProvides(
+                    self._report_missing_provides(
                         missing_provides, state.get_first_token(), None)
 
                 missing_requires, illegal_alias = \
                     ns_info.get_missing_requires()
                 if missing_requires:
-                    self._ReportMissingRequires(
+                    self._report_missing_requires(
                         missing_requires, state.get_first_token(), None)
                 if illegal_alias:
-                    self._ReportIllegalAliasStatement(illegal_alias)
+                    self._report_illegal_alias_statement(illegal_alias)
 
-        self._CheckSortedRequiresProvides(state.get_first_token())
+        self._check_sorted_requires_provides(state.get_first_token())
 
-    def _CheckSortedRequiresProvides(self, token):
+    def _check_sorted_requires_provides(self, token):
         """Checks that all goog.require and goog.provide statements are
         sorted.
 
