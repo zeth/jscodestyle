@@ -149,16 +149,16 @@ class IndentationRules(object):
 
         # Add tokens that could decrease indentation before checking.
         if token_type == TokenType.END_PAREN:
-            self._PopTo(TokenType.START_PAREN)
+            self._pop_to(TokenType.START_PAREN)
 
         elif token_type == TokenType.END_PARAMETERS:
-            self._PopTo(TokenType.START_PARAMETERS)
+            self._pop_to(TokenType.START_PARAMETERS)
 
         elif token_type == TokenType.END_BRACKET:
-            self._PopTo(TokenType.START_BRACKET)
+            self._pop_to(TokenType.START_BRACKET)
 
         elif token_type == TokenType.END_BLOCK:
-            start_token = self._PopTo(TokenType.START_BLOCK)
+            start_token = self._pop_to(TokenType.START_BLOCK)
             # Check for required goog.scope comment.
             if start_token:
                 goog_scope = tokenutil.GoogScopeOrNoneFromStartBlock(
@@ -182,10 +182,10 @@ class IndentationRules(object):
 
         elif (token_type == TokenType.KEYWORD
               and token.string in ('case', 'default')):
-            self._Add(self._PopTo(TokenType.START_BLOCK))
+            self._add(self._pop_to(TokenType.START_BLOCK))
 
         elif token_type == TokenType.SEMICOLON:
-            self._PopTransient()
+            self._pop_transient()
 
         if (is_first and token_type not in (TokenType.COMMENT,
                                             TokenType.DOC_PREFIX,
@@ -234,27 +234,27 @@ class IndentationRules(object):
 
         # Add tokens that could increase indentation.
         if token_type == TokenType.START_BRACKET:
-            self._Add(TokenInfo(
+            self._add(TokenInfo(
                 token=token,
                 is_block=token.metadata.context.type == Context.ARRAY_LITERAL))
 
         elif (token_type == TokenType.START_BLOCK
               or token.metadata.is_implied_block):
-            self._Add(TokenInfo(token=token, is_block=True))
+            self._add(TokenInfo(token=token, is_block=True))
 
         elif token_type in (TokenType.START_PAREN, TokenType.START_PARAMETERS):
-            self._Add(TokenInfo(token=token, is_block=False))
+            self._add(TokenInfo(token=token, is_block=False))
 
         elif token_type == TokenType.KEYWORD and token.string == 'return':
-            self._Add(TokenInfo(token))
+            self._add(TokenInfo(token))
 
         elif not token.IsLastInLine() and (
                 token.IsAssignment() or token.IsOperator('?')):
-            self._Add(TokenInfo(token=token))
+            self._add(TokenInfo(token=token))
 
         # Handle implied block closes.
         if token.metadata.is_implied_block_close:
-            self._PopToImpliedBlock()
+            self._pop_to_implied_block()
 
         # Add some tokens only if they appear at the end of the line.
         is_last = self._is_last_code_in_line(token)
@@ -268,7 +268,7 @@ class IndentationRules(object):
                         # When a ternary : is on a different line than
                         # its '?', it doesn't add indentation.
                         if token.line_number == stack[-1].token.line_number:
-                            self._Add(TokenInfo(token))
+                            self._add(TokenInfo(token))
                     elif token.metadata.context.type == Context.CASE_BLOCK:
                         # Pop transient tokens from say,
                         # line continuations, e.g.,
@@ -276,49 +276,50 @@ class IndentationRules(object):
                         #     y:
                         # Want to pop the transient 4 space continuation
                         # indent.
-                        self._PopTransient()
+                        self._pop_transient()
                         # Starting the body of the case statement,
                         # which is a type of block.
-                        self._Add(TokenInfo(token=token, is_block=True))
+                        self._add(TokenInfo(token=token, is_block=True))
                     elif (token.metadata.context.type ==
                           Context.LITERAL_ELEMENT):
                         # When in an object literal, acts as operator
                         # indicating line continuations.
-                        self._Add(TokenInfo(token))
+                        self._add(TokenInfo(token))
                     else:
                         # ':' might also be a statement label, no
                         # effect on indentation in this case.
                         pass
 
                 elif token.string != ',':
-                    self._Add(TokenInfo(token))
+                    self._add(TokenInfo(token))
                 else:
                     # The token is a comma.
                     if token.metadata.context.type == Context.VAR:
-                        self._Add(TokenInfo(token))
+                        self._add(TokenInfo(token))
                     elif token.metadata.context.type != Context.PARAMETERS:
-                        self._PopTransient()
+                        self._pop_transient()
             # Increase required indentation if this is the end of a
             # statement that's continued with an operator on the next
             # line (e.g. the '.').
             elif (next_code_token
                   and next_code_token.type == TokenType.OPERATOR
                   and not next_code_token.metadata.is_unary_operator()):
-                self._Add(TokenInfo(token))
+                self._add(TokenInfo(token))
             elif (token_type == TokenType.PARAMETERS
                   and token.string.endswith(',')):
                 # Parameter lists.
-                self._Add(TokenInfo(token))
+                self._add(TokenInfo(token))
             elif token.IsKeyword('var'):
-                self._Add(TokenInfo(token))
+                self._add(TokenInfo(token))
             elif token.metadata.is_implied_semicolon:
-                self._PopTransient()
+                self._pop_transient()
         elif token.IsAssignment():
-            self._Add(TokenInfo(token))
+            self._add(TokenInfo(token))
 
         return indentation_errors
 
-    def _add_to_each(self, original, amount):
+    @staticmethod
+    def _add_to_each(original, amount):
         """Returns a new set with the given amount added to each element.
 
         Args:
@@ -425,7 +426,8 @@ class IndentationRules(object):
 
         return (expected | hard_stops) or set([0])
 
-    def _get_actual_indentation(self, token):
+    @staticmethod
+    def _get_actual_indentation(token):
         """Gets the actual indentation of the line containing the given token.
 
         Args:
@@ -451,7 +453,8 @@ class IndentationRules(object):
         else:
             return 0
 
-    def _is_first_non_whitespace_token(self, token):
+    @staticmethod
+    def _is_first_non_whitespace_token(token):
         """Determines if the given token is the first non-space token on its line.
 
         Args:
@@ -467,7 +470,8 @@ class IndentationRules(object):
         return (token.previous and token.previous.IsFirstInLine() and
                 token.previous.type == TokenType.WHITESPACE)
 
-    def _is_last_code_in_line(self, token):
+    @staticmethod
+    def _is_last_code_in_line(token):
         """Determines if the given token is the last code token on its line.
 
         Args:
@@ -486,7 +490,8 @@ class IndentationRules(object):
             if token.type not in TokenType.NON_CODE_TYPES:
                 return False
 
-    def _all_funprop_assign_tokens(self, start_token, end_token):
+    @staticmethod
+    def _all_funprop_assign_tokens(start_token, end_token):
         """Checks if tokens are (likely) a valid function property assignment.
 
         Args:
@@ -512,7 +517,7 @@ class IndentationRules(object):
                 return False
         return True
 
-    def _Add(self, token_info):
+    def _add(self, token_info):
         """Adds the given token info to the stack.
 
         Args:
@@ -588,7 +593,7 @@ class IndentationRules(object):
 
         self._stack.append(token_info)
 
-    def _Pop(self):
+    def _pop(self):
         """Pops the top token from the stack.
 
         Returns:
@@ -598,7 +603,7 @@ class IndentationRules(object):
         if token_info.token.type not in (TokenType.START_BLOCK,
                                          TokenType.START_BRACKET):
             # Remove any temporary overrides.
-            self._RemoveOverrides(token_info)
+            self._remove_overrides(token_info)
         else:
             # For braces and brackets, which can be object and array
             # literals, remove overrides when the literal is closed on
@@ -616,19 +621,19 @@ class IndentationRules(object):
                 if token_check.type == goal_type:
                     count -= 1
                     if not count:
-                        self._RemoveOverrides(token_info)
+                        self._remove_overrides(token_info)
                         break
                 if token_check.type == same_type:
                     count += 1
                 token_check = token_check.next
         return token_info
 
-    def _PopToImpliedBlock(self):
+    def _pop_to_implied_block(self):
         """Pops the stack until an implied block token is found."""
-        while not self._Pop().token.metadata.is_implied_block:
+        while not self._pop().token.metadata.is_implied_block:
             pass
 
-    def _PopTo(self, stop_type):
+    def _pop_to(self, stop_type):
         """Pops the stack until a token of the given type is popped.
 
         Args:
@@ -639,12 +644,12 @@ class IndentationRules(object):
         """
         last = None
         while True:
-            last = self._Pop()
+            last = self._pop()
             if last.token.type == stop_type:
                 break
         return last
 
-    def _RemoveOverrides(self, token_info):
+    def _remove_overrides(self, token_info):
         """Marks any token that was overridden by this token as active again.
 
         Args:
@@ -655,7 +660,7 @@ class IndentationRules(object):
                     and not stack_token.is_permanent_override):
                 stack_token.overridden_by = None
 
-    def _PopTransient(self):
+    def _pop_transient(self):
         """Pops all transient tokens - i.e. not blocks, literals, or parens."""
         while self._stack and self._stack[-1].is_transient:
-            self._Pop()
+            self._pop()
