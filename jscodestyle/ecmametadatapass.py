@@ -17,11 +17,8 @@
 
 """Metadata pass for annotating tokens in EcmaScript files."""
 
-from jscodestyle import javascripttokens
+from jscodestyle.javascripttokens import JavaScriptTokenType as TokenType
 from jscodestyle import tokenutil
-
-
-TokenType = javascripttokens.JavaScriptTokenType
 
 
 class ParseError(Exception):
@@ -137,7 +134,7 @@ class EcmaContext(object):
         self.children = []
 
         if parent:
-            parent.AddChild(self)
+            parent.add_child(self)
 
     def __repr__(self):
         """Returns a string representation of the context object."""
@@ -148,7 +145,7 @@ class EcmaContext(object):
             context = context.parent
         return 'Context(%s)' % ' > '.join(stack)
 
-    def AddChild(self, child):
+    def add_child(self, child):
         """Adds a child to this context and sets child's parent to this context.
 
         Args:
@@ -159,7 +156,7 @@ class EcmaContext(object):
         child.parent = self
 
         self.children.append(child)
-        self.children.sort(EcmaContext._CompareContexts)
+        self.children.sort(EcmaContext._compare_contexts)
 
     def GetRoot(self):
         """Get the root context that contains this context, if any."""
@@ -170,7 +167,7 @@ class EcmaContext(object):
             context = context.parent
 
     @staticmethod
-    def _CompareContexts(context1, context2):
+    def _compare_contexts(context1, context2):
         """Sorts contexts 1 and 2 by start token document position."""
         return tokenutil.Compare(context1.start_token, context2.start_token)
 
@@ -239,26 +236,27 @@ class EcmaMetaDataPass(object):
         """Resets the metadata pass to prepare for the next file."""
         self._token = None
         self._context = None
-        self._AddContext(EcmaContext.ROOT)
+        self._add_context(EcmaContext.ROOT)
         self._last_code = None
 
-    def _CreateContext(self, context_type):
+    def _create_context(self, context_type):
         """Overridable by subclasses to create the appropriate context type."""
         return EcmaContext(context_type, self._token, self._context)
 
-    def _CreateMetaData(self):
+    @staticmethod
+    def _create_metadata():
         """Overridable by subclasses to create the appropriate metadata type."""
         return EcmaMetaData()
 
-    def _AddContext(self, context_type):
+    def _add_context(self, context_type):
         """Adds a context of the given type to the context stack.
 
         Args:
           context_type: The type of context to create
         """
-        self._context = self._CreateContext(context_type)
+        self._context = self._create_context(context_type)
 
-    def _PopContext(self):
+    def _pop_context(self):
         """Moves up one level in the context stack.
 
         Returns:
@@ -275,7 +273,7 @@ class EcmaMetaDataPass(object):
         else:
             raise ParseError(self._token)
 
-    def _PopContextType(self, *stop_types):
+    def _pop_context_type(self, *stop_types):
         """Pops the context stack until a context of the given type is popped.
 
         Args:
@@ -286,17 +284,17 @@ class EcmaMetaDataPass(object):
         """
         last = None
         while not last or last.type not in stop_types:
-            last = self._PopContext()
+            last = self._pop_context()
         return last
 
-    def _EndStatement(self):
+    def _end_statement(self):
         """Process the end of a statement."""
-        self._PopContextType(EcmaContext.STATEMENT)
+        self._pop_context_type(EcmaContext.STATEMENT)
         if self._context.type == EcmaContext.IMPLIED_BLOCK:
             self._token.metadata.is_implied_block_close = True
-            self._PopContext()
+            self._pop_context()
 
-    def _ProcessContext(self):
+    def _process_context(self):
         """Process the context at the current token.
 
         Returns:
@@ -317,22 +315,22 @@ class EcmaMetaDataPass(object):
             # that causes no harm.
             parent = self._context.parent
             if not parent or parent.type != EcmaContext.SWITCH:
-                self._AddContext(EcmaContext.STATEMENT)
+                self._add_context(EcmaContext.STATEMENT)
 
         elif self._context.type == EcmaContext.ARRAY_LITERAL:
-            self._AddContext(EcmaContext.LITERAL_ELEMENT)
+            self._add_context(EcmaContext.LITERAL_ELEMENT)
 
         if token_type == TokenType.START_PAREN:
             if self._last_code and self._last_code.IsKeyword('for'):
                 # for loops contain multiple statements in the group unlike while,
                 # switch, if, etc.
-                self._AddContext(EcmaContext.FOR_GROUP_BLOCK)
+                self._add_context(EcmaContext.FOR_GROUP_BLOCK)
             else:
-                self._AddContext(EcmaContext.GROUP)
+                self._add_context(EcmaContext.GROUP)
 
         elif token_type == TokenType.END_PAREN:
-            result = self._PopContextType(EcmaContext.GROUP,
-                                          EcmaContext.FOR_GROUP_BLOCK)
+            result = self._pop_context_type(EcmaContext.GROUP,
+                                            EcmaContext.FOR_GROUP_BLOCK)
             keyword_token = result.start_token.metadata.last_code
             # keyword_token will not exist if the open paren is the first line of the
             # file, for example if all code is wrapped in an immediately executed
@@ -350,7 +348,7 @@ class EcmaMetaDataPass(object):
 
                     # If it's not do-while, it's an implied block.
                     if not is_do_while:
-                        self._AddContext(EcmaContext.IMPLIED_BLOCK)
+                        self._add_context(EcmaContext.IMPLIED_BLOCK)
                         token.metadata.is_implied_block = True
 
             return result
@@ -364,25 +362,25 @@ class EcmaMetaDataPass(object):
             if (next_code.type != TokenType.START_BLOCK
                     and (next_code.type != TokenType.KEYWORD
                          or next_code.string != 'if')):
-                self._AddContext(EcmaContext.IMPLIED_BLOCK)
+                self._add_context(EcmaContext.IMPLIED_BLOCK)
                 token.metadata.is_implied_block = True
 
         elif token_type == TokenType.START_PARAMETERS:
-            self._AddContext(EcmaContext.PARAMETERS)
+            self._add_context(EcmaContext.PARAMETERS)
 
         elif token_type == TokenType.END_PARAMETERS:
-            return self._PopContextType(EcmaContext.PARAMETERS)
+            return self._pop_context_type(EcmaContext.PARAMETERS)
 
         elif token_type == TokenType.START_BRACKET:
             if (self._last_code
                     and self._last_code.type
                     in TokenType.EXPRESSION_ENDER_TYPES):
-                self._AddContext(EcmaContext.INDEX)
+                self._add_context(EcmaContext.INDEX)
             else:
-                self._AddContext(EcmaContext.ARRAY_LITERAL)
+                self._add_context(EcmaContext.ARRAY_LITERAL)
 
         elif token_type == TokenType.END_BRACKET:
-            return self._PopContextType(EcmaContext.INDEX, EcmaContext.ARRAY_LITERAL)
+            return self._pop_context_type(EcmaContext.INDEX, EcmaContext.ARRAY_LITERAL)
 
         elif token_type == TokenType.START_BLOCK:
             if (self._last_code.type in (TokenType.END_PAREN,
@@ -395,42 +393,42 @@ class EcmaMetaDataPass(object):
                         and self._last_code.metadata.context.type == EcmaContext.CASE_BLOCK)):
                 # else, do, try, and finally all might have no () before {.
                 # Also, handle the bizzare syntax case 10: {...}.
-                self._AddContext(EcmaContext.BLOCK)
+                self._add_context(EcmaContext.BLOCK)
             else:
-                self._AddContext(EcmaContext.OBJECT_LITERAL)
+                self._add_context(EcmaContext.OBJECT_LITERAL)
 
         elif token_type == TokenType.END_BLOCK:
-            context = self._PopContextType(EcmaContext.BLOCK,
-                                           EcmaContext.OBJECT_LITERAL)
+            context = self._pop_context_type(EcmaContext.BLOCK,
+                                             EcmaContext.OBJECT_LITERAL)
             if self._context.type == EcmaContext.SWITCH:
                 # The end of the block also means the end of the switch statement it
                 # applies to.
-                return self._PopContext()
+                return self._pop_context()
             return context
 
         elif token.IsKeyword('switch'):
-            self._AddContext(EcmaContext.SWITCH)
+            self._add_context(EcmaContext.SWITCH)
 
         elif (token_type == TokenType.KEYWORD and
               token.string in ('case', 'default') and
               self._context.type != EcmaContext.OBJECT_LITERAL):
             # Pop up to but not including the switch block.
             while self._context.parent.type != EcmaContext.SWITCH:
-                self._PopContext()
+                self._pop_context()
                 if self._context.parent is None:
                     raise ParseError(token, 'Encountered case/default statement '
                                      'without switch statement')
 
         elif token.IsOperator('?'):
-            self._AddContext(EcmaContext.TERNARY_TRUE)
+            self._add_context(EcmaContext.TERNARY_TRUE)
 
         elif token.IsOperator(':'):
             if self._context.type == EcmaContext.OBJECT_LITERAL:
-                self._AddContext(EcmaContext.LITERAL_ELEMENT)
+                self._add_context(EcmaContext.LITERAL_ELEMENT)
 
             elif self._context.type == EcmaContext.TERNARY_TRUE:
-                self._PopContext()
-                self._AddContext(EcmaContext.TERNARY_FALSE)
+                self._pop_context()
+                self._add_context(EcmaContext.TERNARY_FALSE)
 
             # Handle nested ternary statements like:
             # foo = bar ? baz ? 1 : 2 : 3
@@ -438,15 +436,15 @@ class EcmaMetaDataPass(object):
             # ternary_false > ternary_true > statement > root
             elif (self._context.type == EcmaContext.TERNARY_FALSE and
                   self._context.parent.type == EcmaContext.TERNARY_TRUE):
-                self._PopContext()  # Leave current ternary false context.
-                self._PopContext()  # Leave current parent ternary true
-                self._AddContext(EcmaContext.TERNARY_FALSE)
+                self._pop_context()  # Leave current ternary false context.
+                self._pop_context()  # Leave current parent ternary true
+                self._add_context(EcmaContext.TERNARY_FALSE)
 
             elif self._context.parent.type == EcmaContext.SWITCH:
-                self._AddContext(EcmaContext.CASE_BLOCK)
+                self._add_context(EcmaContext.CASE_BLOCK)
 
         elif token.IsKeyword('var'):
-            self._AddContext(EcmaContext.VAR)
+            self._add_context(EcmaContext.VAR)
 
         elif token.IsOperator(','):
             while self._context.type not in (EcmaContext.VAR,
@@ -455,10 +453,10 @@ class EcmaMetaDataPass(object):
                                              EcmaContext.STATEMENT,
                                              EcmaContext.PARAMETERS,
                                              EcmaContext.GROUP):
-                self._PopContext()
+                self._pop_context()
 
         elif token_type == TokenType.SEMICOLON:
-            self._EndStatement()
+            self._end_statement()
 
     def Process(self, first_token):
         """Processes the token stream starting with the given token."""
@@ -472,7 +470,7 @@ class EcmaMetaDataPass(object):
             self._token = self._token.next
 
         try:
-            self._PopContextType(self, EcmaContext.ROOT)
+            self._pop_context_type(self, EcmaContext.ROOT)
         except ParseError:
             # Ignore the "popped to root" error.
             pass
@@ -480,14 +478,14 @@ class EcmaMetaDataPass(object):
     def _process_token(self):
         """Process the given token."""
         token = self._token
-        token.metadata = self._CreateMetaData()
-        context = (self._ProcessContext() or self._context)
+        token.metadata = self._create_metadata()
+        context = (self._process_context() or self._context)
         token.metadata.context = context
         token.metadata.last_code = self._last_code
 
         # Determine the operator type of the token, if applicable.
         if token.type == TokenType.OPERATOR:
-            token.metadata.operator_type = self._GetOperatorType(token)
+            token.metadata.operator_type = self._get_operator_type(token)
 
         # Determine if there is an implied semicolon after the token.
         if token.type != TokenType.SEMICOLON:
@@ -512,7 +510,7 @@ class EcmaMetaDataPass(object):
                                      token.line_number < next_code.line_number)
             next_code_is_block = next_code and next_code.type == TokenType.START_BLOCK
             if (is_last_code_in_line
-                    and self._StatementCouldEndInContext()
+                    and self._statement_could_end_in_context()
                     and not is_multiline_string
                     and not is_end_of_block
                     and not is_continued_var_decl
@@ -522,9 +520,9 @@ class EcmaMetaDataPass(object):
                     and not is_implied_block
                     and not next_code_is_block):
                 token.metadata.is_implied_semicolon = True
-                self._EndStatement()
+                self._end_statement()
 
-    def _StatementCouldEndInContext(self):
+    def _statement_could_end_in_context(self):
         """Returns if the current statement (if any) may end in this context."""
         # In the basic statement or variable declaration context, statement can
         # always end in this context.
@@ -545,7 +543,8 @@ class EcmaMetaDataPass(object):
         # the statement can't yet end.
         return False
 
-    def _GetOperatorType(self, token):
+    @staticmethod
+    def _get_operator_type(token):
         """Returns the operator type of the given operator token.
 
         Args:
