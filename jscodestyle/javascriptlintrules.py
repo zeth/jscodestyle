@@ -38,6 +38,26 @@ Position = position.Position
 Type = javascripttokens.JavaScriptTokenType
 
 
+OUT_OF_ORDER_TEXT = 'Type should be immediately after %s tag'
+UNNECESSARY_DOUBLE_TEXT = (
+    'Single-quoted string preferred over double-quoted string.')
+BLANK_BEFORE_OVERVIEW_TEXT = 'Should have a blank line before a file overview.'
+BLANK_BEFORE_CONSTRUCTOR = (
+    'Should have 3 blank lines before a constructor/interface.')
+BLANK_BETWEEN_TOP_LEVEL = 'Should have 2 blank lines between top-level blocks.'
+MISSING_RETURN = 'Missing @return JsDoc in function with non-trivial return'
+UNNECESSARY_RETURN = 'Found @return JsDoc on function that returns nothing'
+MISSING_JSDOC_THIS = (
+    'Missing @this JsDoc in function referencing "this". ('
+    'this usually means you are trying to reference "this"'
+    ' in a static function, or you have forgotten to mark'
+    ' a constructor with @constructor)',)
+MISSING_NL_GI = 'Missing newline between constructor and goog.inherits',
+SET_NS_TEST_ONLY = (' *Test namespaces must be mentioned in the '
+                    'goog.setTestOnly() call')
+
+
+
 class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
     """JavaScript lint rules that catch JavaScript specific style errors."""
 
@@ -80,8 +100,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
     def handle_missing_parameter_doc(self, token, param_name):
         """Handle errors associated with a parameter missing a param tag."""
-        self._handle_error(errors.MISSING_PARAMETER_DOCUMENTATION,
-                           'Missing docs for parameter: "%s"' % param_name, token)
+        self._handle_error(
+            errors.MISSING_PARAMETER_DOCUMENTATION,
+            'Missing docs for parameter: "%s"' % param_name, token)
 
     # pylint: disable=too-many-statements
     def check_token(self, token, state):
@@ -89,7 +110,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
 
         Args:
           token: The current token under consideration
-          state: parser_state object that indicates the current state in the page
+          state: parser_state object that indicates the current state
+                 in the page
         """
 
         # Call the base class's check_token function.
@@ -147,46 +169,57 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 if flag.type is not None and flag.name is not None:
                     if self.should_check(Rule.VARIABLE_ARG_MARKER):
                         # Check for variable arguments marker in type.
-                        if flag.jstype.IsVarArgsType() and flag.name != 'var_args':
-                            self._handle_error(errors.JSDOC_MISSING_VAR_ARGS_NAME,
-                                               'Variable length argument %s must be renamed '
-                                               'to var_args.' % flag.name,
-                                               token)
-                        elif not flag.jstype.IsVarArgsType() and flag.name == 'var_args':
-                            self._handle_error(errors.JSDOC_MISSING_VAR_ARGS_TYPE,
-                                               'Variable length argument %s type must start '
-                                               'with \'...\'.' % flag.name,
-                                               token)
+                        if (flag.jstype.IsVarArgsType()
+                                and flag.name != 'var_args'):
+                            self._handle_error(
+                                errors.JSDOC_MISSING_VAR_ARGS_NAME,
+                                'Variable length argument %s must be renamed '
+                                'to var_args.' % flag.name,
+                                token)
+                        elif (not flag.jstype.IsVarArgsType()
+                              and flag.name == 'var_args'):
+                            self._handle_error(
+                                errors.JSDOC_MISSING_VAR_ARGS_TYPE,
+                                'Variable length argument %s type must start '
+                                'with \'...\'.' % flag.name,
+                                token)
 
                     if self.should_check(Rule.OPTIONAL_TYPE_MARKER):
                         # Check for optional marker in type.
                         if (flag.jstype.opt_arg
                                 and not flag.name.startswith('opt_')):
-                            self._handle_error(errors.JSDOC_MISSING_OPTIONAL_PREFIX,
-                                               'Optional parameter name %s must be prefixed '
-                                               'with opt_.' % flag.name,
-                                               token)
+                            self._handle_error(
+                                errors.JSDOC_MISSING_OPTIONAL_PREFIX,
+                                'Optional parameter name %s must be prefixed '
+                                'with opt_.' % flag.name,
+                                token)
                         elif (not flag.jstype.opt_arg and
                               flag.name.startswith('opt_')):
-                            self._handle_error(errors.JSDOC_MISSING_OPTIONAL_TYPE,
-                                               'Optional parameter %s type must end with =.' %
-                                               flag.name,
-                                               token)
+                            self._handle_error(
+                                errors.JSDOC_MISSING_OPTIONAL_TYPE,
+                                'Optional parameter %s type must end with =.' %
+                                flag.name,
+                                token)
 
             if flag.flag_type in state.get_doc_flag().HAS_TYPE:
-                # Check for both missing type token and empty type braces '{}'
-                # Missing suppress types are reported separately and we allow enums,
-                # const, private, public and protected without types.
+                # Check for both missing type token and empty type
+                # braces '{}' Missing suppress types are reported
+                # separately and we allow enums, const, private,
+                # public and protected without types.
                 if (flag.flag_type not in state.get_doc_flag().CAN_OMIT_TYPE
                         and (not flag.jstype or flag.jstype.IsEmpty())):
-                    self._handle_error(errors.MISSING_JSDOC_TAG_TYPE,
-                                       'Missing type in %s tag' % token.string, token)
+                    self._handle_error(
+                        errors.MISSING_JSDOC_TAG_TYPE,
+                        'Missing type in %s tag' % token.string, token)
 
-                elif flag.name_token and flag.type_end_token and tokenutil.Compare(
-                        flag.type_end_token, flag.name_token) > 0:
+                elif (flag.name_token
+                      and flag.type_end_token
+                      and tokenutil.Compare(
+                          flag.type_end_token,
+                          flag.name_token) > 0):
                     self._handle_error(
                         errors.OUT_OF_ORDER_JSDOC_TAG_TYPE,
-                        'Type should be immediately after %s tag' % token.string,
+                        OUT_OF_ORDER_TEXT % token.string,
                         token)
 
         elif token.type == Type.DOUBLE_QUOTE_STRING_START:
@@ -199,16 +232,18 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             else:
                 self._handle_error(
                     errors.UNNECESSARY_DOUBLE_QUOTED_STRING,
-                    'Single-quoted string preferred over double-quoted string.',
+                    UNNECESSARY_DOUBLE_TEXT,
                     token,
                     position=Position.All(token.string))
 
         elif token.type == Type.END_DOC_COMMENT:
             doc_comment = state.get_doc_comment()
 
-            # When @externs appears in a @fileoverview comment, it should trigger
-            # the same limited doc checks as a special filename like externs.js.
-            if doc_comment.has_flag('fileoverview') and doc_comment.has_flag('externs'):
+            # When @externs appears in a @fileoverview comment, it
+            # should trigger the same limited doc checks as a special
+            # filename like externs.js.
+            if doc_comment.has_flag(
+                    'fileoverview') and doc_comment.has_flag('externs'):
                 self._set_limited_doc_checks(True)
 
             if (self.should_check(Rule.BLANK_LINES_AT_TOP_LEVEL)
@@ -220,16 +255,17 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 is_constructor = (
                     doc_comment.has_flag('constructor') or
                     doc_comment.has_flag('interface'))
-                # @fileoverview is an optional tag so if the dosctring is the first
-                # token in the file treat it as a file level docstring.
+                # @fileoverview is an optional tag so if the dosctring
+                # is the first token in the file treat it as a file
+                # level docstring.
                 is_file_level_comment = (
                     doc_comment.has_flag('fileoverview') or
                     not doc_comment.start_token.previous)
 
-                # If the comment is not a file overview, and it does not immediately
-                # precede some code, skip it.
-                # NOTE: The tokenutil methods are not used here because of their
-                # behavior at the top of a file.
+                # If the comment is not a file overview, and it does
+                # not immediately precede some code, skip it.
+                # NOTE: The tokenutil methods are not used here
+                # because of their behavior at the top of a file.
                 next_token = token.next
                 if (not next_token or
                         (not is_file_level_comment and
@@ -240,11 +276,12 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # goog.require errors.
                 if (doc_comment.suppression_only()
                         and next_token.type == Type.IDENTIFIER
-                        and next_token.string in ['goog.provide', 'goog.require']):
+                        and next_token.string in ['goog.provide',
+                                                  'goog.require']):
                     return
 
-                # Find the start of this block (include comments above the block, unless
-                # this is a file overview).
+                # Find the start of this block (include comments above
+                # the block, unless this is a file overview).
                 block_start = doc_comment.start_token
                 if not is_file_level_comment:
                     token = block_start.previous
@@ -268,18 +305,21 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 error_message = False
                 expected_blank_lines = 0
 
-                # Only need blank line before file overview if it is not the beginning
-                # of the file, e.g. copyright is first.
-                if is_file_level_comment and blank_lines == 0 and block_start.previous:
-                    error_message = 'Should have a blank line before a file overview.'
+                # Only need blank line before file overview if it is
+                # not the beginning of the file, e.g. copyright is
+                # first.
+                if (is_file_level_comment
+                        and blank_lines == 0
+                        and block_start.previous):
+                    error_message = BLANK_BEFORE_OVERVIEW_TEXT
                     expected_blank_lines = 1
                 elif is_constructor and blank_lines != 3:
-                    error_message = (
-                        'Should have 3 blank lines before a constructor/interface.')
+                    error_message = BLANK_BEFORE_CONSTRUCTOR
                     expected_blank_lines = 3
-                elif (not is_file_level_comment and not is_constructor and
-                      blank_lines != 2):
-                    error_message = 'Should have 2 blank lines between top-level blocks.'
+                elif (not is_file_level_comment
+                      and not is_constructor
+                      and blank_lines != 2):
+                    error_message = BLANK_BETWEEN_TOP_LEVEL
                     expected_blank_lines = 2
 
                 if error_message:
@@ -319,17 +359,19 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         if invalid_return:
                             self._handle_error(
                                 errors.UNNECESSARY_RETURN_DOCUMENTATION,
-                                'Found @return JsDoc on function that returns nothing',
-                                flag.flag_token, position=Position.AtBeginning())
+                                UNNECESSARY_RETURN,
+                                flag.flag_token,
+                                position=Position.AtBeginning())
 
-                # b/4073735. Method in object literal definition of prototype can
-                # safely reference 'this'.
+                # b/4073735. Method in object literal definition of
+                # prototype can safely reference 'this'.
                 prototype_object_literal = False
                 block_start = None
                 previous_code = None
                 previous_previous_code = None
 
-                # Search for cases where prototype is defined as object literal.
+                # Search for cases where prototype is defined as
+                # object literal.
                 #       previous_previous_code
                 #       |       previous_code
                 #       |       | block_start
@@ -340,8 +382,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 #   }
                 # }
 
-                # If in object literal, find first token of block so to find previous
-                # tokens to check above condition.
+                # If in object literal, find first token of block so
+                # to find previous tokens to check above condition.
                 if state.in_object_literal():
                     block_start = state.GetCurrentBlockStart()
 
@@ -546,7 +588,8 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
           token: The token to check.
           state: The state tracker.
         """
-        # We don't use state.in_function because that disregards scope functions.
+        # We don't use state.in_function because that disregards scope
+        # functions.
         in_function = state.function_depth() > 0
         if token.type == Type.SIMPLE_LVALUE or token.type == Type.IDENTIFIER:
             if in_function:
@@ -715,18 +758,18 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             self._declared_private_members = set()
             self._used_private_members = set()
 
-        namespaces_info = self._namespaces_info
-        if namespaces_info is not None:
+        ns_info = self._namespaces_info
+        if ns_info is not None:
             # If there are no provide or require statements, missing provides and
             # requires should be reported on line 1.
-            if (not namespaces_info.get_provided_namespaces()
-                    and not namespaces_info.get_required_namespaces()):
-                missing_provides = namespaces_info.get_missing_provides()
+            if (not ns_info.get_provided_namespaces()
+                    and not ns_info.get_required_namespaces()):
+                missing_provides = ns_info.get_missing_provides()
                 if missing_provides:
                     self._ReportMissingProvides(
                         missing_provides, state.get_first_token(), None)
 
-                missing_requires, illegal_alias = namespaces_info.get_missing_requires()
+                missing_requires, illegal_alias = ns_info.get_missing_requires()
                 if missing_requires:
                     self._ReportMissingRequires(
                         missing_requires, state.get_first_token(), None)
