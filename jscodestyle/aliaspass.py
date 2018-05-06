@@ -104,7 +104,7 @@ class AliasPass(object):
         # If we have closurized namespaces, identify aliased identifiers.
         if self._closurized_namespaces:
             context = start_token.metadata.context
-            root_context = context.GetRoot()
+            root_context = context.get_root()
             self._process_root_context(root_context)
 
     def _check_goog_scope_calls(self, start_token):

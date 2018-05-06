@@ -490,7 +490,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             # before a comment, it's ok.
             # Don't report an error before a start bracket - it will be reported
             # by that token's space checks.
-            if (not token.metadata.IsUnaryOperator() and not last_in_line
+            if (not token.metadata.is_unary_operator() and not last_in_line
                 and not token.next.IsComment()
                 and not token.next.IsOperator(',')
                 and not tokenutil.IsDot(token)

@@ -158,7 +158,7 @@ class EcmaContext(object):
         self.children.append(child)
         self.children.sort(EcmaContext._compare_contexts)
 
-    def GetRoot(self):
+    def get_root(self):
         """Get the root context that contains this context, if any."""
         context = self
         while context:
@@ -217,11 +217,11 @@ class EcmaMetaData(object):
             parts.append('alias for: %s' % self.aliased_symbol)
         return 'MetaData(%s)' % ', '.join(parts)
 
-    def IsUnaryOperator(self):
+    def is_unary_operator(self):
         return self.operator_type in (EcmaMetaData.UNARY_OPERATOR,
                                       EcmaMetaData.UNARY_POST_OPERATOR)
 
-    def IsUnaryPostOperator(self):
+    def is_unary_post_operator(self):
         return self.operator_type == EcmaMetaData.UNARY_POST_OPERATOR
 
 
@@ -495,7 +495,7 @@ class EcmaMetaDataPass(object):
             is_last_code_in_line = token.IsCode() and (
                 not next_code or next_code.line_number != token.line_number)
             is_continued_operator = (token.type == TokenType.OPERATOR and
-                                     not token.metadata.IsUnaryPostOperator())
+                                     not token.metadata.is_unary_post_operator())
             is_continued_dot = token.string == '.'
             next_code_is_operator = next_code and next_code.type == TokenType.OPERATOR
             is_end_of_block = (

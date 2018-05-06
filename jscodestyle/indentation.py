@@ -276,7 +276,7 @@ class IndentationRules(object):
             # Increase required indentation if this is the end of a statement that's
             # continued with an operator on the next line (e.g. the '.').
             elif (next_code_token and next_code_token.type == Type.OPERATOR and
-                  not next_code_token.metadata.IsUnaryOperator()):
+                  not next_code_token.metadata.is_unary_operator()):
                 self._Add(TokenInfo(token))
             elif token_type == Type.PARAMETERS and token.string.endswith(','):
                 # Parameter lists.

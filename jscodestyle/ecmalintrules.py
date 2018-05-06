@@ -268,7 +268,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
                 '"." must go on the following line',
                 token)
         if (not is_dot and wrapped_before
-                and not token.metadata.IsUnaryOperator()):
+                and not token.metadata.is_unary_operator()):
             self._handle_error(
                 errors.LINE_STARTS_WITH_OPERATOR,
                 'Binary operator must go on previous line "%s"' % token.string,
@@ -294,7 +294,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         Returns:
           Whether there should be a space before the token.
         """
-        if token.string == ',' or token.metadata.IsUnaryPostOperator():
+        if token.string == ',' or token.metadata.is_unary_post_operator():
             return False
 
         if tokenutil.IsDot(token):
@@ -306,7 +306,7 @@ class EcmaScriptLintRules(checkerbase.LintRulesBase):
         if self._is_label(token):
             return False
 
-        if token.metadata.IsUnaryOperator() and token.IsFirstInLine():
+        if token.metadata.is_unary_operator() and token.IsFirstInLine():
             return False
 
         return True
