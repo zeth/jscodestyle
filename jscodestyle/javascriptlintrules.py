@@ -37,7 +37,6 @@ Error = error.Error
 Position = position.Position
 Type = javascripttokens.JavaScriptTokenType
 
-
 OUT_OF_ORDER_TEXT = 'Type should be immediately after %s tag'
 UNNECESSARY_DOUBLE_TEXT = (
     'Single-quoted string preferred over double-quoted string.')
@@ -55,7 +54,6 @@ MISSING_JSDOC_THIS = (
 MISSING_NL_GI = 'Missing newline between constructor and goog.inherits',
 SET_NS_TEST_ONLY = (' *Test namespaces must be mentioned in the '
                     'goog.setTestOnly() call')
-
 
 
 class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
@@ -93,10 +91,10 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         self._declared_private_member_tokens = {}
         self._declared_private_members = set()
         self._used_private_members = set()
-        # A stack of dictionaries, one for each function scope entered. Each
-        # dictionary is keyed by an identifier that defines a local variable and has
-        # a token as its value.
-        self._unused_local_variables_by_scope = []
+        # A stack of dictionaries, one for each function scope
+        # entered. Each dictionary is keyed by an identifier that
+        # defines a local variable and has a token as its value.
+        self._unused_local_vars_by_scope = []
 
     def handle_missing_parameter_doc(self, token, param_name):
         """Handle errors associated with a parameter missing a param tag."""
@@ -118,7 +116,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         super(JavaScriptLintRules, self).check_token(token, state)
 
         # Store some convenience variables
-        namespaces_info = self._namespaces_info
+        ns_info = self._namespaces_info
 
         if self.should_check(Rule.UNUSED_LOCAL_VARIABLES):
             self._CheckUnusedLocalVariables(token, state)
@@ -133,22 +131,28 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         'underscore' in doc_comment.suppressions or
                         'unusedPrivateMembers' in doc_comment.suppressions)
                     if not suppressed:
-                        # Look for static members defined on a provided namespace.
-                        if namespaces_info:
-                            namespace = namespaces_info.get_closurized_namespace(identifier)
-                            provided_namespaces = namespaces_info.get_provided_namespaces()
+                        # Look for static members defined on a
+                        # provided namespace.
+                        if ns_info:
+                            namespace = ns_info.get_closurized_namespace(
+                                identifier)
+                            provided_namespaces = (
+                                ns_info.get_provided_namespaces())
                         else:
                             namespace = None
                             provided_namespaces = set()
 
                         # Skip cases of this.something_.somethingElse_.
                         regex = re.compile(r'^this\.[a-zA-Z_]+$')
-                        if namespace in provided_namespaces or regex.match(identifier):
+                        if (namespace in provided_namespaces
+                                or regex.match(identifier)):
                             variable = identifier.split('.')[-1]
-                            self._declared_private_member_tokens[variable] = token
+                            self._declared_private_member_tokens[
+                                variable] = token
                             self._declared_private_members.add(variable)
                 elif not identifier.endswith('__'):
-                    # Consider setting public members of private members to be a usage.
+                    # Consider setting public members of private
+                    # members to be a usage.
                     for piece in identifier.split('.'):
                         if piece.endswith('_'):
                             self._used_private_members.add(piece)
@@ -292,11 +296,13 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # Count the number of blank lines before this block.
                 blank_lines = 0
                 token = block_start.previous
-                while token and token.type in [Type.WHITESPACE, Type.BLANK_LINE]:
+                while token and token.type in [Type.WHITESPACE,
+                                               Type.BLANK_LINE]:
                     if token.type == Type.BLANK_LINE:
                         # A blank line.
                         blank_lines += 1
-                    elif token.type == Type.WHITESPACE and not token.line.strip():
+                    elif (token.type == Type.WHITESPACE
+                              and not token.line.strip()):
                         # A line with only whitespace on it.
                         blank_lines += 1
                     token = token.previous
@@ -343,8 +349,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         # Check for proper documentation of return value.
                         self._handle_error(
                             errors.MISSING_RETURN_DOCUMENTATION,
-                            'Missing @return JsDoc in function with non-trivial return',
-                            function.doc.end_token, position=Position.AtBeginning())
+                            MISSING_RETURN,
+                            function.doc.end_token,
+                            position=Position.AtBeginning())
                     elif (not function.has_return and
                           not function.has_throw and
                           function.doc and
@@ -387,24 +394,28 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 if state.in_object_literal():
                     block_start = state.GetCurrentBlockStart()
 
-                # If an object literal then get previous token (code type). For above
-                # case it should be '='.
+                # If an object literal then get previous token (code
+                # type). For above case it should be '='.
                 if block_start:
                     previous_code = tokenutil.SearchExcept(block_start,
                                                            Type.NON_CODE_TYPES,
                                                            reverse=True)
 
-                # If previous token to block is '=' then get its previous token.
+                # If previous token to block is '=' then get its
+                # previous token.
                 if previous_code and previous_code.IsOperator('='):
-                    previous_previous_code = tokenutil.SearchExcept(previous_code,
-                                                                    Type.NON_CODE_TYPES,
-                                                                    reverse=True)
+                    previous_previous_code = tokenutil.SearchExcept(
+                        previous_code,
+                        Type.NON_CODE_TYPES,
+                        reverse=True)
 
-                # If variable/token before '=' ends with '.prototype' then its above
-                # case of prototype defined with object literal.
-                prototype_object_literal = (previous_previous_code and
-                                            previous_previous_code.string.endswith(
-                                                '.prototype'))
+                # If variable/token before '=' ends with '.prototype'
+                # then its above case of prototype defined with object
+                # literal.
+                prototype_object_literal = (
+                    previous_previous_code
+                    and previous_previous_code.string.endswith(
+                        '.prototype'))
 
                 if (function.has_this
                         and function.doc
@@ -415,18 +426,17 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         and not prototype_object_literal):
                     self._handle_error(
                         errors.MISSING_JSDOC_TAG_THIS,
-                        'Missing @this JsDoc in function referencing "this". ('
-                        'this usually means you are trying to reference "this" in '
-                        'a static function, or you have forgotten to mark a '
-                        'constructor with @constructor)',
-                        function.doc.end_token, position=Position.AtBeginning())
+                        MISSING_JSDOC_THIS,
+                        function.doc.end_token,
+                        position=Position.AtBeginning())
 
         elif token.type == Type.IDENTIFIER:
             if token.string == 'goog.inherits' and not state.in_function():
-                if state.get_last_non_space_token().line_number == token.line_number:
+                if (state.get_last_non_space_token().line_number
+                        == token.line_number):
                     self._handle_error(
                         errors.MISSING_LINE,
-                        'Missing newline between constructor and goog.inherits',
+                        MISSING_NL_GI,
                         token,
                         position=Position.AtBeginning())
 
@@ -440,62 +450,66 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     extra_space = extra_space.next
 
                 # TODO(robbyw): Test the last function was a constructor.
-                # TODO(robbyw): Test correct @extends and @implements documentation.
+
+                # TODO(robbyw): Test correct @extends and @implements
+                # documentation.
 
             elif (token.string == 'goog.provide' and
                   not state.in_function() and
-                  namespaces_info is not None):
+                  ns_info is not None):
                 namespace = tokenutil.GetStringAfterToken(token)
 
                 # Report extra goog.provide statement.
-                if not namespace or namespaces_info.is_extra_provide(token):
+                if not namespace or ns_info.is_extra_provide(token):
                     if not namespace:
                         msg = 'Empty namespace in goog.provide'
                     else:
-                        msg = 'Unnecessary goog.provide: ' +  namespace
+                        msg = 'Unnecessary goog.provide: ' + namespace
 
                         # Hint to user if this is a Test namespace.
                         if namespace.endswith('Test'):
-                            msg += (' *Test namespaces must be mentioned in the '
-                                    'goog.setTestOnly() call')
+                            msg += SET_NS_TEST_ONLY
 
                     self._handle_error(
                         errors.EXTRA_GOOG_PROVIDE,
                         msg,
                         token, position=Position.AtBeginning())
 
-                if namespaces_info.is_last_provide(token):
-                    # Report missing provide statements after the last existing provide.
-                    missing_provides = namespaces_info.get_missing_provides()
+                if ns_info.is_last_provide(token):
+                    # Report missing provide statements after the last
+                    # existing provide.
+                    missing_provides = ns_info.get_missing_provides()
                     if missing_provides:
                         self._ReportMissingProvides(
                             missing_provides,
                             tokenutil.GetLastTokenInSameLine(token).next,
                             False)
 
-                    # If there are no require statements, missing requires should be
-                    # reported after the last provide.
-                    if not namespaces_info.get_required_namespaces():
+                    # If there are no require statements, missing
+                    # requires should be reported after the last
+                    # provide.
+                    if not ns_info.get_required_namespaces():
                         missing_requires, illegal_alias_statements = (
-                            namespaces_info.get_missing_requires())
+                            ns_info.get_missing_requires())
                         if missing_requires:
                             self._ReportMissingRequires(
                                 missing_requires,
                                 tokenutil.GetLastTokenInSameLine(token).next,
                                 True)
                         if illegal_alias_statements:
-                            self._ReportIllegalAliasStatement(illegal_alias_statements)
+                            self._ReportIllegalAliasStatement(
+                                illegal_alias_statements)
 
             elif (token.string == 'goog.require' and
                   not state.in_function() and
-                  namespaces_info is not None):
+                  ns_info is not None):
                 namespace = tokenutil.GetStringAfterToken(token)
 
-                # If there are no provide statements, missing provides should be
-                # reported before the first require.
-                if (namespaces_info.is_first_require(token)
-                        and not namespaces_info.get_provided_namespaces()):
-                    missing_provides = namespaces_info.get_missing_provides()
+                # If there are no provide statements, missing provides
+                # should be reported before the first require.
+                if (ns_info.is_first_require(token)
+                        and not ns_info.get_provided_namespaces()):
+                    missing_provides = ns_info.get_missing_provides()
                     if missing_provides:
                         self._ReportMissingProvides(
                             missing_provides,
@@ -503,7 +517,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                             True)
 
                 # Report extra goog.require statement.
-                if not namespace or namespaces_info.is_extra_require(token):
+                if not namespace or ns_info.is_extra_require(token):
                     if not namespace:
                         msg = 'Empty namespace in goog.require'
                     else:
@@ -515,24 +529,25 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                         token, position=Position.AtBeginning())
 
                 # Report missing goog.require statements.
-                if namespaces_info.is_last_require(token):
+                if ns_info.is_last_require(token):
                     missing_requires, illegal_alias_statements = (
-                        namespaces_info.get_missing_requires())
+                        ns_info.get_missing_requires())
                     if missing_requires:
                         self._ReportMissingRequires(
                             missing_requires,
                             tokenutil.GetLastTokenInSameLine(token).next,
                             False)
                     if illegal_alias_statements:
-                        self._ReportIllegalAliasStatement(illegal_alias_statements)
+                        self._ReportIllegalAliasStatement(
+                            illegal_alias_statements)
 
         elif token.type == Type.OPERATOR:
             last_in_line = token.IsLastInLine()
-            # If the token is unary and appears to be used in a unary context
-            # it's ok.  Otherwise, if it's at the end of the line or immediately
-            # before a comment, it's ok.
-            # Don't report an error before a start bracket - it will be reported
-            # by that token's space checks.
+            # If the token is unary and appears to be used in a unary
+            # context it's ok.  Otherwise, if it's at the end of the
+            # line or immediately before a comment, it's ok.
+            # Don't report an error before a start bracket - it will
+            # be reported by that token's space checks.
             if (not token.metadata.is_unary_operator()
                     and not last_in_line
                     and not token.next.IsComment()
@@ -551,11 +566,14 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         elif token.type == Type.WHITESPACE:
             first_in_line = token.IsFirstInLine()
             last_in_line = token.IsLastInLine()
-            # Check whitespace length if it's not the first token of the line and
-            # if it's not immediately before a comment.
-            if not last_in_line and not first_in_line and not token.next.IsComment():
+            # Check whitespace length if it's not the first token of
+            # the line and if it's not immediately before a comment.
+            if (not last_in_line
+                    and not first_in_line
+                    and not token.next.IsComment()):
                 # Ensure there is no space after opening parentheses.
-                if (token.previous.type in (Type.START_PAREN, Type.START_BRACKET,
+                if (token.previous.type in (Type.START_PAREN,
+                                            Type.START_BRACKET,
                                             Type.FUNCTION_NAME)
                         or token.next.type == Type.START_PARAMETERS):
                     self._handle_error(
@@ -573,7 +591,9 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     token,
                     position=Position.AtEnd(token.string))
             elif (previous_token.type == Type.KEYWORD and
-                  previous_token.string not in ['break', 'continue', 'return']):
+                  previous_token.string not in ['break',
+                                                'continue',
+                                                'return']):
                 self._handle_error(
                     errors.REDUNDANT_SEMICOLON,
                     ('Semicolon after \'%s\' without any statement.'
@@ -599,10 +619,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                     token,
                     lambda t: t.type not in Type.NON_CODE_TYPES,
                     reverse=True)
-                if previous_code_token and previous_code_token.IsKeyword('var'):
-                    # Add local variable declaration to the top of the unused locals
-                    # stack.
-                    self._unused_local_variables_by_scope[-1][identifier] = token
+                if (previous_code_token
+                        and previous_code_token.IsKeyword('var')):
+                    # Add local variable declaration to the top of the
+                    # unused locals stack.
+                    self._unused_local_vars_by_scope[-1][identifier] = token
                 elif token.type == Type.IDENTIFIER:
                     # This covers most cases where the variable is used as an identifier.
                     self._MarkLocalVariableUsed(token.string)
@@ -613,11 +634,11 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         elif token.type == Type.START_BLOCK:
             if in_function and state.is_function_open():
                 # Push a new map onto the stack
-                self._unused_local_variables_by_scope.append({})
+                self._unused_local_vars_by_scope.append({})
         elif token.type == Type.END_BLOCK:
             if state.is_function_close():
                 # Pop the stack and report any remaining locals as unused.
-                unused_local_variables = self._unused_local_variables_by_scope.pop()
+                unused_local_variables = self._unused_local_vars_by_scope.pop()
                 for unused_token in unused_local_variables.values():
                     self._handle_error(
                         errors.UNUSED_LOCAL_VARIABLE,
@@ -660,7 +681,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
         # Find the first instance of the identifier in the stack of function scopes
         # and mark it used.
         for unused_local_variables in reversed(
-                self._unused_local_variables_by_scope):
+                self._unused_local_vars_by_scope):
             if identifier in unused_local_variables:
                 del unused_local_variables[identifier]
                 break
