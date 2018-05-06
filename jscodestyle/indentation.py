@@ -121,6 +121,7 @@ class IndentationRules(object):
         self._start_index_offset = {}
 
     def finish(self):
+        """Move to the next stack."""
         if self._stack:
             old_stack = self._stack
             self._stack = []
@@ -144,7 +145,7 @@ class IndentationRules(object):
         token_type = token.type
         indentation_errors = []
         stack = self._stack
-        is_first = self._IsFirstNonWhitespaceTokenInLine(token)
+        is_first = self._is_first_non_whitespace_token(token)
 
         # Add tokens that could decrease indentation before checking.
         if token_type == TokenType.END_PAREN:
@@ -200,8 +201,8 @@ class IndentationRules(object):
             # Ignore lines that start with operators
             # since we report that already.
             # Ignore lines with tabs since we report that already.
-            expected = self._GetAllowableIndentations()
-            actual = self._GetActualIndentation(token)
+            expected = self._get_allowable_indentations()
+            actual = self._get_actual_indentation(token)
 
             # Special case comments describing else, case, and default.
             # Allow them to outdent to the parent block.
@@ -217,7 +218,7 @@ class IndentationRules(object):
                                                       'default'):
                     # TODO(robbyw): This almost certainly introduces
                     # false negatives.
-                    expected |= self._AddToEach(expected, -2)
+                    expected |= self._add_to_each(expected, -2)
 
             if actual >= 0 and actual not in expected:
                 expected = sorted(expected)
@@ -256,7 +257,7 @@ class IndentationRules(object):
             self._PopToImpliedBlock()
 
         # Add some tokens only if they appear at the end of the line.
-        is_last = self._IsLastCodeInLine(token)
+        is_last = self._is_last_code_in_line(token)
         if is_last:
             next_code_token = tokenutil.GetNextCodeToken(token)
             # Increase required indentation if this is an overlong
@@ -317,7 +318,7 @@ class IndentationRules(object):
 
         return indentation_errors
 
-    def _AddToEach(self, original, amount):
+    def _add_to_each(self, original, amount):
         """Returns a new set with the given amount added to each element.
 
         Args:
@@ -335,7 +336,7 @@ class IndentationRules(object):
 
     _HARD_STOP_STRINGS = ('return', '?')
 
-    def _IsHardStop(self, token):
+    def _is_hard_stop(self, token):
         """Determines if the given token can have a hard stop after it.
 
         Args:
@@ -352,7 +353,7 @@ class IndentationRules(object):
                 token.string in self._HARD_STOP_STRINGS or
                 token.IsAssignment())
 
-    def _GetAllowableIndentations(self):
+    def _get_allowable_indentations(self):
         """Computes the set of allowable indentations.
 
         Returns:
@@ -375,21 +376,21 @@ class IndentationRules(object):
             # Handle normal additive indentation tokens.
             if not token_info.overridden_by and token.string != 'return':
                 if token_info.is_block:
-                    expected = self._AddToEach(expected, 2)
-                    hard_stops = self._AddToEach(hard_stops, 2)
+                    expected = self._add_to_each(expected, 2)
+                    hard_stops = self._add_to_each(hard_stops, 2)
                     in_same_continuation = False
                 elif in_same_continuation:
-                    expected |= self._AddToEach(expected, 4)
-                    hard_stops |= self._AddToEach(hard_stops, 4)
+                    expected |= self._add_to_each(expected, 4)
+                    hard_stops |= self._add_to_each(hard_stops, 4)
                 else:
-                    expected = self._AddToEach(expected, 4)
-                    hard_stops |= self._AddToEach(hard_stops, 4)
+                    expected = self._add_to_each(expected, 4)
+                    hard_stops |= self._add_to_each(hard_stops, 4)
                     in_same_continuation = True
 
             # Handle hard stops after (, [, return, =, and ?
-            if self._IsHardStop(token):
+            if self._is_hard_stop(token):
                 override_is_hard_stop = (token_info.overridden_by and
-                                         self._IsHardStop(
+                                         self._is_hard_stop(
                                              token_info.overridden_by.token))
                 if token.type == TokenType.START_PAREN and token.previous:
                     # For someFunction(...) we allow to indent at the
@@ -424,7 +425,7 @@ class IndentationRules(object):
 
         return (expected | hard_stops) or set([0])
 
-    def _GetActualIndentation(self, token):
+    def _get_actual_indentation(self, token):
         """Gets the actual indentation of the line containing the given token.
 
         Args:
@@ -450,7 +451,7 @@ class IndentationRules(object):
         else:
             return 0
 
-    def _IsFirstNonWhitespaceTokenInLine(self, token):
+    def _is_first_non_whitespace_token(self, token):
         """Determines if the given token is the first non-space token on its line.
 
         Args:
@@ -466,7 +467,7 @@ class IndentationRules(object):
         return (token.previous and token.previous.IsFirstInLine() and
                 token.previous.type == TokenType.WHITESPACE)
 
-    def _IsLastCodeInLine(self, token):
+    def _is_last_code_in_line(self, token):
         """Determines if the given token is the last code token on its line.
 
         Args:
@@ -485,7 +486,7 @@ class IndentationRules(object):
             if token.type not in TokenType.NON_CODE_TYPES:
                 return False
 
-    def _AllFunctionPropertyAssignTokens(self, start_token, end_token):
+    def _all_funprop_assign_tokens(self, start_token, end_token):
         """Checks if tokens are (likely) a valid function property assignment.
 
         Args:
@@ -548,7 +549,7 @@ class IndentationRules(object):
                     last_token = token_info.token.previous
                     for stack_info in reversed(self._stack):
                         if (last_token
-                                and not self._AllFunctionPropertyAssignTokens(
+                                and not self._all_funprop_assign_tokens(
                                     stack_info.token,
                                     last_token)):
                             break
