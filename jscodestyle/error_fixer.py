@@ -18,18 +18,15 @@
 """Main class responsible for automatically fixing simple style violations."""
 
 import re
+import StringIO
 
 from jscodestyle import errors
 from jscodestyle import javascriptstatetracker
-from jscodestyle import javascripttokens
+from jscodestyle.javascripttokens import JavaScriptToken as Token
+from jscodestyle.javascripttokens import JavaScriptTokenType as TokenType
 from jscodestyle import requireprovidesorter
 from jscodestyle import tokenutil
 from jscodestyle.common import errorhandler
-import StringIO
-
-# Shorthand
-Token = javascripttokens.JavaScriptToken
-Type = javascripttokens.JavaScriptTokenType
 
 END_OF_FLAG_TYPE = re.compile(r'(}?\s*)$')
 
@@ -63,6 +60,9 @@ class ErrorFixer(errorhandler.ErrorHandler):
         self._file_token = None
         self.disable_indentation_fixing = disable_indentation_fixing
         self.fix_error_codes = None or []
+        self._file_is_html = None
+        self._file_changed_lines = set()
+        self._file_fix_count = 0
         self.dry_run = dry_run
         self.output_buffer = None
         if self.dry_run:
@@ -71,8 +71,8 @@ class ErrorFixer(errorhandler.ErrorHandler):
         try:
             self._fix_error_codes = set([errors.by_name(error.upper()) for error in
                                          self.fix_error_codes])
-        except KeyError as ke:
-            raise ValueError('Unknown error code ' + ke.args[0])
+        except KeyError as err:
+            raise ValueError('Unknown error code ' + err.args[0])
 
     def HandleFile(self, filename, first_token):
         """Notifies this ErrorPrinter that subsequent errors are in filename.
@@ -122,7 +122,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 return
 
             first_token = js_type.FirstToken()
-            question_mark = Token('?', Type.DOC_TYPE_MODIFIER, first_token.line,
+            question_mark = Token('?', TokenType.DOC_TYPE_MODIFIER, first_token.line,
                                   first_token.line_number)
             tokenutil.InsertTokenBefore(question_mark, first_token)
             js_type.tokens.insert(0, question_mark)
@@ -135,7 +135,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             for token in js_type.tokens:
                 if (token
                         and isinstance(token, Token)
-                        and token.type == Type.DOC_TYPE_MODIFIER
+                        and token.type == TokenType.DOC_TYPE_MODIFIER
                         and token.string == '|'):
                     tokenutil.DeleteToken(token)
                     js_type.tokens.remove(token)
@@ -159,7 +159,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
         elif code == errors.JSDOC_MISSING_OPTIONAL_TYPE:
             iterator = token.attached_object.type_end_token
-            if iterator.type == Type.DOC_END_BRACE or iterator.string.isspace():
+            if iterator.type == TokenType.DOC_END_BRACE or iterator.string.isspace():
                 iterator = iterator.previous
 
             ending_space = len(iterator.string) - len(iterator.string.rstrip())
@@ -172,7 +172,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
         elif code == errors.JSDOC_MISSING_VAR_ARGS_TYPE:
             iterator = token.attached_object.type_start_token
-            if iterator.type == Type.DOC_START_BRACE or iterator.string.isspace():
+            if iterator.type == TokenType.DOC_START_BRACE or iterator.string.isspace():
                 iterator = iterator.next
 
             starting_space = len(iterator.string) - len(iterator.string.lstrip())
@@ -185,7 +185,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
         elif code in (errors.MISSING_SEMICOLON_AFTER_FUNCTION,
                       errors.MISSING_SEMICOLON):
-            semicolon_token = Token(';', Type.SEMICOLON, token.line,
+            semicolon_token = Token(';', TokenType.SEMICOLON, token.line,
                                     token.line_number)
             tokenutil.InsertTokenAfter(semicolon_token, token)
             token.metadata.is_implied_semicolon = False
@@ -257,12 +257,12 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 self._AddFix(token)
 
         elif code == errors.UNNECESSARY_DOUBLE_QUOTED_STRING:
-            end_quote = tokenutil.Search(token, Type.DOUBLE_QUOTE_STRING_END)
+            end_quote = tokenutil.Search(token, TokenType.DOUBLE_QUOTE_STRING_END)
             if end_quote:
                 single_quote_start = Token(
-                    "'", Type.SINGLE_QUOTE_STRING_START, token.line, token.line_number)
+                    "'", TokenType.SINGLE_QUOTE_STRING_START, token.line, token.line_number)
                 single_quote_end = Token(
-                    "'", Type.SINGLE_QUOTE_STRING_START, end_quote.line,
+                    "'", TokenType.SINGLE_QUOTE_STRING_START, end_quote.line,
                     token.line_number)
 
                 tokenutil.InsertTokenAfter(single_quote_start, token)
@@ -275,7 +275,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             fixed_tokens = []
             start_token = token.attached_object.type_start_token
 
-            if start_token.type != Type.DOC_START_BRACE:
+            if start_token.type != TokenType.DOC_START_BRACE:
                 leading_space = (
                     len(start_token.string) - len(start_token.string.lstrip()))
                 if leading_space:
@@ -284,14 +284,14 @@ class ErrorFixer(errorhandler.ErrorHandler):
                     if token.attached_object.type_end_token == start_token.previous:
                         token.attached_object.type_end_token = start_token
 
-                new_token = Token('{', Type.DOC_START_BRACE, start_token.line,
+                new_token = Token('{', TokenType.DOC_START_BRACE, start_token.line,
                                   start_token.line_number)
                 tokenutil.InsertTokenAfter(new_token, start_token.previous)
                 token.attached_object.type_start_token = new_token
                 fixed_tokens.append(new_token)
 
             end_token = token.attached_object.type_end_token
-            if end_token.type != Type.DOC_END_BRACE:
+            if end_token.type != TokenType.DOC_END_BRACE:
                 # If the start token was a brace, the end token will be a
                 # FLAG_ENDING_TYPE token, if there wasn't a starting brace then
                 # the end token is the last token of the actual type.
@@ -305,14 +305,14 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 # If there was no starting brace then a lone end brace wouldn't have
                 # been type end token. Now that we've added any missing start brace,
                 # see if the last effective type token was an end brace.
-                if last_type.type != Type.DOC_END_BRACE:
+                if last_type.type != TokenType.DOC_END_BRACE:
                     trailing_space = (len(last_type.string) -
                                       len(last_type.string.rstrip()))
                     if trailing_space:
                         tokenutil.SplitToken(last_type,
                                              len(last_type.string) - trailing_space)
 
-                    new_token = Token('}', Type.DOC_END_BRACE, last_type.line,
+                    new_token = Token('}', TokenType.DOC_END_BRACE, last_type.line,
                                       last_type.line_number)
                     tokenutil.InsertTokenAfter(new_token, last_type)
                     token.attached_object.type_end_token = new_token
@@ -331,7 +331,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             insertion_point = tokenutil.GetPreviousCodeToken(token)
 
             # Insert a space between the previous token and the new operator.
-            space = Token(' ', Type.WHITESPACE, insertion_point.line,
+            space = Token(' ', TokenType.WHITESPACE, insertion_point.line,
                           insertion_point.line_number)
             tokenutil.InsertTokenAfter(space, insertion_point)
 
@@ -399,12 +399,12 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 token.string = token.string.lstrip()
                 actual = 0
 
-            if token.type in (Type.WHITESPACE, Type.PARAMETERS) and actual != 0:
+            if token.type in (TokenType.WHITESPACE, TokenType.PARAMETERS) and actual != 0:
                 token.string = token.string.lstrip() + (' ' * expected)
                 self._AddFix([token])
             else:
                 # We need to add indentation.
-                new_token = Token(' ' * expected, Type.WHITESPACE,
+                new_token = Token(' ' * expected, TokenType.WHITESPACE,
                                   token.line, token.line_number)
                 # Note that we'll never need to add indentation at the first line,
                 # since it will always not be indented.  Therefore it's safe to assume
@@ -416,15 +416,15 @@ class ErrorFixer(errorhandler.ErrorHandler):
                       errors.MISSING_END_OF_SCOPE_COMMENT]:
             # Only fix cases where }); is found with no trailing content on the line
             # other than a comment. Value of 'token' is set to } for this error.
-            if (token.type == Type.END_BLOCK
-                    and token.next.type == Type.END_PAREN
-                    and token.next.next.type == Type.SEMICOLON):
+            if (token.type == TokenType.END_BLOCK
+                    and token.next.type == TokenType.END_PAREN
+                    and token.next.next.type == TokenType.SEMICOLON):
                 current_token = token.next.next.next
                 removed_tokens = []
                 while current_token and current_token.line_number == token.line_number:
-                    if current_token.IsAnyType(Type.WHITESPACE,
-                                               Type.START_SINGLE_LINE_COMMENT,
-                                               Type.COMMENT):
+                    if current_token.IsAnyType(TokenType.WHITESPACE,
+                                               TokenType.START_SINGLE_LINE_COMMENT,
+                                               TokenType.COMMENT):
                         removed_tokens.append(current_token)
                         current_token = current_token.next
                     else:
@@ -433,11 +433,11 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 if removed_tokens:
                     self._DeleteTokens(removed_tokens[0], len(removed_tokens))
 
-                whitespace_token = Token('  ', Type.WHITESPACE, token.line,
+                whitespace_token = Token('  ', TokenType.WHITESPACE, token.line,
                                          token.line_number)
-                start_comment_token = Token('//', Type.START_SINGLE_LINE_COMMENT,
+                start_comment_token = Token('//', TokenType.START_SINGLE_LINE_COMMENT,
                                             token.line, token.line_number)
-                comment_token = Token(' goog.scope', Type.COMMENT, token.line,
+                comment_token = Token(' goog.scope', TokenType.COMMENT, token.line,
                                       token.line_number)
                 insertion_tokens = [whitespace_token, start_comment_token,
                                     comment_token]
@@ -452,8 +452,8 @@ class ErrorFixer(errorhandler.ErrorHandler):
             # delete one blank line also.
             if (tokens_in_line[0].previous
                     and tokens_in_line[-1].next
-                    and tokens_in_line[0].previous.type == Type.BLANK_LINE
-                    and tokens_in_line[-1].next.type == Type.BLANK_LINE):
+                    and tokens_in_line[0].previous.type == TokenType.BLANK_LINE
+                    and tokens_in_line[-1].next.type == TokenType.BLANK_LINE):
                 num_delete_tokens += 1
             self._DeleteTokens(tokens_in_line[0], num_delete_tokens)
             self._AddFix(tokens_in_line)
@@ -462,7 +462,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             missing_namespaces = error.fix_data[0]
             need_blank_line = error.fix_data[1] or (not token.previous)
 
-            insert_location = Token('', Type.NORMAL, '', token.line_number - 1)
+            insert_location = Token('', TokenType.NORMAL, '', token.line_number - 1)
             dummy_first_token = insert_location
             tokenutil.InsertTokenBefore(insert_location, token)
 
@@ -470,7 +470,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             # token to avoid extra blank lines.
             if (need_blank_line
                     and insert_location.previous
-                    and insert_location.previous.type != Type.BLANK_LINE):
+                    and insert_location.previous.type != TokenType.BLANK_LINE):
                 tokenutil.InsertBlankLineAfter(insert_location)
                 insert_location = insert_location.next
 
@@ -486,7 +486,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             # token to avoid extra blank lines.
             if (need_blank_line
                     and insert_location.next
-                    and insert_location.next.type != Type.BLANK_LINE):
+                    and insert_location.next.type != TokenType.BLANK_LINE):
                 tokenutil.InsertBlankLineAfter(insert_location)
 
             tokenutil.DeleteToken(dummy_first_token)
@@ -499,7 +499,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
           before: If true, strip space before the token, if false, after it.
         """
         token = token.previous if before else token.next
-        while token and token.type == Type.WHITESPACE:
+        while token and token.type == TokenType.WHITESPACE:
             tokenutil.DeleteToken(token)
             token = token.previous if before else token.next
 
@@ -520,13 +520,13 @@ class ErrorFixer(errorhandler.ErrorHandler):
             string = 'goog.provide'
         line_text = string + '(\'' + namespace + '\');\n'
         return [
-            Token(string, Type.IDENTIFIER, line_text, line_number),
-            Token('(', Type.START_PAREN, line_text, line_number),
-            Token('\'', Type.SINGLE_QUOTE_STRING_START, line_text, line_number),
-            Token(namespace, Type.STRING_TEXT, line_text, line_number),
-            Token('\'', Type.SINGLE_QUOTE_STRING_END, line_text, line_number),
-            Token(')', Type.END_PAREN, line_text, line_number),
-            Token(';', Type.SEMICOLON, line_text, line_number)
+            Token(string, TokenType.IDENTIFIER, line_text, line_number),
+            Token('(', TokenType.START_PAREN, line_text, line_number),
+            Token('\'', TokenType.SINGLE_QUOTE_STRING_START, line_text, line_number),
+            Token(namespace, TokenType.STRING_TEXT, line_text, line_number),
+            Token('\'', TokenType.SINGLE_QUOTE_STRING_END, line_text, line_number),
+            Token(')', TokenType.END_PAREN, line_text, line_number),
+            Token(';', TokenType.SEMICOLON, line_text, line_number)
             ]
 
     def _DeleteToken(self, token):
