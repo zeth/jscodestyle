@@ -133,8 +133,10 @@ class ErrorFixer(errorhandler.ErrorHandler):
             # Now also remove the separator, which is in the parent's token list,
             # either before or after the sub_type, there is exactly one. Scan for it.
             for token in js_type.tokens:
-                if (token and isinstance(token, Token) and
-                    token.type == Type.DOC_TYPE_MODIFIER and token.string == '|'):
+                if (token
+                        and isinstance(token, Token)
+                        and token.type == Type.DOC_TYPE_MODIFIER
+                        and token.string == '|'):
                     tokenutil.DeleteToken(token)
                     js_type.tokens.remove(token)
                     self._AddFix(token)
@@ -392,8 +394,8 @@ class ErrorFixer(errorhandler.ErrorHandler):
             expected = error.position.length
 
             # Cases where first token is param but with leading spaces.
-            if (len(token.string.lstrip()) == len(token.string) - actual and
-                token.string.lstrip()):
+            if (len(token.string.lstrip()) == len(token.string) - actual
+                    and token.string.lstrip()):
                 token.string = token.string.lstrip()
                 actual = 0
 
@@ -414,9 +416,9 @@ class ErrorFixer(errorhandler.ErrorHandler):
                       errors.MISSING_END_OF_SCOPE_COMMENT]:
             # Only fix cases where }); is found with no trailing content on the line
             # other than a comment. Value of 'token' is set to } for this error.
-            if (token.type == Type.END_BLOCK and
-                token.next.type == Type.END_PAREN and
-                token.next.next.type == Type.SEMICOLON):
+            if (token.type == Type.END_BLOCK
+                    and token.next.type == Type.END_PAREN
+                    and token.next.next.type == Type.SEMICOLON):
                 current_token = token.next.next.next
                 removed_tokens = []
                 while current_token and current_token.line_number == token.line_number:
@@ -448,9 +450,10 @@ class ErrorFixer(errorhandler.ErrorHandler):
             num_delete_tokens = len(tokens_in_line)
             # If line being deleted is preceded and succeed with blank lines then
             # delete one blank line also.
-            if (tokens_in_line[0].previous and tokens_in_line[-1].next
-                and tokens_in_line[0].previous.type == Type.BLANK_LINE
-                and tokens_in_line[-1].next.type == Type.BLANK_LINE):
+            if (tokens_in_line[0].previous
+                    and tokens_in_line[-1].next
+                    and tokens_in_line[0].previous.type == Type.BLANK_LINE
+                    and tokens_in_line[-1].next.type == Type.BLANK_LINE):
                 num_delete_tokens += 1
             self._DeleteTokens(tokens_in_line[0], num_delete_tokens)
             self._AddFix(tokens_in_line)
@@ -465,8 +468,9 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
             # If inserting a blank line check blank line does not exist before
             # token to avoid extra blank lines.
-            if (need_blank_line and insert_location.previous
-                and insert_location.previous.type != Type.BLANK_LINE):
+            if (need_blank_line
+                    and insert_location.previous
+                    and insert_location.previous.type != Type.BLANK_LINE):
                 tokenutil.InsertBlankLineAfter(insert_location)
                 insert_location = insert_location.next
 
@@ -480,8 +484,9 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
             # If inserting a blank line check blank line does not exist after
             # token to avoid extra blank lines.
-            if (need_blank_line and insert_location.next
-                and insert_location.next.type != Type.BLANK_LINE):
+            if (need_blank_line
+                    and insert_location.next
+                    and insert_location.next.type != Type.BLANK_LINE):
                 tokenutil.InsertBlankLineAfter(insert_location)
 
             tokenutil.DeleteToken(dummy_first_token)
@@ -597,8 +602,9 @@ class ErrorFixer(errorhandler.ErrorHandler):
                     # file or newly added error fix by looking at the "org_line_number"
                     # field on the token. It is only set in the tokenizer, so for all
                     # error fixes, the value should be None.
-                    if (line or not self._file_is_html or
-                        token.orig_line_number is None):
+                    if (line
+                            or not self._file_is_html
+                            or token.orig_line_number is None):
                         f.write(line)
                         f.write('\n')
                     else:
