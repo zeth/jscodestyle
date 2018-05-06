@@ -152,9 +152,9 @@ class IndentationRules(object):
                 goog_scope = tokenutil.GoogScopeOrNoneFromStartBlock(start_token.token)
                 if goog_scope is not None:
                     if not token.line.endswith(';  // goog.scope\n'):
-                        if (token.line.find('//') > -1 and
-                            token.line.find('goog.scope') >
-                            token.line.find('//')):
+                        if (token.line.find('//') > -1
+                                and token.line.find('goog.scope') >
+                                token.line.find('//')):
                             indentation_errors.append([
                                 errors.MALFORMED_END_OF_SCOPE_COMMENT,
                                 ('Malformed end of goog.scope comment. Please use the '
@@ -178,8 +178,9 @@ class IndentationRules(object):
         elif token_type == Type.SEMICOLON:
             self._PopTransient()
 
-        if (is_first and
-            token_type not in (Type.COMMENT, Type.DOC_PREFIX, Type.STRING_TEXT)):
+        if (is_first and token_type not in (Type.COMMENT,
+                                            Type.DOC_PREFIX,
+                                            Type.STRING_TEXT)):
             if self.debug_indentation:
                 print 'Line #%d: stack %r' % (token.line_number, stack)
 
@@ -227,7 +228,7 @@ class IndentationRules(object):
             self._Add(TokenInfo(token))
 
         elif not token.IsLastInLine() and (
-            token.IsAssignment() or token.IsOperator('?')):
+                token.IsAssignment() or token.IsOperator('?')):
             self._Add(TokenInfo(token=token))
 
         # Handle implied block closes.
@@ -366,15 +367,16 @@ class IndentationRules(object):
                     # For someFunction(...) we allow to indent at the beginning of the
                     # identifier +4
                     prev = token.previous
-                    if (prev.type == Type.IDENTIFIER and
-                        prev.line_number == token.line_number):
+                    if (prev.type == Type.IDENTIFIER
+                            and prev.line_number == token.line_number):
                         hard_stops.add(prev.start_index + 4)
                 if not override_is_hard_stop:
                     start_index = token.start_index
                     if token.line_number in self._start_index_offset:
                         start_index += self._start_index_offset[token.line_number]
-                    if (token.type in (Type.START_PAREN, Type.START_PARAMETERS) and
-                        not token_info.overridden_by):
+                    if (token.type in (Type.START_PAREN,
+                                       Type.START_PARAMETERS)
+                            and not token_info.overridden_by):
                         hard_stops.add(start_index + 1)
 
                     elif token.string == 'return' and not token_info.overridden_by:
@@ -467,11 +469,12 @@ class IndentationRules(object):
                               Type.START_PARAMETERS,
                               Type.END_PARAMETERS,
                               Type.END_PAREN)
-            if (token.type not in fn_decl_tokens and
-                token.IsCode() and
-                not tokenutil.IsIdentifierOrDot(token) and
-                not token.IsAssignment() and
-                not (token.type == Type.OPERATOR and token.string == ',')):
+            if (token.type not in fn_decl_tokens
+                    and token.IsCode()
+                    and not tokenutil.IsIdentifierOrDot(token)
+                    and not token.IsAssignment()
+                    and not (token.type == Type.OPERATOR
+                             and token.string == ',')):
                 return False
         return True
 
@@ -489,8 +492,8 @@ class IndentationRules(object):
             scope_token = tokenutil.GoogScopeOrNoneFromStartBlock(token_info.token)
             token_info.overridden_by = TokenInfo(scope_token) if scope_token else None
 
-            if (token_info.token.type == Type.START_BLOCK and
-                token_info.token.metadata.context.type == Context.BLOCK):
+            if (token_info.token.type == Type.START_BLOCK
+                    and token_info.token.metadata.context.type == Context.BLOCK):
                 # Handle function() {} assignments: their block contents get special
                 # treatment and are allowed to just indent by two whitespace.
                 # For example
@@ -504,9 +507,10 @@ class IndentationRules(object):
                 if has_assignment:
                     last_token = token_info.token.previous
                     for stack_info in reversed(self._stack):
-                        if (last_token and
-                            not self._AllFunctionPropertyAssignTokens(stack_info.token,
-                                                                      last_token)):
+                        if (last_token
+                                and not self._AllFunctionPropertyAssignTokens(
+                                    stack_info.token,
+                                    last_token)):
                             break
                         stack_info.overridden_by = token_info
                         stack_info.is_permanent_override = True
@@ -521,9 +525,9 @@ class IndentationRules(object):
                     # In general, tokens only override each other when they are on
                     # the same line.
                     stack_info.overridden_by = token_info
-                    if (token_info.token.type == Type.START_BLOCK and
-                        (stack_token.IsAssignment() or
-                         stack_token.type in (Type.IDENTIFIER, Type.START_PAREN))):
+                    if (token_info.token.type == Type.START_BLOCK
+                            and (stack_token.IsAssignment() or
+                                 stack_token.type in (Type.IDENTIFIER, Type.START_PAREN))):
                         # Multi-line blocks have lasting overrides, as in:
                         # callFn({
                         #   a: 10
@@ -601,8 +605,8 @@ class IndentationRules(object):
           token_info: The token that is being removed from the stack.
         """
         for stack_token in self._stack:
-            if (stack_token.overridden_by == token_info and
-                not stack_token.is_permanent_override):
+            if (stack_token.overridden_by == token_info
+                    and not stack_token.is_permanent_override):
                 stack_token.overridden_by = None
 
     def _PopTransient(self):
