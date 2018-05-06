@@ -264,7 +264,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
             if (self.should_check(Rule.BLANK_LINES_AT_TOP_LEVEL)
                     and not self._is_html
                     and state.in_top_level()
-                    and not state.InNonScopeBlock()):
+                    and not state.in_non_scope_block()):
 
                 # Check if we're in a fileoverview or constructor JsDoc.
                 is_constructor = (
@@ -403,7 +403,7 @@ class JavaScriptLintRules(ecmalintrules.EcmaScriptLintRules):
                 # If in object literal, find first token of block so
                 # to find previous tokens to check above condition.
                 if state.in_object_literal():
-                    block_start = state.GetCurrentBlockStart()
+                    block_start = state.get_current_blockstart()
 
                 # If an object literal then get previous token (code
                 # type). For above case it should be '='.

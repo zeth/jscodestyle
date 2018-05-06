@@ -16,14 +16,9 @@
 
 """Parser for JavaScript files."""
 
-
-
-from jscodestyle import javascripttokens
+from jscodestyle.javascripttokens import JavaScriptTokenType as Type
 from jscodestyle import statetracker
 from jscodestyle import tokenutil
-
-# Shorthand
-Type = javascripttokens.JavaScriptTokenType
 
 
 class JsDocFlag(statetracker.DocFlag):
@@ -75,13 +70,14 @@ class JavaScriptStateTracker(statetracker.StateTracker):
     def in_top_level(self):
         """Compute whether we are at the top level in the class.
 
-        This function call is language specific.  In some languages like
-        JavaScript, a function is top level if it is not inside any parenthesis.
-        In languages such as ActionScript, a function is top level if it is directly
-        within a class.
+        This function call is language specific.  In some languages
+        like JavaScript, a function is top level if it is not inside
+        any parenthesis.  In languages such as ActionScript, a
+        function is top level if it is directly within a class.
 
         Returns:
           Whether we are at the top level in the class.
+
         """
         return self._scope_depth == self.parentheses_depth()
 
@@ -95,33 +91,39 @@ class JavaScriptStateTracker(statetracker.StateTracker):
         """
         return self._scope_depth != self.function_depth()
 
-    def InNonScopeBlock(self):
+    def in_non_scope_block(self):
         """Compute whether we are nested within a non-goog.scope block.
 
         Returns:
-          True if the token is not enclosed in a block that does not originate from
-          a goog.scope statement. False otherwise.
+                True if the token is not enclosed in a block that does
+                not originate from a goog.scope statement. False
+                otherwise.
         """
         return self._scope_depth != self.block_depth()
 
     def get_block_type(self, token):
         """Determine the block type given a START_BLOCK token.
 
-        Code blocks come after parameters, keywords  like else, and closing parens.
+        Code blocks come after parameters, keywords like else, and
+        closing parens.
 
         Args:
           token: The current token. Can be assumed to be type START_BLOCK
         Returns:
           Code block type for current token.
+
         """
-        last_code = tokenutil.SearchExcept(token, Type.NON_CODE_TYPES, reverse=True)
+        last_code = tokenutil.SearchExcept(token,
+                                           Type.NON_CODE_TYPES,
+                                           reverse=True)
         if last_code.type in (Type.END_PARAMETERS, Type.END_PAREN,
-                              Type.KEYWORD) and not last_code.IsKeyword('return'):
+                              Type.KEYWORD) and not last_code.IsKeyword(
+                                  'return'):
             return self.CODE
         else:
             return self.OBJECT_LITERAL
 
-    def GetCurrentBlockStart(self):
+    def get_current_blockstart(self):
         """Gets the start token of current block.
 
         Returns:
