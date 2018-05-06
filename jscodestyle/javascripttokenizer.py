@@ -20,13 +20,10 @@
 import copy
 import re
 
-from jscodestyle import javascripttokens
-from jscodestyle.common import matcher
+from jscodestyle.javascripttokens import JavaScriptTokenType as Type
+from jscodestyle.javascripttokens import JavaScriptToken as Token
+from jscodestyle.common.matcher import Matcher
 from jscodestyle.common import tokenizer
-
-# Shorthand
-Type = javascripttokens.JavaScriptTokenType
-Matcher = matcher.Matcher
 
 
 class JavaScriptModes(object):
@@ -309,7 +306,7 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
     }
 
     @classmethod
-    def BuildMatchers(cls):
+    def build_matchers(cls):
         """Builds the token matcher group.
 
         The token matcher groups work as follows: it is a list of Matcher objects.
@@ -450,15 +447,17 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
           parse_js_doc: Whether to do detailed parsing of javascript doc comments,
               or simply treat them as normal comments.  Defaults to parsing JsDoc.
         """
-        matchers = self.BuildMatchers()
+        matchers = self.build_matchers()
         if not parse_js_doc:
             # Make a copy so the original doesn't get modified.
             matchers = copy.deepcopy(matchers)
             matchers[JavaScriptModes.DOC_COMMENT_MODE] = matchers[
                 JavaScriptModes.BLOCK_COMMENT_MODE]
 
-        tokenizer.Tokenizer.__init__(self, JavaScriptModes.TEXT_MODE, matchers,
-            self.JAVASCRIPT_DEFAULT_TYPES)
+        tokenizer.Tokenizer.__init__(self,
+                                     JavaScriptModes.TEXT_MODE,
+                                     matchers,
+                                     self.JAVASCRIPT_DEFAULT_TYPES)
 
     def _CreateToken(self, string, token_type, line, line_number, values=None):
         """Creates a new JavaScriptToken object.
@@ -472,5 +471,5 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
             function declaration may have a value called 'name' which captures the
             name of the function.
         """
-        return javascripttokens.JavaScriptToken(string, token_type, line,
-                                                line_number, values, line_number)
+        return Token(string, token_type, line,
+                     line_number, values, line_number)
