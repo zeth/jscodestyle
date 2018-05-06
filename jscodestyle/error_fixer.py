@@ -59,7 +59,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
         self._file_name = None
         self._file_token = None
         self.disable_indentation_fixing = disable_indentation_fixing
-        self.fix_error_codes = None or []
+        self.fix_error_codes = fix_error_codes or []
         self._file_is_html = None
         self._file_changed_lines = set()
         self._file_fix_count = 0
@@ -87,7 +87,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
         self._file_fix_count = 0
         self._file_changed_lines = set()
 
-    def _AddFix(self, tokens):
+    def _add_fix(self, tokens):
         """Adds the fix to the internal count.
 
         Args:
@@ -100,7 +100,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             for token in tokens:
                 self._file_changed_lines.add(token.line_number)
 
-    def _FixJsDocPipeNull(self, js_type):
+    def _fix_jsdoc_pipe_null(self, js_type):
         """Change number|null or null|number to ?number.
 
         Args:
@@ -108,7 +108,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
         """
 
         # Recurse into all sub_types if the error was at a deeper level.
-        map(self._FixJsDocPipeNull, js_type.IterTypes())
+        map(self._fix_jsdoc_pipe_null, js_type.IterTypes())
 
         if js_type.type_group and len(js_type.sub_types) == 2:
             # Find and remove the null sub_type:
@@ -116,7 +116,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             for sub_type in js_type.sub_types:
                 if sub_type.identifier == 'null':
                     map(tokenutil.DeleteToken, sub_type.tokens)
-                    self._AddFix(sub_type.tokens)
+                    self._add_fix(sub_type.tokens)
                     break
             else:
                 return
@@ -139,7 +139,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                         and token.string == '|'):
                     tokenutil.DeleteToken(token)
                     js_type.tokens.remove(token)
-                    self._AddFix(token)
+                    self._add_fix(token)
                     break
 
     def handle_error(self, error):
@@ -155,7 +155,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             return
 
         if code == errors.JSDOC_PREFER_QUESTION_TO_PIPE_NULL:
-            self._FixJsDocPipeNull(token.attached_object.jstype)
+            self._fix_jsdoc_pipe_null(token.attached_object.jstype)
 
         elif code == errors.JSDOC_MISSING_OPTIONAL_TYPE:
             iterator = token.attached_object.type_end_token
@@ -168,7 +168,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
             # Create a new flag object with updated type info.
             token.attached_object = javascriptstatetracker.JsDocFlag(token)
-            self._AddFix(token)
+            self._add_fix(token)
 
         elif code == errors.JSDOC_MISSING_VAR_ARGS_TYPE:
             iterator = token.attached_object.type_start_token
@@ -181,7 +181,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
             # Create a new flag object with updated type info.
             token.attached_object = javascriptstatetracker.JsDocFlag(token)
-            self._AddFix(token)
+            self._add_fix(token)
 
         elif code in (errors.MISSING_SEMICOLON_AFTER_FUNCTION,
                       errors.MISSING_SEMICOLON):
@@ -190,27 +190,27 @@ class ErrorFixer(errorhandler.ErrorHandler):
             tokenutil.InsertTokenAfter(semicolon_token, token)
             token.metadata.is_implied_semicolon = False
             semicolon_token.metadata.is_implied_semicolon = False
-            self._AddFix(token)
+            self._add_fix(token)
 
         elif code in (errors.ILLEGAL_SEMICOLON_AFTER_FUNCTION,
                       errors.REDUNDANT_SEMICOLON,
                       errors.COMMA_AT_END_OF_LITERAL):
-            self._DeleteToken(token)
-            self._AddFix(token)
+            self._delete_token(token)
+            self._add_fix(token)
 
         elif code == errors.INVALID_JSDOC_TAG:
             if token.string == '@returns':
                 token.string = '@return'
-                self._AddFix(token)
+                self._add_fix(token)
 
         elif code == errors.FILE_MISSING_NEWLINE:
             # This error is fixed implicitly by the way we restore the file
-            self._AddFix(token)
+            self._add_fix(token)
 
         elif code == errors.MISSING_SPACE:
             if error.fix_data:
                 token.string = error.fix_data
-                self._AddFix(token)
+                self._add_fix(token)
             elif error.position:
                 if error.position.IsAtBeginning():
                     tokenutil.InsertSpaceTokenAfter(token.previous)
@@ -218,23 +218,23 @@ class ErrorFixer(errorhandler.ErrorHandler):
                     tokenutil.InsertSpaceTokenAfter(token)
                 else:
                     token.string = error.position.Set(token.string, ' ')
-                self._AddFix(token)
+                self._add_fix(token)
 
         elif code == errors.EXTRA_SPACE:
             if error.position:
                 token.string = error.position.Set(token.string, '')
-                self._AddFix(token)
+                self._add_fix(token)
 
         elif code == errors.MISSING_LINE:
             if error.position.IsAtBeginning():
                 tokenutil.InsertBlankLineAfter(token.previous)
             else:
                 tokenutil.InsertBlankLineAfter(token)
-            self._AddFix(token)
+            self._add_fix(token)
 
         elif code == errors.EXTRA_LINE:
-            self._DeleteToken(token)
-            self._AddFix(token)
+            self._delete_token(token)
+            self._add_fix(token)
 
         elif code == errors.WRONG_BLANK_LINE_COUNT:
             if not token.previous:
@@ -248,13 +248,13 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 num_lines *= -1
                 should_delete = True
 
-            for unused_i in xrange(1, num_lines + 1):
+            for _ in xrange(1, num_lines + 1):
                 if should_delete:
                     # TODO(user): DeleteToken should update line numbers.
-                    self._DeleteToken(token.previous)
+                    self._delete_token(token.previous)
                 else:
                     tokenutil.InsertBlankLineAfter(token.previous)
-                self._AddFix(token)
+                self._add_fix(token)
 
         elif code == errors.UNNECESSARY_DOUBLE_QUOTED_STRING:
             end_quote = tokenutil.Search(token, TokenType.DOUBLE_QUOTE_STRING_END)
@@ -267,9 +267,9 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
                 tokenutil.InsertTokenAfter(single_quote_start, token)
                 tokenutil.InsertTokenAfter(single_quote_end, end_quote)
-                self._DeleteToken(token)
-                self._DeleteToken(end_quote)
-                self._AddFix([token, end_quote])
+                self._delete_token(token)
+                self._delete_token(end_quote)
+                self._add_fix([token, end_quote])
 
         elif code == errors.MISSING_BRACES_AROUND_TYPE:
             fixed_tokens = []
@@ -318,15 +318,15 @@ class ErrorFixer(errorhandler.ErrorHandler):
                     token.attached_object.type_end_token = new_token
                     fixed_tokens.append(new_token)
 
-            self._AddFix(fixed_tokens)
+            self._add_fix(fixed_tokens)
 
         elif code == errors.LINE_STARTS_WITH_OPERATOR:
             # Remove whitespace following the operator so the line starts clean.
-            self._StripSpace(token, before=False)
+            self._strip_space(token, before=False)
 
             # Remove the operator.
             tokenutil.DeleteToken(token)
-            self._AddFix(token)
+            self._add_fix(token)
 
             insertion_point = tokenutil.GetPreviousCodeToken(token)
 
@@ -339,15 +339,15 @@ class ErrorFixer(errorhandler.ErrorHandler):
             new_token = Token(token.string, token.type, insertion_point.line,
                               insertion_point.line_number)
             tokenutil.InsertTokenAfter(new_token, space)
-            self._AddFix(new_token)
+            self._add_fix(new_token)
 
         elif code == errors.LINE_ENDS_WITH_DOT:
             # Remove whitespace preceding the operator to remove trailing whitespace.
-            self._StripSpace(token, before=True)
+            self._strip_space(token, before=True)
 
             # Remove the dot.
             tokenutil.DeleteToken(token)
-            self._AddFix(token)
+            self._add_fix(token)
 
             insertion_point = tokenutil.GetNextCodeToken(token)
 
@@ -355,27 +355,27 @@ class ErrorFixer(errorhandler.ErrorHandler):
             new_token = Token(token.string, token.type, insertion_point.line,
                               insertion_point.line_number)
             tokenutil.InsertTokenBefore(new_token, insertion_point)
-            self._AddFix(new_token)
+            self._add_fix(new_token)
 
         elif code == errors.GOOG_REQUIRES_NOT_ALPHABETIZED:
             require_start_token = error.fix_data
             sorter = requireprovidesorter.RequireProvideSorter()
             sorter.FixRequires(require_start_token)
 
-            self._AddFix(require_start_token)
+            self._add_fix(require_start_token)
 
         elif code == errors.GOOG_PROVIDES_NOT_ALPHABETIZED:
             provide_start_token = error.fix_data
             sorter = requireprovidesorter.RequireProvideSorter()
             sorter.FixProvides(provide_start_token)
 
-            self._AddFix(provide_start_token)
+            self._add_fix(provide_start_token)
 
         elif code == errors.UNNECESSARY_BRACES_AROUND_INHERIT_DOC:
             if token.previous.string == '{' and token.next.string == '}':
-                self._DeleteToken(token.previous)
-                self._DeleteToken(token.next)
-                self._AddFix([token])
+                self._delete_token(token.previous)
+                self._delete_token(token.next)
+                self._add_fix([token])
 
         elif code == errors.INVALID_AUTHOR_TAG_DESCRIPTION:
             match = INVERTED_AUTHOR_SPEC.match(token.string)
@@ -385,7 +385,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                                                  match.group('whitespace_after_name'),
                                                  match.group('name'),
                                                  match.group('trailing_characters'))
-                self._AddFix(token)
+                self._add_fix(token)
 
         elif (code == errors.WRONG_INDENTATION and
               not self.disable_indentation_fixing):
@@ -401,7 +401,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
             if token.type in (TokenType.WHITESPACE, TokenType.PARAMETERS) and actual != 0:
                 token.string = token.string.lstrip() + (' ' * expected)
-                self._AddFix([token])
+                self._add_fix([token])
             else:
                 # We need to add indentation.
                 new_token = Token(' ' * expected, TokenType.WHITESPACE,
@@ -410,7 +410,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 # since it will always not be indented.  Therefore it's safe to assume
                 # token.previous exists.
                 tokenutil.InsertTokenAfter(new_token, token.previous)
-                self._AddFix([token])
+                self._add_fix([token])
 
         elif code in [errors.MALFORMED_END_OF_SCOPE_COMMENT,
                       errors.MISSING_END_OF_SCOPE_COMMENT]:
@@ -431,7 +431,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                         return
 
                 if removed_tokens:
-                    self._DeleteTokens(removed_tokens[0], len(removed_tokens))
+                    self._delete_tokens(removed_tokens[0], len(removed_tokens))
 
                 whitespace_token = Token('  ', TokenType.WHITESPACE, token.line,
                                          token.line_number)
@@ -443,7 +443,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
                                     comment_token]
 
                 tokenutil.InsertTokensAfter(insertion_tokens, token.next.next)
-                self._AddFix(removed_tokens + insertion_tokens)
+                self._add_fix(removed_tokens + insertion_tokens)
 
         elif code in [errors.EXTRA_GOOG_PROVIDE, errors.EXTRA_GOOG_REQUIRE]:
             tokens_in_line = tokenutil.GetAllTokensInSameLine(token)
@@ -455,8 +455,8 @@ class ErrorFixer(errorhandler.ErrorHandler):
                     and tokens_in_line[0].previous.type == TokenType.BLANK_LINE
                     and tokens_in_line[-1].next.type == TokenType.BLANK_LINE):
                 num_delete_tokens += 1
-            self._DeleteTokens(tokens_in_line[0], num_delete_tokens)
-            self._AddFix(tokens_in_line)
+            self._delete_tokens(tokens_in_line[0], num_delete_tokens)
+            self._add_fix(tokens_in_line)
 
         elif code in [errors.MISSING_GOOG_PROVIDE, errors.MISSING_GOOG_REQUIRE]:
             missing_namespaces = error.fix_data[0]
@@ -475,12 +475,12 @@ class ErrorFixer(errorhandler.ErrorHandler):
                 insert_location = insert_location.next
 
             for missing_namespace in missing_namespaces:
-                new_tokens = self._GetNewRequireOrProvideTokens(
+                new_tokens = self._get_new_requireprovide_tokens(
                     code == errors.MISSING_GOOG_PROVIDE,
                     missing_namespace, insert_location.line_number + 1)
                 tokenutil.InsertLineAfter(insert_location, new_tokens)
                 insert_location = new_tokens[-1]
-                self._AddFix(new_tokens)
+                self._add_fix(new_tokens)
 
             # If inserting a blank line check blank line does not exist after
             # token to avoid extra blank lines.
@@ -491,7 +491,8 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
             tokenutil.DeleteToken(dummy_first_token)
 
-    def _StripSpace(self, token, before):
+    @staticmethod
+    def _strip_space(token, before):
         """Strip whitespace tokens either preceding or following the given token.
 
         Args:
@@ -503,7 +504,8 @@ class ErrorFixer(errorhandler.ErrorHandler):
             tokenutil.DeleteToken(token)
             token = token.previous if before else token.next
 
-    def _GetNewRequireOrProvideTokens(self, is_provide, namespace, line_number):
+    @staticmethod
+    def _get_new_requireprovide_tokens(is_provide, namespace, line_number):
         """Returns a list of tokens to create a goog.require/provide statement.
 
         Args:
@@ -529,7 +531,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
             Token(';', TokenType.SEMICOLON, line_text, line_number)
             ]
 
-    def _DeleteToken(self, token):
+    def _delete_token(self, token):
         """Deletes the specified token from the linked list of tokens.
 
         Updates instance variables pointing to tokens such as _file_token if
@@ -543,7 +545,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
         tokenutil.DeleteToken(token)
 
-    def _DeleteTokens(self, token, token_count):
+    def _delete_tokens(self, token, token_count):
         """Deletes the given number of tokens starting with the given token.
 
         Updates instance variables pointing to tokens such as _file_token if
@@ -554,7 +556,7 @@ class ErrorFixer(errorhandler.ErrorHandler):
           token_count: The total number of tokens to delete.
         """
         if token == self._file_token:
-            for unused_i in xrange(token_count):
+            for _ in xrange(token_count):
                 self._file_token = self._file_token.next
 
         tokenutil.DeleteTokens(token, token_count)
@@ -572,16 +574,16 @@ class ErrorFixer(errorhandler.ErrorHandler):
         if self._file_fix_count:
             # Get the original file content for html.
             if self._file_is_html:
-                f = open(self._file_name, 'r')
-                original_lines = f.readlines()
-                f.close()
+                file_o = open(self._file_name, 'r')
+                original_lines = file_o.readlines()
+                file_o.close()
 
-            f = self.output_buffer
-            if not f:
+            file_p = self.output_buffer
+            if not file_p:
                 error_noun = 'error' if self._file_fix_count == 1 else 'errors'
                 print 'Fixed %d %s in %s' % (
                     self._file_fix_count, error_noun, self._file_name)
-                f = open(self._file_name, 'w')
+                file_p = open(self._file_name, 'w')
 
             token = self._file_token
             # Finding the first not deleted token.
@@ -605,10 +607,10 @@ class ErrorFixer(errorhandler.ErrorHandler):
                     if (line
                             or not self._file_is_html
                             or token.orig_line_number is None):
-                        f.write(line)
-                        f.write('\n')
+                        file_p.write(line)
+                        file_p.write('\n')
                     else:
-                        f.write(original_lines[token.orig_line_number - 1])
+                        file_p.write(original_lines[token.orig_line_number - 1])
                     line = ''
                     if char_count > 80 and token.line_number in self._file_changed_lines:
                         print 'WARNING: Line %d of %s is now longer than 80 characters.' % (
@@ -620,4 +622,4 @@ class ErrorFixer(errorhandler.ErrorHandler):
 
             if not self.output_buffer:
                 # Close the file if we created it
-                f.close()
+                file_p.close()

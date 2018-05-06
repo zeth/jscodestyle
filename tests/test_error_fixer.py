@@ -33,7 +33,7 @@ class ErrorFixerTest(unittest.TestCase):
         second_token = start_token.next
         self.error_fixer.HandleFile('test_file', start_token)
 
-        self.error_fixer._DeleteToken(start_token)
+        self.error_fixer._delete_token(start_token)
 
         self.assertEqual(second_token, self.error_fixer._file_token)
 
@@ -42,7 +42,7 @@ class ErrorFixerTest(unittest.TestCase):
         fourth_token = start_token.next.next.next
         self.error_fixer.HandleFile('test_file', start_token)
 
-        self.error_fixer._DeleteTokens(start_token, 3)
+        self.error_fixer._delete_tokens(start_token, 3)
 
         self.assertEqual(fourth_token, self.error_fixer._file_token)
 
@@ -51,7 +51,7 @@ class ErrorFixerTest(unittest.TestCase):
             '/** @param {%s} */' % original)
         jstype = comments[0].get_doc_flags()[0].jstype
         self.error_fixer.HandleFile('unittest', None)
-        self.error_fixer._FixJsDocPipeNull(jstype)
+        self.error_fixer._fix_jsdoc_pipe_null(jstype)
         self.assertEquals(expected, repr(jstype))
         result = tokenutil.TokensToString(jstype.FirstToken()).strip('} */')
         self.assertEquals(expected, result)
