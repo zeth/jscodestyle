@@ -85,8 +85,8 @@ class EcmaContext(object):
     # The entire switch statment.  This will contain a GROUP with the variable
     # and a BLOCK with the code.
 
-    # Since that BLOCK is not a normal block, it can not contain statements except
-    # for case and default.
+    # Since that BLOCK is not a normal block, it can not contain
+    # statements except for case and default.
     SWITCH = 'switch'
 
     # A normal comment.
@@ -218,10 +218,12 @@ class EcmaMetaData(object):
         return 'MetaData(%s)' % ', '.join(parts)
 
     def is_unary_operator(self):
+        """True if the object is unary operator."""
         return self.operator_type in (EcmaMetaData.UNARY_OPERATOR,
                                       EcmaMetaData.UNARY_POST_OPERATOR)
 
     def is_unary_post_operator(self):
+        """True if the object is unary post operator."""
         return self.operator_type == EcmaMetaData.UNARY_POST_OPERATOR
 
 
@@ -230,6 +232,9 @@ class EcmaMetaDataPass(object):
 
     def __init__(self):
         """Initialize the meta data pass object."""
+        self._token = None
+        self._context = None
+        self._last_code = None
         self.reset()
 
     def reset(self):
@@ -245,7 +250,8 @@ class EcmaMetaDataPass(object):
 
     @staticmethod
     def _create_metadata():
-        """Overridable by subclasses to create the appropriate metadata type."""
+        """Overridable by subclasses to create the appropriate metadata
+        type."""
         return EcmaMetaData()
 
     def _add_context(self, context_type):
@@ -277,7 +283,8 @@ class EcmaMetaDataPass(object):
         """Pops the context stack until a context of the given type is popped.
 
         Args:
-          *stop_types: The types of context to pop to - stops at the first match.
+          *stop_types: The types of context to pop to - stops at the
+           first match.
 
         Returns:
           The context object of the given type that was popped.
@@ -308,11 +315,12 @@ class EcmaMetaDataPass(object):
         token_type = token.type
 
         if self._context.type in EcmaContext.BLOCK_TYPES:
-            # Whenever we're in a block, we add a statement context.  We make an
-            # exception for switch statements since they can only contain case: and
-            # default: and therefore don't directly contain statements.
-            # The block we add here may be immediately removed in some cases, but
-            # that causes no harm.
+            # Whenever we're in a block, we add a statement context.
+            # We make an exception for switch statements since they
+            # can only contain case: and default: and therefore don't
+            # directly contain statements.  The block we add here may
+            # be immediately removed in some cases, but that causes no
+            # harm.
             parent = self._context.parent
             if not parent or parent.type != EcmaContext.SWITCH:
                 self._add_context(EcmaContext.STATEMENT)
@@ -322,8 +330,8 @@ class EcmaMetaDataPass(object):
 
         if token_type == TokenType.START_PAREN:
             if self._last_code and self._last_code.IsKeyword('for'):
-                # for loops contain multiple statements in the group unlike while,
-                # switch, if, etc.
+                # for loops contain multiple statements in the group
+                # unlike while, switch, if, etc.
                 self._add_context(EcmaContext.FOR_GROUP_BLOCK)
             else:
                 self._add_context(EcmaContext.GROUP)
@@ -332,19 +340,24 @@ class EcmaMetaDataPass(object):
             result = self._pop_context_type(EcmaContext.GROUP,
                                             EcmaContext.FOR_GROUP_BLOCK)
             keyword_token = result.start_token.metadata.last_code
-            # keyword_token will not exist if the open paren is the first line of the
-            # file, for example if all code is wrapped in an immediately executed
-            # annonymous function.
-            if keyword_token and keyword_token.string in ('if', 'for', 'while'):
-                next_code = tokenutil.SearchExcept(token, TokenType.NON_CODE_TYPES)
+            # keyword_token will not exist if the open paren is the
+            # first line of the file, for example if all code is
+            # wrapped in an immediately executed annonymous function.
+            if keyword_token and keyword_token.string in (
+                    'if', 'for', 'while'):
+                next_code = tokenutil.SearchExcept(
+                    token, TokenType.NON_CODE_TYPES)
                 if next_code.type != TokenType.START_BLOCK:
                     # Check for do-while.
                     is_do_while = False
                     pre_keyword_token = keyword_token.metadata.last_code
                     if (pre_keyword_token
                             and pre_keyword_token.type == TokenType.END_BLOCK):
-                        start_block_token = pre_keyword_token.metadata.context.start_token
-                        is_do_while = start_block_token.metadata.last_code.string == 'do'
+                        start_block_token = (
+                            pre_keyword_token.metadata.context.start_token)
+                        is_do_while = (
+                            start_block_token.metadata.last_code.string
+                            == 'do')
 
                     # If it's not do-while, it's an implied block.
                     if not is_do_while:
@@ -353,9 +366,9 @@ class EcmaMetaDataPass(object):
 
             return result
 
-        # else (not else if) with no open brace after it should be considered the
-        # start of an implied block, similar to the case with if, for, and while
-        # above.
+        # else (not else if) with no open brace after it should be
+        # considered the start of an implied block, similar to the
+        # case with if, for, and while above.
         elif (token_type == TokenType.KEYWORD and
               token.string == 'else'):
             next_code = tokenutil.SearchExcept(token, TokenType.NON_CODE_TYPES)
@@ -380,7 +393,9 @@ class EcmaMetaDataPass(object):
                 self._add_context(EcmaContext.ARRAY_LITERAL)
 
         elif token_type == TokenType.END_BRACKET:
-            return self._pop_context_type(EcmaContext.INDEX, EcmaContext.ARRAY_LITERAL)
+            return self._pop_context_type(
+                EcmaContext.INDEX,
+                EcmaContext.ARRAY_LITERAL)
 
         elif token_type == TokenType.START_BLOCK:
             if (self._last_code.type in (TokenType.END_PAREN,
@@ -390,7 +405,8 @@ class EcmaMetaDataPass(object):
                     or self._last_code.IsKeyword('try')
                     or self._last_code.IsKeyword('finally')
                     or (self._last_code.IsOperator(':')
-                        and self._last_code.metadata.context.type == EcmaContext.CASE_BLOCK)):
+                        and self._last_code.metadata.context.type
+                        == EcmaContext.CASE_BLOCK)):
                 # else, do, try, and finally all might have no () before {.
                 # Also, handle the bizzare syntax case 10: {...}.
                 self._add_context(EcmaContext.BLOCK)
@@ -401,8 +417,8 @@ class EcmaMetaDataPass(object):
             context = self._pop_context_type(EcmaContext.BLOCK,
                                              EcmaContext.OBJECT_LITERAL)
             if self._context.type == EcmaContext.SWITCH:
-                # The end of the block also means the end of the switch statement it
-                # applies to.
+                # The end of the block also means the end of the
+                # switch statement it applies to.
                 return self._pop_context()
             return context
 
@@ -416,8 +432,10 @@ class EcmaMetaDataPass(object):
             while self._context.parent.type != EcmaContext.SWITCH:
                 self._pop_context()
                 if self._context.parent is None:
-                    raise ParseError(token, 'Encountered case/default statement '
-                                     'without switch statement')
+                    raise ParseError(
+                        token,
+                        'Encountered case/default statement '
+                        'without switch statement')
 
         elif token.IsOperator('?'):
             self._add_context(EcmaContext.TERNARY_TRUE)
@@ -494,21 +512,27 @@ class EcmaMetaDataPass(object):
             is_implied_block = self._context == EcmaContext.IMPLIED_BLOCK
             is_last_code_in_line = token.IsCode() and (
                 not next_code or next_code.line_number != token.line_number)
-            is_continued_operator = (token.type == TokenType.OPERATOR and
-                                     not token.metadata.is_unary_post_operator())
+            is_continued_operator = (
+                token.type == TokenType.OPERATOR and
+                not token.metadata.is_unary_post_operator())
             is_continued_dot = token.string == '.'
-            next_code_is_operator = next_code and next_code.type == TokenType.OPERATOR
+            next_code_is_operator = (next_code
+                                     and next_code.type == TokenType.OPERATOR)
             is_end_of_block = (
                 token.type == TokenType.END_BLOCK and
                 token.metadata.context.type != EcmaContext.OBJECT_LITERAL)
-            is_multiline_string = (token.type == TokenType.STRING_TEXT or
-                                   token.type == TokenType.TEMPLATE_STRING_START)
-            is_continued_var_decl = (token.IsKeyword('var') and
-                                     next_code and
-                                     (next_code.type in [TokenType.IDENTIFIER,
-                                                         TokenType.SIMPLE_LVALUE]) and
-                                     token.line_number < next_code.line_number)
-            next_code_is_block = next_code and next_code.type == TokenType.START_BLOCK
+            is_multiline_string = (
+                token.type == TokenType.STRING_TEXT or
+                token.type == TokenType.TEMPLATE_STRING_START)
+            is_continued_var_decl = (
+                token.IsKeyword('var')
+                and next_code
+                and (next_code.type in [
+                    TokenType.IDENTIFIER,
+                    TokenType.SIMPLE_LVALUE])
+                and token.line_number < next_code.line_number)
+            next_code_is_block = (next_code
+                                  and next_code.type == TokenType.START_BLOCK)
             if (is_last_code_in_line
                     and self._statement_could_end_in_context()
                     and not is_multiline_string
@@ -523,7 +547,8 @@ class EcmaMetaDataPass(object):
                 self._end_statement()
 
     def _statement_could_end_in_context(self):
-        """Returns if the current statement (if any) may end in this context."""
+        """Returns if the current statement (if any) may end in this
+        context."""
         # In the basic statement or variable declaration context, statement can
         # always end in this context.
         if self._context.type in (EcmaContext.STATEMENT, EcmaContext.VAR):
@@ -532,15 +557,15 @@ class EcmaMetaDataPass(object):
         # End of a ternary false branch inside a statement can also be the
         # end of the statement, for example:
         # var x = foo ? foo.bar() : null
-        # In this case the statement ends after the null, when the context stack
-        # looks like ternary_false > var > statement > root.
+        # In this case the statement ends after the null, when the
+        # context stack looks like ternary_false > var > statement > root.
         if (self._context.type == EcmaContext.TERNARY_FALSE
                 and self._context.parent.type in (EcmaContext.STATEMENT,
                                                   EcmaContext.VAR)):
             return True
 
-        # In all other contexts like object and array literals, ternary true, etc.
-        # the statement can't yet end.
+        # In all other contexts like object and array literals,
+        # ternary true, etc. the statement can't yet end.
         return False
 
     @staticmethod
