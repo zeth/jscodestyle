@@ -19,8 +19,12 @@
 
 from jscodestyle.common import tokens
 
+
 class JavaScriptTokenType(tokens.TokenType):
-    """Enumeration of JavaScript token types, and useful sets of token types."""
+    """Enumeration of JavaScript token types, and useful sets of token
+    types.
+
+    """
     NUMBER = 'number'
     START_SINGLE_LINE_COMMENT = '//'
     START_BLOCK_COMMENT = '/*'
@@ -89,7 +93,8 @@ class JavaScriptTokenType(tokens.TokenType):
 
     UNARY_POST_OPERATORS = ['--', '++']
 
-    # An expression ender is any token that can end an object - i.e. we could have
+    # An expression ender is any token that can end an object -
+    # i.e. we could have:
     # x.y or [1, 2], or (10 + 9) or {a: 10}.
     EXPRESSION_ENDER_TYPES = [tokens.TokenType.NORMAL, IDENTIFIER, NUMBER,
                               SIMPLE_LVALUE, END_BRACKET, END_PAREN, END_BLOCK,
@@ -113,7 +118,8 @@ class JavaScriptToken(tokens.Token):
         Returns:
           True if this token is a keyword token with the given name.
         """
-        return self.type == JavaScriptTokenType.KEYWORD and self.string == keyword
+        return (self.type == JavaScriptTokenType.KEYWORD
+                and self.string == keyword)
 
     def IsOperator(self, operator):
         """Tests if this token is the given operator.
@@ -124,7 +130,8 @@ class JavaScriptToken(tokens.Token):
         Returns:
           True if this token is a operator token with the given name.
         """
-        return self.type == JavaScriptTokenType.OPERATOR and self.string == operator
+        return (self.type == JavaScriptTokenType.OPERATOR
+                and self.string == operator)
 
     def IsAssignment(self):
         """Tests if this token is an assignment operator.
@@ -145,11 +152,13 @@ class JavaScriptToken(tokens.Token):
         return self.type in JavaScriptTokenType.COMMENT_TYPES
 
     def IsCode(self):
-        """Tests if this token is code, as opposed to a comment or whitespace."""
+        """Tests if this token is code, as opposed to a comment or
+whitespace."""
         return self.type not in JavaScriptTokenType.NON_CODE_TYPES
 
     def __repr__(self):
         return '<JavaScriptToken: %d, %s, "%s", %r, %r>' % (self.line_number,
-                                                            self.type, self.string,
+                                                            self.type,
+                                                            self.string,
                                                             self.values,
                                                             self.metadata)
