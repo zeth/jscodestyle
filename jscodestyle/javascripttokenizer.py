@@ -62,11 +62,11 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
                         ((%s)|(%s))
                         """ % (HEX_LITERAL, DECIMAL_LITERAL), re.VERBOSE)
 
-    # Strings come in three parts - first we match the start of the string, then
-    # the contents, then the end.  The contents consist of any character except a
-    # backslash or end of string, or a backslash followed by any character, or a
-    # backslash followed by end of line to support correct parsing of multi-line
-    # strings.
+    # Strings come in three parts - first we match the start of the
+    # string, then the contents, then the end.  The contents consist
+    # of any character except a backslash or end of string, or a
+    # backslash followed by any character, or a backslash followed by
+    # end of line to support correct parsing of multi-line strings.
     SINGLE_QUOTE = re.compile(r"'")
     SINGLE_QUOTE_TEXT = re.compile(r"([^'\\]|\\(.|$))+")
     DOUBLE_QUOTE = re.compile(r'"')
@@ -84,12 +84,13 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
     END_BLOCK_COMMENT = re.compile(r'\*/')
     BLOCK_COMMENT_TEXT = re.compile(r'([^*]|\*(?!/))+')
 
-    # Comment text is anything that we are not going to parse into another special
-    # token like (inline) flags or end comments. Complicated regex to match
-    # most normal characters, and '*', '{', '}', and '@' when we are sure that
-    # it is safe. Expression [^*{\s]@ must come first, or the other options will
-    # match everything before @, and we won't match @'s that aren't part of flags
-    # like in email addresses in the @author tag.
+    # Comment text is anything that we are not going to parse into
+    # another special token like (inline) flags or end
+    # comments. Complicated regex to match most normal characters, and
+    # '*', '{', '}', and '@' when we are sure that it is
+    # safe. Expression [^*{\s]@ must come first, or the other options
+    # will match everything before @, and we won't match @'s that
+    # aren't part of flags like in email addresses in the @author tag.
     DOC_COMMENT_TEXT = re.compile(r'([^*{}\s]@|[^*{}@]|\*(?!/))+')
     DOC_COMMENT_NO_SPACES_TEXT = re.compile(r'([^*{}\s]@|[^*{}@\s]|\*(?!/))+')
     # Match anything that is allowed in a type definition, except for tokens
@@ -124,7 +125,8 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
                        /                      # closing slash
                        [gimsx]*               # optional modifiers
                        (?=\s*(%s))
-                       """ % (REGEX_CHARACTER_CLASS, '|'.join(POST_REGEX_LIST)),
+                       """ % (REGEX_CHARACTER_CLASS,
+                              '|'.join(POST_REGEX_LIST)),
                        re.VERBOSE)
 
     ANYTHING = re.compile(r'.*')
@@ -143,7 +145,8 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
     #   function - covered by FUNCTION_DECLARATION.
     #   delete, in, instanceof, new, typeof - included as operators.
     #   this - included in identifiers.
-    #   null, undefined - not included, should go in some "special constant" list.
+    #   null, undefined - not included,
+    #                     should go in some "special constant" list.
     KEYWORD_LIST = [
         'break',
         'case',
@@ -164,12 +167,13 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
         'with',
     ]
 
-    # List of regular expressions to match as operators.  Some notes: for our
-    # purposes, the comma behaves similarly enough to a normal operator that we
-    # include it here.  r'\bin\b' actually matches 'in' surrounded by boundary
-    # characters - this may not match some very esoteric uses of the in operator.
-    # Operators that are subsets of larger operators must come later in this list
-    # for proper matching, e.g., '>>' must come AFTER '>>>'.
+    # List of regular expressions to match as operators.  Some notes:
+    # for our purposes, the comma behaves similarly enough to a normal
+    # operator that we include it here.  r'\bin\b' actually matches
+    # 'in' surrounded by boundary characters - this may not match some
+    # very esoteric uses of the in operator.  Operators that are
+    # subsets of larger operators must come later in this list for
+    # proper matching, e.g., '>>' must come AFTER '>>>'.
     OPERATOR_LIST = [
         ',',
         r'\+\+',
@@ -223,8 +227,9 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
 
     WHITESPACE = re.compile(r'\s+')
     SEMICOLON = re.compile(r';')
-    # Technically JavaScript identifiers can't contain '.', but we treat a set of
-    # nested identifiers as a single identifier, except for trailing dots.
+    # Technically JavaScript identifiers can't contain '.', but we
+    # treat a set of nested identifiers as a single identifier, except
+    # for trailing dots.
     NESTED_IDENTIFIER = r'[a-zA-Z_$]([%s]|\.[a-zA-Z_$])*' % IDENTIFIER_CHAR
     IDENTIFIER = re.compile(NESTED_IDENTIFIER)
 
@@ -235,14 +240,15 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
                                (?!=))                  # not follwed by equal
                                """ % NESTED_IDENTIFIER, re.VERBOSE)
 
-    # A doc flag is a @ sign followed by non-space characters that appears at the
-    # beginning of the line, after whitespace, or after a '{'.  The look-behind
-    # check is necessary to not match someone@google.com as a flag.
+    # A doc flag is a @ sign followed by non-space characters that
+    # appears at the beginning of the line, after whitespace, or after
+    # a '{'.  The look-behind check is necessary to not match
+    # someone@google.com as a flag.
     DOC_FLAG = re.compile(r'(^|(?<=\s))@(?P<name>[a-zA-Z]+)')
-    # To properly parse parameter names and complex doctypes containing
-    # whitespace, we need to tokenize whitespace into a token after certain
-    # doctags. All statetracker.HAS_TYPE that are not listed here must not contain
-    # any whitespace in their types.
+    # To properly parse parameter names and complex doctypes
+    # containing whitespace, we need to tokenize whitespace into a
+    # token after certain doctags. All statetracker.HAS_TYPE that are
+    # not listed here must not contain any whitespace in their types.
     DOC_FLAG_LEX_SPACES = re.compile(
         r'(^|(?<=\s))@(?P<name>%s)\b' %
         '|'.join([
@@ -309,26 +315,29 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
     def build_matchers(cls):
         """Builds the token matcher group.
 
-        The token matcher groups work as follows: it is a list of Matcher objects.
-        The matchers will be tried in this order, and the first to match will be
-        returned.  Hence the order is important because the matchers that come first
-        overrule the matchers that come later.
+        The token matcher groups work as follows: it is a list of
+        Matcher objects.  The matchers will be tried in this order,
+        and the first to match will be returned.  Hence the order is
+        important because the matchers that come first overrule the
+        matchers that come later.
 
         Returns:
           The completed token matcher group.
+
         """
-        # Match a keyword string followed by a non-identifier character in order to
-        # not match something like doSomething as do + Something.
+        # Match a keyword string followed by a non-identifier
+        # character in order to not match something like doSomething
+        # as do + Something.
         keyword = re.compile('(%s)((?=[^%s])|$)' % (
             '|'.join(cls.KEYWORD_LIST), cls.IDENTIFIER_CHAR))
         return {
 
             # Matchers for basic text mode.
             JavaScriptModes.TEXT_MODE: [
-                # Check a big group - strings, starting comments, and regexes - all
-                # of which could be intertwined.  'string with /regex/',
-                # /regex with 'string'/, /* comment with /regex/ and string */ (and
-                # so on)
+                # Check a big group - strings, starting comments, and regexes
+                # - all of which could be intertwined.  'string with /regex/',
+                # /regex with 'string'/, /* comment with /regex/ and string */
+                # (and so on)
                 Matcher(cls.START_DOC_COMMENT, Type.START_DOC_COMMENT,
                         JavaScriptModes.DOC_COMMENT_MODE),
                 Matcher(cls.START_BLOCK_COMMENT, Type.START_BLOCK_COMMENT,
@@ -346,8 +355,8 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
                         JavaScriptModes.TEMPLATE_STRING_MODE),
                 Matcher(cls.REGEX, Type.REGEX),
 
-                # Next we check for start blocks appearing outside any of the items
-                # above.
+                # Next we check for start blocks appearing outside any
+                # of the items above.
                 Matcher(cls.START_BLOCK, Type.START_BLOCK),
                 Matcher(cls.END_BLOCK, Type.END_BLOCK),
 
@@ -418,14 +427,17 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
 
             # Matchers for single line comments.
             JavaScriptModes.LINE_COMMENT_MODE: [
-                # We greedy match until the end of the line in line comment mode.
-                Matcher(cls.ANYTHING, Type.COMMENT, JavaScriptModes.TEXT_MODE)],
+                # We greedy match until the end of the line in line
+                # comment mode.
+                Matcher(cls.ANYTHING,
+                        Type.COMMENT,
+                        JavaScriptModes.TEXT_MODE)],
 
             # Matchers for code after the function keyword.
             JavaScriptModes.FUNCTION_MODE: [
-                # Must match open paren before anything else and move into parameter
-                # mode, otherwise everything inside the parameter list is parsed
-                # incorrectly.
+                # Must match open paren before anything else and move
+                # into parameter mode, otherwise everything inside the
+                # parameter list is parsed incorrectly.
                 Matcher(cls.OPENING_PAREN, Type.START_PARAMETERS,
                         JavaScriptModes.PARAMETER_MODE),
                 Matcher(cls.WHITESPACE, Type.WHITESPACE),
@@ -433,8 +445,9 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
 
             # Matchers for function parameters
             JavaScriptModes.PARAMETER_MODE: [
-                # When in function parameter mode, a closing paren is treated
-                # specially. Everything else is treated as lines of parameters.
+                # When in function parameter mode, a closing paren is
+                # treated specially. Everything else is treated as
+                # lines of parameters.
                 Matcher(cls.CLOSING_PAREN_WITH_SPACE, Type.END_PARAMETERS,
                         JavaScriptModes.TEXT_MODE),
                 Matcher(cls.PARAMETERS, Type.PARAMETERS,
@@ -444,8 +457,9 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
         """Create a tokenizer object.
 
         Args:
-          parse_js_doc: Whether to do detailed parsing of javascript doc comments,
-              or simply treat them as normal comments.  Defaults to parsing JsDoc.
+          parse_js_doc: Whether to do detailed parsing of javascript
+                        doc comments, or simply treat them as normal comments.
+                        Defaults to parsing JsDoc.
         """
         matchers = self.build_matchers()
         if not parse_js_doc:
@@ -467,9 +481,10 @@ class JavaScriptTokenizer(tokenizer.Tokenizer):
           token_type: The type of token.
           line: The text of the line this token is in.
           line_number: The line number of the token.
-          values: A dict of named values within the token.  For instance, a
-            function declaration may have a value called 'name' which captures the
-            name of the function.
+          values: A dict of named values within the token.
+                  For instance, a function declaration may
+                  have a value called 'name' which captures
+                  the name of the function.
         """
         return Token(string, token_type, line,
                      line_number, values, line_number)
