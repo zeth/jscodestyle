@@ -343,8 +343,8 @@ class EcmaMetaDataPass(object):
                     # Check for do-while.
                     is_do_while = False
                     pre_keyword_token = keyword_token.metadata.last_code
-                    if (pre_keyword_token and
-                        pre_keyword_token.type == TokenType.END_BLOCK):
+                    if (pre_keyword_token
+                            and pre_keyword_token.type == TokenType.END_BLOCK):
                         start_block_token = pre_keyword_token.metadata.context.start_token
                         is_do_while = start_block_token.metadata.last_code.string == 'do'
 
@@ -361,8 +361,9 @@ class EcmaMetaDataPass(object):
         elif (token_type == TokenType.KEYWORD and
               token.string == 'else'):
             next_code = tokenutil.SearchExcept(token, TokenType.NON_CODE_TYPES)
-            if (next_code.type != TokenType.START_BLOCK and
-                (next_code.type != TokenType.KEYWORD or next_code.string != 'if')):
+            if (next_code.type != TokenType.START_BLOCK
+                    and (next_code.type != TokenType.KEYWORD
+                         or next_code.string != 'if')):
                 self._AddContext(EcmaContext.IMPLIED_BLOCK)
                 token.metadata.is_implied_block = True
 
@@ -373,8 +374,9 @@ class EcmaMetaDataPass(object):
             return self._PopContextType(EcmaContext.PARAMETERS)
 
         elif token_type == TokenType.START_BRACKET:
-            if (self._last_code and
-                self._last_code.type in TokenType.EXPRESSION_ENDER_TYPES):
+            if (self._last_code
+                    and self._last_code.type
+                    in TokenType.EXPRESSION_ENDER_TYPES):
                 self._AddContext(EcmaContext.INDEX)
             else:
                 self._AddContext(EcmaContext.ARRAY_LITERAL)
@@ -384,13 +386,13 @@ class EcmaMetaDataPass(object):
 
         elif token_type == TokenType.START_BLOCK:
             if (self._last_code.type in (TokenType.END_PAREN,
-                                         TokenType.END_PARAMETERS) or
-                self._last_code.IsKeyword('else') or
-                self._last_code.IsKeyword('do') or
-                self._last_code.IsKeyword('try') or
-                self._last_code.IsKeyword('finally') or
-                (self._last_code.IsOperator(':') and
-                 self._last_code.metadata.context.type == EcmaContext.CASE_BLOCK)):
+                                         TokenType.END_PARAMETERS)
+                    or self._last_code.IsKeyword('else')
+                    or self._last_code.IsKeyword('do')
+                    or self._last_code.IsKeyword('try')
+                    or self._last_code.IsKeyword('finally')
+                    or (self._last_code.IsOperator(':')
+                        and self._last_code.metadata.context.type == EcmaContext.CASE_BLOCK)):
                 # else, do, try, and finally all might have no () before {.
                 # Also, handle the bizzare syntax case 10: {...}.
                 self._AddContext(EcmaContext.BLOCK)
@@ -509,16 +511,16 @@ class EcmaMetaDataPass(object):
                                                          TokenType.SIMPLE_LVALUE]) and
                                      token.line_number < next_code.line_number)
             next_code_is_block = next_code and next_code.type == TokenType.START_BLOCK
-            if (is_last_code_in_line and
-                self._StatementCouldEndInContext() and
-                not is_multiline_string and
-                not is_end_of_block and
-                not is_continued_var_decl and
-                not is_continued_operator and
-                not is_continued_dot and
-                not next_code_is_operator and
-                not is_implied_block and
-                not next_code_is_block):
+            if (is_last_code_in_line
+                    and self._StatementCouldEndInContext()
+                    and not is_multiline_string
+                    and not is_end_of_block
+                    and not is_continued_var_decl
+                    and not is_continued_operator
+                    and not is_continued_dot
+                    and not next_code_is_operator
+                    and not is_implied_block
+                    and not next_code_is_block):
                 token.metadata.is_implied_semicolon = True
                 self._EndStatement()
 
@@ -534,8 +536,9 @@ class EcmaMetaDataPass(object):
         # var x = foo ? foo.bar() : null
         # In this case the statement ends after the null, when the context stack
         # looks like ternary_false > var > statement > root.
-        if (self._context.type == EcmaContext.TERNARY_FALSE and
-            self._context.parent.type in (EcmaContext.STATEMENT, EcmaContext.VAR)):
+        if (self._context.type == EcmaContext.TERNARY_FALSE
+                and self._context.parent.type in (EcmaContext.STATEMENT,
+                                                  EcmaContext.VAR)):
             return True
 
         # In all other contexts like object and array literals, ternary true, etc.
@@ -562,13 +565,13 @@ class EcmaMetaDataPass(object):
         if not last_code or last_code.type == TokenType.END_BLOCK:
             return EcmaMetaData.UNARY_OPERATOR
 
-        if (token.string in TokenType.UNARY_POST_OPERATORS and
-            last_code.type in TokenType.EXPRESSION_ENDER_TYPES):
+        if (token.string in TokenType.UNARY_POST_OPERATORS
+                and last_code.type in TokenType.EXPRESSION_ENDER_TYPES):
             return EcmaMetaData.UNARY_POST_OPERATOR
 
-        if (token.string in TokenType.UNARY_OK_OPERATORS and
-            last_code.type not in TokenType.EXPRESSION_ENDER_TYPES and
-            last_code.string not in TokenType.UNARY_POST_OPERATORS):
+        if (token.string in TokenType.UNARY_OK_OPERATORS
+                and last_code.type not in TokenType.EXPRESSION_ENDER_TYPES
+                and last_code.string not in TokenType.UNARY_POST_OPERATORS):
             return EcmaMetaData.UNARY_OPERATOR
 
         return EcmaMetaData.BINARY_OPERATOR
